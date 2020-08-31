@@ -9,3 +9,6 @@ This repo is display weather information on old kindle 3, inspired by [Kindle-we
 
 ### Kindle 3 and TV-box (Armbian)
 <img src="screenshot-kindle-weather.jpg" width="300" alt="Kindle 3 screenshot" />
+
+## Option
+[kindle-debian](https://mega.nz/folder/4XAlBK7Y#cSr2Gq8KxL6LkRe4SB0hqQ)
