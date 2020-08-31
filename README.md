@@ -6,3 +6,6 @@ This repo is display weather information on old kindle 3, inspired by [Kindle-we
 * weather information is based on [OpenWeatherMap API](https://openweathermap.org/)
 * current weather, 3 hour forecast and 3 day forecast
 * any locales, languages and units
+
+### Kindle 3 and TV-box (Armbian)
+<img src="screenshot-kindle-weather.img" width="300" alt="Kindle 3 screenshot" />
