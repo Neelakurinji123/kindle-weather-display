@@ -9,5 +9,5 @@
 ?FORMAT 2
 ###############################################################################
 #ZONE		INTERFACE		OPTIONS
-loc             br0.111                 routeback,bridge,dhcp,tcpflags,logmartians,nosmurfs,sourceroute=0
+loc             br0                 routeback,bridge,dhcp,tcpflags,logmartians,nosmurfs,sourceroute=0
 kindle          usb0			routeback,bridge,dhcp,tcpflags,logmartians,nosmurfs,sourceroute=0
