@@ -1,6 +1,6 @@
 # kindle-weather-display
 
-This repo is display weather information on old kindle 3, inspired by [Kindle-weather-station](https://gitlab.com/iero/Kindle-weather-station).
+This repo is display weather information on old kindle 3, based on the original work by [Kindle-weather-station](https://gitlab.com/iero/Kindle-weather-station).
 
 ## Features
 * weather information is based on [OpenWeatherMap API](https://openweathermap.org/)
