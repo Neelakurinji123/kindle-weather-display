@@ -8,4 +8,4 @@ This repo is display weather information on old kindle 3, inspired by [Kindle-we
 * any locales, languages and units
 
 ### Kindle 3 and TV-box (Armbian)
-<img src="screenshot-kindle-weather.img" width="300" alt="Kindle 3 screenshot" />
+<img src="screenshot-kindle-weather.jpg" width="300" alt="Kindle 3 screenshot" />
