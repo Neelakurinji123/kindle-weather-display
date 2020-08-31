@@ -9,7 +9,7 @@
 	</service>
 	<service name="openweathermap">
 		<service>onecall</service>
-		<api_key>9d8b66cdc9b73bea34aab23fa7bf32bf</api_key>
+		<api_key>xxxxxxxxxxxxxxxx</api_key>
 		<lat>37.7576792</lat>
 		<lng>-122.50781175</lng>
 		<exclude>minutely,hourly,daily</exclude>
