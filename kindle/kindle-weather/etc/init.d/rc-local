@@ -1,0 +1,16 @@
+#!/bin/sh
+
+_FUNCTIONS=/etc/rc.d/functions
+[ -f ${_FUNCTIONS} ] && . ${_FUNCTIONS}
+
+case "$1" in
+
+        start)
+            sh -c "ash /etc/rc.local"
+        ;;
+
+        *)
+                msg "Usage: $0 {start|stop}" W >&2
+                exit 1
+                ;;
+esac

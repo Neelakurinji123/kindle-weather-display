@@ -1,0 +1,26 @@
+#
+# Shorewall -- /etc/shorewall/policy
+#
+# For information about entries in this file, type "man shorewall-policy"
+#
+# The manpage is also online at
+# http://www.shorewall.net/manpages/shorewall-policy.html
+#
+###############################################################################
+#SOURCE		DEST		POLICY	LOGLEVEL	RATE	CONNLIMIT
+#$FW		net		ACCEPT
+$FW		loc		ACCEPT
+$FW		kindle		ACCEPT
+#net		all		DROP		info
+
+# loc
+loc             $FW             ACCEPT
+#loc             $FW             DROP
+loc             kindle		ACCEPT
+
+# kindle
+kindle		$FW		DROP
+kindle		loc		DROP
+
+# The FOLLOWING POLICY MUST BE LAST
+all		all		REJECT		info

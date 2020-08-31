@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<data>
+	<service name="station">
+		<city>Tokorozawa</city>
+		<timezone>Asia/Tokyo</timezone>
+                <encoding>iso-8859-1</encoding>
+		<locale>en_US.UTF-8</locale>
+		<font>Droid Sans</font>
+	</service>
+	<service name="openweathermap">
+		<service>onecall</service>
+		<api_key>9d8b66cdc9b73bea34aab23fa7bf32bf</api_key>
+		<lat>35.8034315</lat>
+		<lng>139.4275599</lng>
+		<exclude>minutely,hourly,daily</exclude>
+		<units>metric</units>
+		<lang>en</lang>
+	</service>
+</data>

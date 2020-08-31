@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<data>
+	<service name="station">
+		<city>Granada</city>
+		<timezone>Europe/Madrid</timezone>
+                <encoding>iso-8859-1</encoding>
+		<locale>es_ES.UTF-8</locale>
+		<font>Droid Sans</font>
+	</service>
+	<service name="openweathermap">
+		<service>onecall</service>
+		<api_key>9d8b66cdc9b73bea34aab23fa7bf32bf</api_key>
+		<lat>37.1809411</lat>
+		<lng>-3.6262912</lng>
+		<exclude>minutely,hourly,daily</exclude>
+		<units>metric</units>
+		<lang>es</lang>
+	</service>
+</data>

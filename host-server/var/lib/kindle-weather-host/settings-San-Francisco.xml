@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<data>
+	<service name="station">
+		<city>San Francisco</city>
+		<timezone>America/Los_Angeles</timezone>
+                <encoding>iso-8859-1</encoding>
+		<locale>en_US.UTF-8</locale>
+		<font>Droid Sans</font>
+	</service>
+	<service name="openweathermap">
+		<service>onecall</service>
+		<api_key>9d8b66cdc9b73bea34aab23fa7bf32bf</api_key>
+		<lat>37.7576792</lat>
+		<lng>-122.50781175</lng>
+		<exclude>minutely,hourly,daily</exclude>
+		<units>imperial</units>
+		<lang>en</lang>
+	</service>
+</data>

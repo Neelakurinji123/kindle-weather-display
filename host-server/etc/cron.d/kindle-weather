@@ -1,0 +1,1 @@
+0,30 * * * * root sh -c "/var/lib/kindle-weather-host/kindle-weather.sh"
