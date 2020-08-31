@@ -197,9 +197,7 @@ for k in fc_data.keys():
             count += 1
 
 # delete today's data
-t_current = datetime.fromtimestamp(curt_data['current']['dt']).astimezone(tz)
-t_index = datetime(t_current.year, t_current.month, t_current.day, 0, 0, tzinfo=tz).astimezone(tz).strftime('%s')
-forecast_day.pop(t_index, None)
+forecast_day.pop(int(sorted(forecast_day)[0]), None)
 
 t = sorted(forecast_day)
 forecast = list()
@@ -373,7 +371,7 @@ maxTemp = math.ceil(max([forecast[1][6], forecast[2][6], forecast[3][6]]))
 pasTemp = 90 / (maxTemp-minTemp)
 
 n=575
-for i in range(1,4):
+for i in range(0,3):
     jour = datetime.fromtimestamp(forecast[i][0], tz)
     svg_file.write('<text style="text-anchor:end;" font-size="35px" x="185" y="')
     svg_file.write("%i" % (n))
