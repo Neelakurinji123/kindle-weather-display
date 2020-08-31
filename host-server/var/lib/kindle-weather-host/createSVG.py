@@ -197,7 +197,11 @@ for k in fc_data.keys():
             count += 1
 
 # delete today's data
-forecast_day.pop(int(sorted(forecast_day)[0]), None)
+today = int(datetime.fromtimestamp(time.time(), tz).strftime("%d"))
+fc_today = int(datetime.fromtimestamp(int(sorted(forecast_day)[0]), tz).strftime("%d"))
+
+if today == fc_today:
+    forecast_day.pop(int(sorted(forecast_day)[0]), None)
 
 t = sorted(forecast_day)
 forecast = list()
