@@ -25,23 +25,6 @@ This repo is display weather information on old kindle 3, based on the original 
 4. setup font
 5. setup cron
 
-    image processors
-    apt install imagemagick imagemagick-6-common imagemagick-6.q16 \
-    imagemagick-common libgraphicsmagick-q16-3 libmagickcore-6.q16-6 \
-    libmagickcore-6.q16-6-extra libmagickwand-6.q16-6 pngcrush
-
-    web server
-    apt install nginx-light
-
-    firewall
-    apt install shorewall
-
-    font
-    apt install fontconfig
-
-    copy ttf font to /root/.fonts
-    fc-cache -v -f
-
 ## setting
 edit settings.xml
 
