@@ -21,7 +21,7 @@ This repo is display weather information on old kindle 3, based on the original 
 ### server
 1. get free subscription plan from openweathermap.org
 2. copy host-server/var/lib/kindle-weather-host to /var/lib
-3. install packages and setup (ex. debian buster)
+3. install packages and setup (eg. debian buster)
 4. setup font
 5. setup cron
 
