@@ -49,7 +49,7 @@ This repo is display weather information on old kindle 3, based on the original 
 Edit settings.xml
 
 ## internet access
-Old system is potential security risk in generally. But in the case of internet access is as followings:
+Old system is potential security risk in general. But in the case of internet access is as followings:
 
 ### server
 Enable masquerade or snat:
