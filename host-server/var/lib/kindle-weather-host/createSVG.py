@@ -159,6 +159,10 @@ curt_weather = [curt_data['current']['dt'],
                 wind_direction(curt_data['current']['wind_deg']),
                 curt_data['current']['clouds']]
 
+temp_24h['temp_min'] += [float(curt_data['current']['temp'])]
+temp_24h['temp_max'] += [float(curt_data['current']['temp'])]
+
+
 # forecast data
 # list: 0:time  1:id  2:weather  3:description  4:icon  5:temp_min  6:temp_max  7:clouds
 #
@@ -279,7 +283,6 @@ svg_file.write('</text>\n')
 
 # Max
 svg_file.write('<text style="text-anchor:end;" font-size="35px" x="550" y="110">')
-#svg_file.write("%i" % (forecast[0][6]))
 svg_file.write("%i" % (math.ceil(max(temp_24h['temp_max']))))
 svg_file.write('</text>\n')
 svg_file.write('<circle cx="555" cy="88" r="4" stroke="black" stroke-width="3" fill="none"/>')
@@ -287,7 +290,6 @@ svg_file.write('<text style="text-anchor:start;" font-size="25px" x="560" y="100
 svg_file.write('<text style="text-anchor:end;" font-size="35px" x="550" y="150">')
 
 # Min
-#svg_file.write("%i" % (forecast[0][5]))
 svg_file.write("%i" % (math.floor(min(temp_24h['temp_min']))))
 svg_file.write('</text>\n')
 svg_file.write('<circle cx="555" cy="130" r="4" stroke="black" stroke-width="3" fill="none"/>')
