@@ -20,13 +20,23 @@ This repo is display weather information on old kindle 3, based on the original 
 
 ### server
 1. get free subscription plan from openweathermap.org
-2. copy host-server/var/lib/kindle-weather-host to /var/lib folder
-3. install packages and setup (eg. debian buster)
-4. install python3 modules: pytz, requests
-5. setup font
-6. setup cron
+2. setup usbnet
+3. copy host-server/var/lib/kindle-weather-host to /var/lib folder
+4. install packages and setup (eg. debian buster)
+5. install python3 modules: pytz, requests
+6. setup font
+7. setup cron
 
 ```
+    usbnet: /etc/network/interfaces
+    
+    auto usb0
+      iface usb0 inet static
+      address 192.168.2.1
+      netmask 255.255.255.0
+      broadcast 192.168.2.255
+      network 192.168.2.0
+
     image processors:
     apt install imagemagick imagemagick-6-common imagemagick-6.q16 \
       imagemagick-common libgraphicsmagick-q16-3 libmagickcore-6.q16-6 \
