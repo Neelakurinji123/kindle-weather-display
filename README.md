@@ -10,5 +10,43 @@ This repo is display weather information on old kindle 3, based on the original 
 ### Kindle 3 and TV-box (Armbian)
 <img src="screenshot-kindle-weather.jpg" width="300" alt="Kindle 3 screenshot" />
 
+## Setup
+### kindle
+1. jailbreak your Kindle
+2. copy kindle/kindle-weather to /mnt/us folder
+3. setup cron
+5. setup usbnet: rename to /mnt/us/usbnet/auto
+4. optionally install kindle-debian, system can improve
+
+### server
+1. get free subscription plan from openweathermap.org
+2. copy host-server/var/lib/kindle-weather-host to /var/lib folder
+3. install packages and setup (eg. debian buster)
+4. install python3 modules: pytz, requests
+5. setup font
+6. setup cron
+
+```
+    image processors:
+    apt install imagemagick imagemagick-6-common imagemagick-6.q16 \
+    imagemagick-common libgraphicsmagick-q16-3 libmagickcore-6.q16-6 \
+    libmagickcore-6.q16-6-extra libmagickwand-6.q16-6 pngcrush
+
+    web server:
+    apt install nginx-light
+
+    firewall:
+    apt install shorewall
+
+    font:
+    apt install fontconfig
+
+    copy ttf font to /root/.fonts
+    fc-cache -v -f
+```
+
+## setting
+edit settings.xml
+
 ## Option
 * [kindle-debian](https://mega.nz/folder/4XAlBK7Y#cSr2Gq8KxL6LkRe4SB0hqQ)
