@@ -47,6 +47,9 @@ This repo is display weather information on old kindle 3, based on the original 
 
     firewall:
     apt install shorewall
+    
+    ntp server:
+    apt install ntp
 
     font:
     apt install fontconfig
