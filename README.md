@@ -53,14 +53,16 @@ Old system is potential security risk in generally. But in the case of internet 
 
 ### server
 Enable masquerade or snat:
-```/etc/shorewall/snat
+```
+/etc/shorewall/snat
 
 MASQUERADE		192.168.2.0/24		<interface>
 ```
 systemctl reload shorewall
 
 ### kindle
-```ip route add default via 192.168.2.1
+```
+ip route add default via 192.168.2.1
 echo 'nameserver 8.8.8.8' >> /etc/resolv.conf
 
 #test
