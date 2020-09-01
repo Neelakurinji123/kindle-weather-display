@@ -29,8 +29,8 @@ This repo is display weather information on old kindle 3, based on the original 
 ```
     image processors:
     apt install imagemagick imagemagick-6-common imagemagick-6.q16 \
-    imagemagick-common libgraphicsmagick-q16-3 libmagickcore-6.q16-6 \
-    libmagickcore-6.q16-6-extra libmagickwand-6.q16-6 pngcrush
+      imagemagick-common libgraphicsmagick-q16-3 libmagickcore-6.q16-6 \
+      libmagickcore-6.q16-6-extra libmagickwand-6.q16-6 pngcrush
 
     web server:
     apt install nginx-light
@@ -41,12 +41,31 @@ This repo is display weather information on old kindle 3, based on the original 
     font:
     apt install fontconfig
 
-    copy ttf font to /root/.fonts
+    copy ttf font to /root/.fonts folder
     fc-cache -v -f
 ```
 
 ## setting
-edit settings.xml
+Edit settings.xml
+
+## internet access
+Old system is potential security risk in generally. But in the case of internet access is as folloings:
+
+### server
+Enable masquerade or snat:
+```/etc/shorewall/snat
+
+MASQUERADE		192.168.2.0/24		<interface>
+```
+systemctl reload shorewall
+
+### kindle
+```ip route add default via 192.168.2.1
+echo 'nameserver 8.8.8.8' >> /etc/resolv.conf
+
+#test
+ping google.com
+```
 
 ## Option
 * [kindle-debian](https://mega.nz/folder/4XAlBK7Y#cSr2Gq8KxL6LkRe4SB0hqQ)
