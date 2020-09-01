@@ -23,18 +23,18 @@ This repo is display weather information on old kindle 3, based on the original 
 2. copy host-server/var/lib/kindle-weather-host to /var/lib
 3. install packages and setup (ex. debian buster):
 
-    # image processors
+    image processors
     apt install imagemagick imagemagick-6-common imagemagick-6.q16 \
     imagemagick-common libgraphicsmagick-q16-3 libmagickcore-6.q16-6 \
     libmagickcore-6.q16-6-extra libmagickwand-6.q16-6 pngcrush
     
-    # web server
+    web server
     apt install nginx-light
     
-    # firewall
+    firewall
     apt install shorewall
     
-    # font
+    font
     apt install fontconfig
 
 4. setup font
