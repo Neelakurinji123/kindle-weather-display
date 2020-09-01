@@ -1,0 +1,10 @@
+Sans_Italic.ttf, Sans_BoldItalic.ttf, Mono_*.ttf: DejaVu fonts, Copyright (c) 2004-2010 DejaVu fonts team, Fonts are (c) Bitstream. DejaVu changes are in public domain. Glyphs imported from Arev fonts are (c) Tavmjong Bah,
+provided "as is". (http://dejavu-fonts.org/wiki/License)
+
+Sans_Regular.ttf, Sans_Bold.ttf: Droid font family, Copyright (C) 2008 The Android Open Source Project,
+Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0).
+(http://android.git.kernel.org/?p=platform/frameworks/base.git;a=tree;f=data/fonts;hb=HEAD)
+
+Serif_*.ttf: Delicious, from the exljbris Font foundry.
+(http://www.josbuivenga.demon.nl/delicious.html)
+Unhinted TTF conversion & missing styles faked with FontForge.
