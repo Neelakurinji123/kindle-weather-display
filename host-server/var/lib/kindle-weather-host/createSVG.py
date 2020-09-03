@@ -363,8 +363,8 @@ svg_file.write('<line x1="200" x2="200" y1="300" y2="490" style="fill:none;strok
 svg_file.write('<line x1="400" x2="400" y1="300" y2="490" style="fill:none;stroke:black;stroke-width:2px;"/>')
 
 # Find min max for next days
-minTemp = math.floor(min([forecast[1][5], forecast[2][5], forecast[3][5]]))
-maxTemp = math.ceil(max([forecast[1][6], forecast[2][6], forecast[3][6]]))
+minTemp = math.floor(min([forecast[0][5], forecast[1][5], forecast[2][5]]))
+maxTemp = math.ceil(max([forecast[0][6], forecast[1][6], forecast[2][6]]))
 
 pasTemp = 90 / (maxTemp-minTemp)
 
