@@ -137,13 +137,6 @@ curt_data = requests.get(site1).json()
 site2 = 'https://api.openweathermap.org/data/2.5/forecast?lat='+lat+'&lon='+lng+'&units='+units+'&lang='+lang+'&appid='+api_key
 fc_data = requests.get(site2).json()
 
-# test
-#json_open = open('openweathermap-curt.txt', 'r')
-#curt_data = json.load(json_open)
-#
-#json_open = open('openweathermap-forecast.txt', 'r')
-#fc_data = json.load(json_open)
-
 # current data
 # list: 0:time  1:id  2:weather  3:description  4:icon  5:temp  6:pressure  7:humidity  8:wind_speed  9:wind_deg  10:clouds
 #
@@ -373,7 +366,6 @@ svg_file.write('<line x1="400" x2="400" y1="300" y2="490" style="fill:none;strok
 minTemp = math.floor(min([forecast[1][5], forecast[2][5], forecast[3][5]]))
 maxTemp = math.ceil(max([forecast[1][6], forecast[2][6], forecast[3][6]]))
 
-#pasTemp = (530-370)/(maxTemp-minTemp)
 pasTemp = 90 / (maxTemp-minTemp)
 
 n=575
@@ -404,7 +396,7 @@ for i in range(0,3):
     svg_file.write("%i" % (n-10))
     svg_file.write('">' + unit_T + '</text>')
 
-    tMax = (int)(470 + pasTemp * (math.ceil(forecast[i][6]) - minTemp))
+    tMax = (int)(440 + pasTemp * (math.ceil(forecast[i][6]) - minTemp))
     svg_file.write('<text style="text-anchor:end;" font-size="35px" x="')
     svg_file.write("%i" % (tMax - c_offset(forecast[i][6])))
     svg_file.write('" y="')
@@ -423,16 +415,15 @@ for i in range(0,3):
     svg_file.write("%i" % (n-10))
     svg_file.write('">' + unit_T + '</text>')
 
-    if (tMax-tMin > 50) :
-        svg_file.write('<line x1="')
-        svg_file.write("%i" % (tMin + 40))
-        svg_file.write('" x2="')
-        svg_file.write("%i" % (tMax - 65))
-        svg_file.write('" y1="')
-        svg_file.write("%i" % (n-10))
-        svg_file.write('" y2="')
-        svg_file.write("%i" % (n-10))
-        svg_file.write('" style="fill:none;stroke:black;stroke-linecap:round;stroke-width:10px;"/>')
+    svg_file.write('<line x1="')
+    svg_file.write("%i" % (tMin + 40))
+    svg_file.write('" x2="')
+    svg_file.write("%i" % (tMax - 65))
+    svg_file.write('" y1="')
+    svg_file.write("%i" % (n-10))
+    svg_file.write('" y2="')
+    svg_file.write("%i" % (n-10))
+    svg_file.write('" style="fill:none;stroke:black;stroke-linecap:round;stroke-width:10px;"/>')
 
     n += 90
 
