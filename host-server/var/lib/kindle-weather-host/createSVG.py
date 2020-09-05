@@ -123,10 +123,19 @@ def add_icon(icon):
     elif icon == 'Snow' : return svg_file.write(geticon.getSnow())
     elif icon == 'Sleet' : return svg_file.write(geticon.getSleet())
     elif icon == 'wind' : return svg_file.write(geticon.getWind())
-    elif icon == 'Atmosphere' : return svg_file.write(geticon.getFog())
     elif icon == 'Clouds' : return svg_file.write(geticon.getCloudy())
     elif icon == 'Few-clouds-day' : return svg_file.write(geticon.getPartlyCloudyDay())
     elif icon == 'Few-clouds-night' : return svg_file.write(geticon.getPartlyCloudyNight())
+    elif icon == 'Mist' : return svg_file.write(geticon.getFog())
+    elif icon == 'Smoke' : return svg_file.write(geticon.getFog())
+    elif icon == 'Haze' : return svg_file.write(geticon.getFog())
+    elif icon == 'Dust' : return svg_file.write(geticon.getFog())
+    elif icon == 'Fog' : return svg_file.write(geticon.getFog())
+    elif icon == 'Sand' : return svg_file.write(geticon.getFog())
+    elif icon == 'Dust' : return svg_file.write(geticon.getFog())
+    elif icon == 'Ash' : return svg_file.write(geticon.getFog())
+    elif icon == 'Squall' : return svg_file.write(geticon.getRain())
+    elif icon == 'Tornado' : return svg_file.write(geticon.getWind())
 
 
 
