@@ -148,6 +148,7 @@ fc_data = requests.get(site2).json()
 
 # current data
 # list: 0:time  1:id  2:weather  3:description  4:icon  5:temp  6:pressure  7:humidity  8:wind_speed  9:wind_deg  10:clouds
+#       11:sunrise  12:sunset
 #
 curt_weather = [curt_data['current']['dt'],
                 curt_data['current']['weather'][0]['id'],
@@ -159,7 +160,9 @@ curt_weather = [curt_data['current']['dt'],
                 curt_data['current']['humidity'],
                 curt_data['current']['wind_speed'],
                 wind_direction(curt_data['current']['wind_deg']),
-                curt_data['current']['clouds']]
+                curt_data['current']['clouds'],
+                curt_data['current']['sunrise'],
+                curt_data['current']['sunset']]
 
 temp_24h['temp_min'] += [float(curt_data['current']['temp'])]
 temp_24h['temp_max'] += [float(curt_data['current']['temp'])]
@@ -222,6 +225,9 @@ for n in range(0, 4):
 # localtime
 maintenant = (str.lower(datetime.fromtimestamp(time.time(), tz).strftime("%a")) + ' ' +
                  str(datetime.fromtimestamp(time.time(), tz).strftime("%Y/%m/%d %H:%M")))
+
+sunrise = str(datetime.fromtimestamp(curt_weather[11], tz).strftime("%H:%M"))
+sunset = str(datetime.fromtimestamp(curt_weather[12], tz).strftime("%H:%M"))
 
 # Create SVG file
 
@@ -375,7 +381,7 @@ svg_file.write('<line x1="400" x2="400" y1="300" y2="490" style="fill:none;strok
 minTemp = math.floor(min([forecast[0][5], forecast[1][5], forecast[2][5]]))
 maxTemp = math.ceil(max([forecast[0][6], forecast[1][6], forecast[2][6]]))
 
-pasTemp = 90 / (maxTemp-minTemp)
+pasTemp = 120 / (maxTemp-minTemp)
 
 n=575
 for i in range(0,3):
