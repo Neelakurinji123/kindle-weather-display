@@ -87,6 +87,7 @@ ping google.com
 
 ### extra icons
 If adding extra icons or using different icon set, edit a python script. createSVG.py automatically uses extra icons.
+Note: extra icons were not included due to complicated licenses.
 ```
 EDIT: kindle-weather-host/extras/getextraicon.py
 ```
