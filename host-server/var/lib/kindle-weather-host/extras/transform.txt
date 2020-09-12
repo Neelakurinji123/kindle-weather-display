@@ -1,0 +1,3 @@
+site: https://thenounproject.com/adamwhitcroft/collection/climacons/
+application: inkscape
+fill: "black"

@@ -8,7 +8,7 @@
 # Update October 2016
 
 # This code creates an SVG image, ready for Kindle 600x800 screen.
-# With weather information from Netatmo weather station and 
+# With weather information from Netatmo weather station and
 # forecast from forecast.io.
 
 # Please fill settings.xml file
@@ -24,7 +24,7 @@ import requests
 import geticon
 import xml.etree.ElementTree as ET
 from decimal import Decimal, ROUND_HALF_UP
-
+import extras.getextraicon as extraicon
 
 params_file="settings.xml"
 filename = "/tmp/www/ieroStation.svg"
@@ -115,29 +115,75 @@ def wind_direction(degree):
     return direction
 
 def add_icon(icon):
-    if icon  == 'Clear-day' : return svg_file.write(geticon.getClearDay())
-    elif icon == 'Clear-night' : return svg_file.write(geticon.getClearNight())
-    elif icon == 'Rain' : return svg_file.write(geticon.getRain())
-    elif icon == 'Drizzle' : return svg_file.write(geticon.getRain())
-    elif icon == 'Thunderstorm' : return svg_file.write(geticon.getThunderstorm())
-    elif icon == 'Snow' : return svg_file.write(geticon.getSnow())
-    elif icon == 'Sleet' : return svg_file.write(geticon.getSleet())
-    elif icon == 'wind' : return svg_file.write(geticon.getWind())
-    elif icon == 'Clouds' : return svg_file.write(geticon.getCloudy())
-    elif icon == 'Few-clouds-day' : return svg_file.write(geticon.getPartlyCloudyDay())
-    elif icon == 'Few-clouds-night' : return svg_file.write(geticon.getPartlyCloudyNight())
-    elif icon == 'Mist' : return svg_file.write(geticon.getFog())
-    elif icon == 'Smoke' : return svg_file.write(geticon.getFog())
-    elif icon == 'Haze' : return svg_file.write(geticon.getFog())
-    elif icon == 'Dust' : return svg_file.write(geticon.getFog())
-    elif icon == 'Fog' : return svg_file.write(geticon.getFog())
-    elif icon == 'Sand' : return svg_file.write(geticon.getFog())
-    elif icon == 'Dust' : return svg_file.write(geticon.getFog())
-    elif icon == 'Ash' : return svg_file.write(geticon.getFog())
-    elif icon == 'Squall' : return svg_file.write(geticon.getRain())
-    elif icon == 'Tornado' : return svg_file.write(geticon.getWind())
-
-
+    if icon  == 'Clear-day':
+        if ("getClearDay" in dir(extraicon)) == True: return svg_file.write(extraicon.getClearDay())
+        else: return svg_file.write(geticon.getClearDay())
+    elif icon == 'Clear-night':
+        if ("getClearNight" in dir(extraicon)) == True: return svg_file.write(extraicon.getClearNight())
+        else: return svg_file.write(geticon.getClearNight())
+    elif icon == 'Rain':
+        if ("getRain" in dir(extraicon)) == True: return svg_file.write(extraicon.getRain())
+        else: return svg_file.write(geticon.getRain())
+    elif icon == 'Drizzle':
+        if ("getDrizzle" in dir(extraicon)) == True: return svg_file.write(extraicon.getDrizzle())
+        else: return svg_file.write(geticon.getRain())
+    elif icon == 'Thunderstorm':
+        if ("getThunderstorm" in dir(extraicon)) == True: return svg_file.write(extraicon.getThunderstorm())
+        else: return svg_file.write(geticon.getRain())
+    elif icon == 'Snow':
+        if ("getSnow" in dir(extraicon)) == True: return svg_file.write(extraicon.getSnow())
+        else: return svg_file.write(geticon.getSnow())
+    elif icon == 'Sleet':
+        if ("getSleet" in dir(extraicon)) == True: return svg_file.write(extraicon.getSleet())
+        else: return svg_file.write(geticon.getRain())
+    elif icon == 'Wind':
+        if ("getWind" in dir(extraicon)) == True: return svg_file.write(extraicon.getWind())
+        else: return svg_file.write(geticon.getWind())
+    elif icon == 'Clouds':
+        if ("getCloudy" in dir(extraicon)) == True: return svg_file.write(extraicon.getCloudy())
+        else: return svg_file.write(geticon.getCloudy())
+    elif icon == 'Few-clouds-day':
+        if ("getPartlyCloudyDay" in dir(extraicon)) == True: return svg_file.write(extraicon.getPartlyCloudyDay())
+        else: return svg_file.write(geticon.getPartlyCloudyDay())
+    elif icon == 'Few-clouds-night':
+        if ("getPartlyCloudyNight" in dir(extraicon)) == True: return svg_file.write(extraicon.getPartlyCloudyNight())
+        else: return svg_file.write(geticon.getPartlyCloudyNight())
+    elif icon == 'Mist':
+        if ("getMist" in dir(extraicon)) == True: return svg_file.write(extraicon.getMist())
+        else: return svg_file.write(geticon.getFog())
+    elif icon == 'Smoke':
+        if ("getSmoke" in dir(extraicon)) == True: return svg_file.write(extraicon.getSmoke())
+        else: return svg_file.write(geticon.getFog())
+    elif icon == 'Haze':
+        if ("getHaze" in dir(extraicon)) == True: return svg_file.write(extraicon.getHaze())
+        else: return svg_file.write(geticon.getFog())
+    elif icon == 'Dust':
+        if ("getDust" in dir(extraicon)) == True: return svg_file.write(extraicon.getDust())
+        else: return svg_file.write(geticon.getFog())
+    elif icon == 'Fog':
+        if ("getFog" in dir(extraicon)) == True: return svg_file.write(extraicon.getFog())
+        else: return svg_file.write(geticon.getFog())
+    elif icon == 'Sand':
+        if ("getSand" in dir(extraicon)) == True: return svg_file.write(extraicon.getSand())
+        else: return svg_file.write(geticon.getFog())
+    elif icon == 'Dust':
+        if ("getDust" in dir(extraicon)) == True: return svg_file.write(extraicon.getDust())
+        else: return svg_file.write(geticon.getFog())
+    elif icon == 'Ash':
+        if ("getAsh" in dir(extraicon)) == True: return svg_file.write(extraicon.getAsh())
+        else: return svg_file.write(geticon.getFog())
+    elif icon == 'Squall':
+        if ("getSquall" in dir(extraicon)) == True: return svg_file.write(extraicon.getSquall())
+        else: return svg_file.write(geticon.getRain())
+    elif icon == 'Tornado':
+        if ("getTornado" in dir(extraicon)) == True: return svg_file.write(extraicon.getTornado())
+        else: return svg_file.write(geticon.getWind())
+    elif icon == 'Cyclone':
+        if ("getCyclone" in dir(extraicon)) == True: return svg_file.write(extraicon.getCyclone())
+        else: return svg_file.write(geticon.getWind())
+    elif icon == 'Snow2':
+        if ("getSnow2" in dir(extraicon)) == True: return svg_file.write(extraicon.getSnow2())
+        else: return svg_file.write(geticon.getSnow())
 
 # OpenWeathermap API
 site1 = 'https://api.openweathermap.org/data/2.5/onecall?lat='+lat+'&lon='+lng+'&exclude='+exclude+'&units='+units+'&lang='+lang+'&appid='+api_key
@@ -277,7 +323,7 @@ svg_file.write('</text>\n')
 
 # Wind
 svg_file.write('<text style="text-anchor:end;" font-size="30px" x="550" y="235">')
-svg_file.write(curt_weather[9] if round(curt_weather[8]) != 0 else ' ')
+svg_file.write(curt_weather[9] if curt_weather[8] < 1 else ' ')
 svg_file.write(' ')
 svg_file.write("%i" % (curt_weather[8]))
 svg_file.write(' ' + unit_W + '</text>\n')
@@ -455,6 +501,11 @@ elif curt_weather[2] == 'Clouds' and curt_weather[3] == 'few clouds':
 else:
     icon = curt_weather[2]
 
+if curt_weather[2] == 'Snow' and (curt_weather[1] == 611 or curt_weather[1] == 612 or curt_weather[1] == 613):
+    icon = 'Sleet'
+elif curt_weather[2] == 'Snow' and (curt_weather[1] == 602 or curt_weather[1] == 622):
+    icon = 'Snow2'
+
 svg_file.write('<g transform="matrix(4,0,0,4,-35,-40)">')
 add_icon(icon)
 svg_file.write('</g>\n')
@@ -475,6 +526,12 @@ for i in range(0,3) :
     else:
         icon = forecast_hour[i][2]
 
+    if forecast_hour[i][2] == 'Snow' and (forecast_hour[i][1] == 611 or forecast_hour[i][1] == 612 or forecast_hour[i][1] == 613):
+        icon = 'Sleet'
+    elif forecast_hour[i][2] == 'Snow' and (forecast_hour[i][1] == 602 or forecast_hour[i][1] == 622):
+        icon = 'Snow2'
+
+
     add_icon(icon)
     n += 200
     svg_file.write('</g>\n')
@@ -494,6 +551,11 @@ for i in range(1,4) :
         icon = 'Few-clouds' + '-' + day_or_night
     else:
         icon = forecast[i][2]
+
+    if forecast[i][2] == 'Snow' and (forecast[i][1] == 611 or forecast[i][1] == 612 or forecast[i][1] == 613):
+        icon = 'Sleet'
+    elif forecast[i][2] == 'Snow' and (forecast[i][1] == 602 or forecast[i][1] == 622):
+        icon = 'Snow2'
 
     add_icon(icon)
     n += 90
