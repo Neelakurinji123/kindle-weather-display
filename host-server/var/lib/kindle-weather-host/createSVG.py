@@ -323,7 +323,7 @@ svg_file.write('</text>\n')
 
 # Wind
 svg_file.write('<text style="text-anchor:end;" font-size="30px" x="550" y="235">')
-svg_file.write(curt_weather[9] if curt_weather[8] < 1 else ' ')
+svg_file.write(curt_weather[9] if int(curt_weather[8]) != 0 else ' ')
 svg_file.write(' ')
 svg_file.write("%i" % (curt_weather[8]))
 svg_file.write(' ' + unit_W + '</text>\n')
@@ -501,9 +501,10 @@ elif curt_weather[2] == 'Clouds' and curt_weather[3] == 'few clouds':
 else:
     icon = curt_weather[2]
 
-if curt_weather[2] == 'Snow' and (curt_weather[1] == 611 or curt_weather[1] == 612 or curt_weather[1] == 613):
+if curt_weather[2] == 'Snow' and (int(curt_weather[1]) == 611 or int(curt_weather[1]) == 612 or
+                                                                   int(curt_weather[1]) == 613):
     icon = 'Sleet'
-elif curt_weather[2] == 'Snow' and (curt_weather[1] == 602 or curt_weather[1] == 622):
+elif curt_weather[2] == 'Snow' and (int(curt_weather[1]) == 602 or int(curt_weather[1]) == 622):
     icon = 'Snow2'
 
 svg_file.write('<g transform="matrix(4,0,0,4,-35,-40)">')
@@ -526,9 +527,10 @@ for i in range(0,3) :
     else:
         icon = forecast_hour[i][2]
 
-    if forecast_hour[i][2] == 'Snow' and (forecast_hour[i][1] == 611 or forecast_hour[i][1] == 612 or forecast_hour[i][1] == 613):
+    if forecast_hour[i][2] == 'Snow' and (int(forecast_hour[i][1]) == 611 or int(forecast_hour[i][1]) == 612 or
+                                                                               int(forecast_hour[i][1]) == 613):
         icon = 'Sleet'
-    elif forecast_hour[i][2] == 'Snow' and (forecast_hour[i][1] == 602 or forecast_hour[i][1] == 622):
+    elif forecast_hour[i][2] == 'Snow' and (int(forecast_hour[i][1]) == 602 or int(forecast_hour[i][1]) == 622):
         icon = 'Snow2'
 
 
@@ -552,9 +554,10 @@ for i in range(1,4) :
     else:
         icon = forecast[i][2]
 
-    if forecast[i][2] == 'Snow' and (forecast[i][1] == 611 or forecast[i][1] == 612 or forecast[i][1] == 613):
+    if forecast[i][2] == 'Snow' and (int(forecast[i][1]) == 611 or int(forecast[i][1]) == 612 or
+                                                                     int(forecast[i][1]) == 613):
         icon = 'Sleet'
-    elif forecast[i][2] == 'Snow' and (forecast[i][1] == 602 or forecast[i][1] == 622):
+    elif forecast[i][2] == 'Snow' and (int(forecast[i][1]) == 602 or int(forecast[i][1]) == 622):
         icon = 'Snow2'
 
     add_icon(icon)
