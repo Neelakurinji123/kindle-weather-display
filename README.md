@@ -85,5 +85,15 @@ echo 'nameserver 8.8.8.8' >> /etc/resolv.conf
 ping google.com
 ```
 
+### extra icons
+If adding extra icons or using different icon set, edit a python script. createSVG.py automatically uses extra icons.
+Note: extra icons were not included due to complicated licenses.
+```
+EDIT: kindle-weather-host/extras/getextraicon.py
+```
+
+<img src="sample_images/kindleStation-sample-extra-icons.png" width="300" alt="kindle weather - extra icons" />
+
+
 ## Option
 * [kindle-debian](https://mega.nz/folder/4XAlBK7Y#cSr2Gq8KxL6LkRe4SB0hqQ)
