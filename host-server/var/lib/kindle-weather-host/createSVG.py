@@ -288,7 +288,7 @@ def add_head():
         t_sunset = str(datetime.fromtimestamp(curt_weather[12], tz).strftime("%H:%M"))
 
         # localtime
-        maintenant = (str.lower(datetime.fromtimestamp(curt_time, tz).strftime("%a %m/%d %H:%M")))
+        maintenant = (str.lower(datetime.fromtimestamp(curt_time, tz).strftime("%a, %b %d %H:%M")))
         s = '<text style="text-anchor:start;" font-size="30px" x="20" y="40">' + maintenant + '</text>\n'
 
         if ("getSunrise" in dir(extraicon)) == True and ("getSunset" in dir(extraicon)) == True:
