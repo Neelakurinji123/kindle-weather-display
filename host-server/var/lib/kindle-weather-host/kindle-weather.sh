@@ -13,5 +13,6 @@ cd "$(dirname "$0")"
 #    -colorspace gray -type palette -geometry 600x800 \
 #    $OUTPUT_DIR/ieroStation.svg $OUTPUT_DIR/kindleStation.png
 
+sleep 3
 cd $OUTPUT_DIR; pngcrush -s -c 0 -ow kindleStation.png
 
