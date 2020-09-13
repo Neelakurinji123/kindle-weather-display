@@ -92,6 +92,7 @@ True: dark mode
 False or None: light mode
 Auto: Automatic switch between light mode and dark mode according to the time of sunrise and sunset
 ```
+<img src="sample_images/kindleStation-Tokorozawa-darkmode.png" width="300" alt="kindle weather - dark mode" />
 
 ### sunrise and sunset time
 If Enable display sunrise and sunset time, edit settings.xml.
