@@ -25,18 +25,21 @@ import geticon
 import xml.etree.ElementTree as ET
 from decimal import Decimal, ROUND_HALF_UP
 import extras.getextraicon as extraicon
+from subprocess import Popen
 
 params_file="settings.xml"
 filename = "/tmp/www/ieroStation.svg"
+pngfile = "/tmp/www/kindleStation.png"
 
 # variables
+curt_time = time.time()
 curt_weather = list()
 forecast_day = dict()
 forecast_hour = list()
 day_or_night = str()
 temp_24h = {'temp_min': [], 'temp_max': []}
 
-# Create 
+# Create
 
 # parse params file
 tree = ET.parse(params_file)
@@ -48,6 +51,8 @@ for service in root.findall('service'):
         t_locale = service.find('locale').text
         encoding = service.find('encoding').text
         font = service.find('font').text
+        sunrise_and_sunset = service.find('sunrise_and_sunset').text
+        dark_mode = service.find('dark_mode').text
 
     elif service.get('name') == 'openweathermap' :
         api_key = service.find('api_key').text
@@ -184,13 +189,19 @@ def add_icon(icon):
     elif icon == 'Snow2':
         if ("getSnow2" in dir(extraicon)) == True: return svg_file.write(extraicon.getSnow2())
         else: return svg_file.write(geticon.getSnow())
+    elif icon == 'Sunrise':
+        if ("getSunrise" in dir(extraicon)) == True: return svg_file.write(extraicon.getSunrise())
+        else: return None
+    elif icon == 'Sunset':
+        if ("getSunset" in dir(extraicon)) == True: return svg_file.write(extraicon.getSunset())
+        else: return None
 
 # OpenWeathermap API
-site1 = 'https://api.openweathermap.org/data/2.5/onecall?lat='+lat+'&lon='+lng+'&exclude='+exclude+'&units='+units+'&lang='+lang+'&appid='+api_key
-curt_data = requests.get(site1).json()
+url1 = 'https://api.openweathermap.org/data/2.5/onecall?lat='+lat+'&lon='+lng+'&exclude='+exclude+'&units='+units+'&lang='+lang+'&appid='+api_key
+curt_data = requests.get(url1).json()
 
-site2 = 'https://api.openweathermap.org/data/2.5/forecast?lat='+lat+'&lon='+lng+'&units='+units+'&lang='+lang+'&appid='+api_key
-fc_data = requests.get(site2).json()
+url2 = 'https://api.openweathermap.org/data/2.5/forecast?lat='+lat+'&lon='+lng+'&units='+units+'&lang='+lang+'&appid='+api_key
+fc_data = requests.get(url2).json()
 
 # current data
 # list: 0:time  1:id  2:weather  3:description  4:icon  5:temp  6:pressure  7:humidity  8:wind_speed  9:wind_deg  10:clouds
@@ -252,7 +263,7 @@ for k in fc_data.keys():
             count += 1
 
 # delete today's data
-today = int(datetime.fromtimestamp(time.time(), tz).strftime("%d"))
+today = int(datetime.fromtimestamp(curt_time, tz).strftime("%d"))
 fc_today = int(datetime.fromtimestamp(int(sorted(forecast_day)[0]), tz).strftime("%d"))
 
 if today == fc_today:
@@ -268,14 +279,36 @@ for n in range(0, 4):
                         min(forecast_day[t[n]]['temp_min']), max(forecast_day[t[n]]['temp_max']),
                         max(forecast_day[t[n]]['clouds'])]]
 
-# localtime
-maintenant = (str.lower(datetime.fromtimestamp(time.time(), tz).strftime("%a")) + ' ' +
-                 str(datetime.fromtimestamp(time.time(), tz).strftime("%Y/%m/%d %H:%M")))
-
-sunrise = str(datetime.fromtimestamp(curt_weather[11], tz).strftime("%H:%M"))
-sunset = str(datetime.fromtimestamp(curt_weather[12], tz).strftime("%H:%M"))
 
 # Create SVG file
+
+def add_head():
+    if sunrise_and_sunset == 'True':
+        t_sunrise = str(datetime.fromtimestamp(curt_weather[11], tz).strftime("%H:%M"))
+        t_sunset = str(datetime.fromtimestamp(curt_weather[12], tz).strftime("%H:%M"))
+
+        # localtime
+        maintenant = (str.lower(datetime.fromtimestamp(curt_time, tz).strftime("%a %m/%d %H:%M")))
+        s = '<text style="text-anchor:start;" font-size="30px" x="20" y="40">' + maintenant + '</text>\n'
+
+        if ("getSunrise" in dir(extraicon)) == True and ("getSunset" in dir(extraicon)) == True:
+            # text
+            s += '<text style="text-anchor:end;" font-size="30px" x="440" y="' + str(40) + '">' + t_sunrise + '</text>\n'
+            s += '<text style="text-anchor:end;" font-size="30px" x="580" y="' + str(40) + '">' + t_sunset + '</text>\n'
+
+            # icon
+            s += '<g transform="matrix(0.07,0,0,0.07,320,' + str(10) + ')">' + extraicon.getSunrise() + '</g>\n'
+            s += '<g transform="matrix(0.07,0,0,0.07,460,' + str(10) + ')">' + extraicon.getSunset() + '</g>\n'
+        else:
+            s += '<text style="text-anchor:end;" font-size="30px" x="580" y="' + str(40) + '">'
+            s += 'daytime: ' + t_sunrise + ' - ' + t_sunset + '</text>\n'
+    else:
+        maintenant = (str.lower(datetime.fromtimestamp(curt_time, tz).strftime("%a %Y/%m/%d %H:%M")))
+
+        s = '<text style="text-anchor:start;" font-size="30px" x="20" y="40">' + city + '</text>\n'
+        s += '<text style="text-anchor:end;" font-size="30px" x="580" y="40">' + maintenant + '</text>\n'
+
+    return svg_file.write(s)
 
 #svg_file = open(filename,"w")
 svg_file = open(filename,"w", encoding=encoding)
@@ -286,16 +319,7 @@ svg_file.write('<svg xmlns="http://www.w3.org/2000/svg" height="800" width="600"
 #svg_file.write('<g font-family="Arial">\n')
 svg_file.write('<g font-family="' + font + '">\n')
 
-# Parsing values
-
-svg_file.write('<text style="text-anchor:start;" font-size="30px" x="20" y="40">')
-svg_file.write(city)
-#svg_file.write(', ')
-svg_file.write('</text>\n')
-
-svg_file.write('<text style="text-anchor:end;" font-size="30px" x="580" y="40">')
-svg_file.write("%s" % (maintenant))
-svg_file.write('</text>\n')
+add_head()
 
 # Temperature
 tempEntier = math.floor(curt_weather[5])
@@ -332,8 +356,6 @@ svg_file.write(' ' + unit_W + '</text>\n')
 svg_file.write('<text style="text-anchor:end;" font-size="30px" x="550" y="275">')
 svg_file.write(curt_weather[3])
 svg_file.write('</text>\n')
-
-# Min/Max for today
 
 # Max
 svg_file.write('<text style="text-anchor:end;" font-size="35px" x="550" y="110">')
@@ -533,7 +555,6 @@ for i in range(0,3) :
     elif forecast_hour[i][2] == 'Snow' and (int(forecast_hour[i][1]) == 602 or int(forecast_hour[i][1]) == 622):
         icon = 'Snow2'
 
-
     add_icon(icon)
     n += 200
     svg_file.write('</g>\n')
@@ -564,8 +585,24 @@ for i in range(1,4) :
     n += 90
     svg_file.write('</g>\n')
 
-# close file 
+# close file
 svg_file.write('</svg>')
 svg_file.close()
 
+
+# image processing
+
+if dark_mode == 'True':
+    args = ['convert', '-size', '600x800',  '-background', 'white', '-depth', '8', '-negate', filename, pngfile]
+    output = Popen(args)
+elif dark_mode == 'Auto':
+    if curt_weather[11] > curt_time or curt_weather[12] < curt_time:
+        args = ['convert', '-size', '600x800',  '-background', 'white', '-depth', '8', '-negate', filename, pngfile]
+        output = Popen(args)
+    else:
+        args = ['convert', '-size', '600x800',  '-background', 'white', '-depth', '8', filename, pngfile]
+        output = Popen(args)
+else:
+    args = ['convert', '-size', '600x800',  '-background', 'white', '-depth', '8', filename, pngfile]
+    output = Popen(args)
 

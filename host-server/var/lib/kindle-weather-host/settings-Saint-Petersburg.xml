@@ -6,10 +6,12 @@
                 <encoding>iso-8859-5</encoding>
 		<locale>ru_RU.UTF-8</locale>
 		<font>Droid Sans</font>
+                <sunrise_and_sunset>False</sunrise_and_sunset>
+                <dark_mode>False</dark_mode>
 	</service>
 	<service name="openweathermap">
 		<service>onecall</service>
-		<api_key>xxxxxxxxxxxxxxxx</api_key>
+		<api_key>b8700c13b9f58b521ceae2d6e3e3869e</api_key>
 		<lat>59.9392259</lat>
 		<lng>29.5342917</lng>
 		<exclude>minutely,hourly,daily</exclude>
