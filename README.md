@@ -85,9 +85,25 @@ echo 'nameserver 8.8.8.8' >> /etc/resolv.conf
 ping google.com
 ```
 
+### dark mode
+If Enable dark mode, edit settings.xml.
+```
+True: dark mode
+False or None: light mode
+Auto: Automatic switch between light mode and dark mode according to the time of sunrise and sunset
+```
+<img src="sample_images/kindleStation-Tokorozawa-darkmode.png" width="300" alt="kindle weather - dark mode" />
+
+### sunrise and sunset time
+If Enable sunrise and sunset time, edit settings.xml.
+```
+True: enable
+False or None: disable
+```
+
 ### extra icons
 If adding extra icons or using different icon set, edit a python script. createSVG.py automatically uses extra icons.
-Note: extra icons were not included due to complicated licenses.
+Note: extra icons are not included due to complicated licenses.
 ```
 EDIT: kindle-weather-host/extras/getextraicon.py
 ```
