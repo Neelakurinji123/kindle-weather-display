@@ -86,7 +86,7 @@ ping google.com
 ```
 
 ### dark mode
-If Enable dark mode, edit settings.xml.
+If enable dark mode, edit settings.xml.
 ```
 True: dark mode
 False or None: light mode
