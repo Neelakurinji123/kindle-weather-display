@@ -288,17 +288,17 @@ def add_head():
         t_sunset = str(datetime.fromtimestamp(curt_weather[12], tz).strftime("%H:%M"))
 
         # localtime
-        maintenant = (str.lower(datetime.fromtimestamp(curt_time, tz).strftime("%a, %b %d %H:%M")))
+        maintenant = (str.lower(datetime.fromtimestamp(curt_time, tz).strftime("%a, %d %b %H:%M")))
         s = '<text style="text-anchor:start;" font-size="30px" x="20" y="40">' + maintenant + '</text>\n'
 
         if ("getSunrise" in dir(extraicon)) == True and ("getSunset" in dir(extraicon)) == True:
             # text
-            s += '<text style="text-anchor:end;" font-size="30px" x="440" y="' + str(40) + '">' + t_sunrise + '</text>\n'
+            s += '<text style="text-anchor:end;" font-size="30px" x="445" y="' + str(40) + '">' + t_sunrise + '</text>\n'
             s += '<text style="text-anchor:end;" font-size="30px" x="580" y="' + str(40) + '">' + t_sunset + '</text>\n'
 
             # icon
-            s += '<g transform="matrix(0.07,0,0,0.07,320,' + str(10) + ')">' + extraicon.getSunrise() + '</g>\n'
-            s += '<g transform="matrix(0.07,0,0,0.07,460,' + str(10) + ')">' + extraicon.getSunset() + '</g>\n'
+            s += '<g transform="matrix(0.06,0,0,0.06,330,' + str(12) + ')">' + extraicon.getSunrise() + '</g>\n'
+            s += '<g transform="matrix(0.06,0,0,0.06,465,' + str(12) + ')">' + extraicon.getSunset() + '</g>\n'
         else:
             s += '<text style="text-anchor:end;" font-size="30px" x="580" y="' + str(40) + '">'
             s += 'daytime: ' + t_sunrise + ' - ' + t_sunset + '</text>\n'
@@ -591,18 +591,22 @@ svg_file.close()
 
 
 # image processing
-
-if dark_mode == 'True':
-    args = ['convert', '-size', '600x800',  '-background', 'white', '-depth', '8', '-negate', filename, pngfile]
-    output = Popen(args)
-elif dark_mode == 'Auto':
-    if curt_weather[11] > curt_time or curt_weather[12] < curt_time:
-        args = ['convert', '-size', '600x800',  '-background', 'white', '-depth', '8', '-negate', filename, pngfile]
-        output = Popen(args)
-    else:
+def displaymode(mode):
+    if mode == 'lightmode':
         args = ['convert', '-size', '600x800',  '-background', 'white', '-depth', '8', filename, pngfile]
         output = Popen(args)
+    elif mode == 'darkmode':
+        args = ['convert', '-size', '600x800',  '-background', 'white', '-depth', '8', '-negate', filename, pngfile]
+        output = Popen(args)
+
+
+if dark_mode == 'True':
+    displaymode('darkmode')
+elif dark_mode == 'Auto':
+    if curt_weather[11] > curt_time or curt_weather[12] < curt_time:
+        displaymode('darkmode')
+    else:
+        displaymode('lightmode')
 else:
-    args = ['convert', '-size', '600x800',  '-background', 'white', '-depth', '8', filename, pngfile]
-    output = Popen(args)
+    displaymode('lightmode')
 
