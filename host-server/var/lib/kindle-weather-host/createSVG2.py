@@ -336,13 +336,11 @@ if __name__ == "__main__":
 
     # set timezone
     t_now = int(time.time())
-    t_timezone = p.t_timezone
-    t_locale = p.t_locale
-    tz = timezone(t_timezone)
+    tz = timezone(p.t_timezone)
     utc = pytz.utc
 
     # set locale
-    locale.setlocale(locale.LC_TIME, t_locale)
+    locale.setlocale(locale.LC_TIME, p.t_locale)
 
     create_svg(p=p, t_now=t_now, tz=tz, utc=utc, svgfile=svgfile, pngfile=pngfile)
 
