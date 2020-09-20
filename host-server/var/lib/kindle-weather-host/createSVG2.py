@@ -131,11 +131,9 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
 
     # probability of precipitation
     if curt_weather[14] > 0 and (curt_weather[2] == 'Rain' or curt_weather[2] == 'Drizzle' or
-            curt_weather[2] == 'Thunderstorm' or curt_weather[2] == 'Snow' or curt_weather[2] == 'Sleet' or
-            curt_weather[2] == 'Clouds' or curt_weather[2] == 'Squall'):
+            curt_weather[2] == 'Snow' or curt_weather[2] == 'Sleet' or curt_weather[2] == 'Clouds'):
 
         s = curt_weather[14] * 100
-        #f_svg.write('<text style="text-anchor:end;" font-size="35px" x="' + str(150 + s_padding(s)) + '" y="165">')
         f_svg.write('<text style="text-anchor:end;" font-size="45px" x="' + str(175 - int(s_padding(s) * 0.64)) + '" y="172">')
         f_svg.write("%i" % s)
         f_svg.write('</text>\n')
@@ -150,21 +148,10 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
         forecast_hourly = p.forecast_hourly(i)
         hourly_icon += [p.icon]
         jour = datetime.fromtimestamp(forecast_hourly[0], tz)
-#        f_svg.write('<text style="text-anchor:end;" font-size="35px" x="')
-#        #f_svg.write("%i" % (n + 35))
-#        f_svg.write("%i" % (n + 75))
-#        f_svg.write('" y="')
-#        #f_svg.write("%i" % (pos_y - 160))
-#        f_svg.write("%i" % (pos_y))
-#        f_svg.write('">')
-#        f_svg.write(jour.strftime("%H:%M"))
-#        f_svg.write('</text>')
 
         f_svg.write('<text style="text-anchor:start;" font-size="30px" x="')
-#        #f_svg.write("%i" % (n + 35))
         f_svg.write("%i" % (n - 55))
         f_svg.write('" y="')
-#        #f_svg.write("%i" % (pos_y - 160))
         f_svg.write("%i" % (pos_y))
         f_svg.write('">')
         f_svg.write(jour.strftime("%H:%M"))
@@ -189,8 +176,8 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
         f_svg.write('">' + p.unit['temp'] + '</text>\n')
 
         if forecast_hourly[7] > 0 and (forecast_hourly[2] == 'Rain' or forecast_hourly[2] == 'Drizzle' or
-                forecast_hourly[2] == 'Thunderstorm' or forecast_hourly[2] == 'Snow' or forecast_hourly[2] == 'Sleet' or
-                forecast_hourly[2] == 'Clouds' or forecast_hourly[2] == 'Squall'):
+                forecast_hourly[2] == 'Snow' or forecast_hourly[2] == 'Sleet' or forecast_hourly[2] == 'Clouds'):
+
             f_svg.write('<text style="text-anchor:end;" font-size="25px" x="')
             s = round(forecast_hourly[7] * 100)
             f_svg.write("%i" % (n + 32 - int(s_padding(s) * 0.357)))
@@ -202,8 +189,6 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
 
         n += 200
 
-    #f_svg.write('<line x1="200" x2="200" y1="300" y2="490" style="fill:none;stroke:black;stroke-width:2px;"/>')
-    #f_svg.write('<line x1="400" x2="400" y1="300" y2="490" style="fill:none;stroke:black;stroke-width:2px;"/>')
     f_svg.write('<line x1="200" x2="200" y1="315" y2="490" style="fill:none;stroke:black;stroke-width:2px;"/>')
     f_svg.write('<line x1="400" x2="400" y1="315" y2="490" style="fill:none;stroke:black;stroke-width:2px;"/>')
 
@@ -293,9 +278,6 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
     # add next hours icons
     n = 8
     for i in range(0, 3):
-        #f_svg.write('<g transform="matrix(1.9,0,0,1.9,')
-        #f_svg.write("%i" % (n))
-        #f_svg.write(',300)">')
         f_svg.write('<g transform="matrix(2.3,0,0,2.3,')
         f_svg.write("%i" % (n-25))
         f_svg.write(',275)">')
