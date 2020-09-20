@@ -111,8 +111,8 @@ EDIT: kindle-weather-host/extras/getextraicon.py
 <img src="sample_images/kindleStation-sample-extra-icons.png" width="300" alt="kindle weather - extra icons" />
 
 ### using One Call API
-Use createSVG2.py instead of createSVG.py
-Not all locations working
+Use createSVG2.py instead of createSVG.py.
+Not all locations working.
 
 <img src="sample_images/kindleStation-new.png" width="300" alt="new kindle weather" />
 
