@@ -41,7 +41,7 @@
 #    return '''<path d="" />'''
 
 #def getDrizzle():
-#   # 45%, x=0px, y=-5px
+#   # 45%, x=0px, y=-5.5px
 #    return '''<path d="" />'''
 
 #def getThunderstorm():
