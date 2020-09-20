@@ -8,14 +8,13 @@
 		<font>Droid Sans</font>
                 <sunrise_and_sunset>False</sunrise_and_sunset>
                 <dark_mode>False</dark_mode>
-	</service>
-	<service name="openweathermap">
 		<service>onecall</service>
 		<api_key>xxxxxxxxxxxxxxxx</api_key>
 		<lat>37.7576792</lat>
-		<lng>-122.50781175</lng>
+		<lon>-122.50781175</lon>
 		<exclude>minutely,hourly,daily</exclude>
 		<units>imperial</units>
 		<lang>en</lang>
+		<exclude>minutely</exclude>
 	</service>
 </data>

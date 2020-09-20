@@ -53,11 +53,9 @@ for service in root.findall('service'):
         font = service.find('font').text
         sunrise_and_sunset = service.find('sunrise_and_sunset').text
         dark_mode = service.find('dark_mode').text
-
-    elif service.get('name') == 'openweathermap' :
         api_key = service.find('api_key').text
         lat = service.find('lat').text
-        lng = service.find('lng').text
+        lng = service.find('lon').text
         units = service.find('units').text
         lang = service.find('lang').text
         exclude = service.find('exclude').text
@@ -371,8 +369,9 @@ svg_file.write('</text>\n')
 svg_file.write('<circle cx="555" cy="130" r="4" stroke="black" stroke-width="3" fill="none"/>')
 svg_file.write('<text style="text-anchor:start;" font-size="25px" x="560" y="142">' + unit_T + '</text>')
 
-def c_offset(x):
-    if x >= 10 : return 10
+def s_padding(x):
+    if x >= 100 : return -10
+    elif 100 > x >= 10 : return 10
     elif 10 > x >= 0 : return 30
     elif -10 < x < 0 : return 20
     elif x <= -10 : return 0
@@ -413,19 +412,19 @@ for i in range(0,3):
     svg_file.write('">' + unit_T + '</text>')
 
     svg_file.write('<text style="text-anchor:end;" font-size="35px" x="')
-    svg_file.write("%i" % (n + 80 + 15 - c_offset(forecast[i][5])))
+    svg_file.write("%i" % (n + 80 + 15 - s_padding(forecast[i][5])))
     svg_file.write('" y="')
     svg_file.write("%i" % (pos_y))
     svg_file.write('">')
     svg_file.write("%i" % (math.ceil(forecast[i][5])))
     svg_file.write('</text>\n')
     svg_file.write('<circle cx="')
-    svg_file.write("%i" % (n + 95 + 5 - c_offset(forecast[i][5])))
+    svg_file.write("%i" % (n + 95 + 5 - s_padding(forecast[i][5])))
     svg_file.write('" cy="')
     svg_file.write("%i" % (pos_y - 25))
     svg_file.write('" r="4" stroke="black" stroke-width="2" fill="none"/>')
     svg_file.write('<text style="text-anchor:start;" font-size="25px" x="')
-    svg_file.write("%i" % (n + 95 + 10 - c_offset(forecast[i][5])))
+    svg_file.write("%i" % (n + 95 + 10 - s_padding(forecast[i][5])))
     svg_file.write('" y="')
     svg_file.write("%i" % (pos_y - 10))
     svg_file.write('">' + unit_T + '</text>')
@@ -481,19 +480,19 @@ for i in range(0,3):
 
     tMax = (int)(440 + pasTemp * (math.ceil(forecast[i][6]) - minTemp))
     svg_file.write('<text style="text-anchor:end;" font-size="35px" x="')
-    svg_file.write("%i" % (tMax - c_offset(forecast[i][6])))
+    svg_file.write("%i" % (tMax - s_padding(forecast[i][6])))
     svg_file.write('" y="')
     svg_file.write("%i" % (n))
     svg_file.write('">')
     svg_file.write("%i" % (math.ceil(forecast[i][6])))
     svg_file.write('</text>\n')
     svg_file.write('<circle cx="')
-    svg_file.write("%i" % (tMax + 5 - c_offset(forecast[i][6])))
+    svg_file.write("%i" % (tMax + 5 - s_padding(forecast[i][6])))
     svg_file.write('" cy="')
     svg_file.write("%i" % (n-25))
     svg_file.write('" r="4" stroke="black" stroke-width="2" fill="none"/>')
     svg_file.write('<text style="text-anchor:start;" font-size="25px" x="')
-    svg_file.write("%i" % (tMax + 10 - c_offset(forecast[i][6])))
+    svg_file.write("%i" % (tMax + 10 - s_padding(forecast[i][6])))
     svg_file.write('" y="')
     svg_file.write("%i" % (n-10))
     svg_file.write('">' + unit_T + '</text>')
