@@ -49,7 +49,7 @@ This repo is display weather information on old kindle 3, based on the original 
     apt install shorewall
     
     EDIT: /etc/shorewall/interfaces
-    select the right interface
+    choose the right interface
     
     ntp server:
     apt install ntp
@@ -109,6 +109,12 @@ EDIT: kindle-weather-host/extras/getextraicon.py
 ```
 
 <img src="sample_images/kindleStation-sample-extra-icons.png" width="300" alt="kindle weather - extra icons" />
+
+### using One Call API
+Use createSVG2.py instead of createSVG.py.
+Not all locations working.
+
+<img src="sample_images/kindleStation-new.png" width="300" alt="new kindle weather" />
 
 
 ## Option
