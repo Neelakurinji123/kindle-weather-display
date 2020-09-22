@@ -133,7 +133,7 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
             curt_weather[2] == 'Snow' or curt_weather[2] == 'Sleet' or curt_weather[2] == 'Clouds'):
 
         s = Decimal(curt_weather[14]).quantize(Decimal('0.1'), rounding=ROUND_HALF_EVEN)
-        f_svg.write('<text style="text-anchor:end;" font-size="45px" x="' + str(190 - int(s_padding(s) * 0.64)) + '" y="172">')
+        f_svg.write('<text style="text-anchor:end;" font-size="45px" x="' + str(190 - int(s_padding(s) * 0.64)) + '" y="175">')
         f_svg.write("%.1f" % s)
         f_svg.write('</text>\n')
 
@@ -178,7 +178,7 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
             f_svg.write('<text style="text-anchor:end;" font-size="25px" x="')
             f_svg.write("%i" % (n + 42 - int(s_padding(s) * 0.357)))
             f_svg.write('" y="')
-            f_svg.write("%i" % (pos_y - 84))
+            f_svg.write("%i" % (pos_y - 80))
             f_svg.write('">')
             f_svg.write("%.1f" % s)
             f_svg.write('</text>\n')
