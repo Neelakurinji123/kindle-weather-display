@@ -12,7 +12,7 @@ class OpenWeatherMap:
 
     def __init__(self, settings):
 
-        self.t_now = time.time()
+        self.t_now = int(time.time())
 
         d = dict()
         s = str()
@@ -44,7 +44,9 @@ class OpenWeatherMap:
 
         self.onecall = requests.get(url).json()
         OpenWeatherMap.unit = self.set_unit(self.units)
-
+        OpenWeatherMap.current_weather.icon = str()
+        OpenWeatherMap.forecast_hourly.icon = dict()
+        OpenWeatherMap.forecast_daily.icon = dict()
 
     def current_weather(self):
 
@@ -95,6 +97,7 @@ class OpenWeatherMap:
         dat[2] = self.fix_icon(**p)
 
         OpenWeatherMap.icon = self.add_icon(dat[2])
+        OpenWeatherMap.current_weather.icon = self.add_icon(dat[2])
 
         return dat
 
@@ -128,6 +131,7 @@ class OpenWeatherMap:
         dat[2] = self.fix_icon(**p)
 
         OpenWeatherMap.icon = self.add_icon(dat[2])
+        OpenWeatherMap.forecast_hourly.icon[hour] = self.add_icon(dat[2])
 
         return dat
 
@@ -162,6 +166,7 @@ class OpenWeatherMap:
         dat[2] = self.fix_icon(**p)
 
         OpenWeatherMap.icon = self.add_icon(dat[2])
+        OpenWeatherMap.forecast_daily.icon[day] = self.add_icon(dat[2])
 
         return dat
 
@@ -311,15 +316,12 @@ class OpenWeatherMap:
         return dat
 
 # test
-#a = OpenWeatherMap('settings-San-Francisco.xml')
-#print(a.current_weather(), '\n')
-#print(a.forecast_hourly(1), '\n')
-#print(a.forecast_daily(1), '\n')
-
-#print(type(a.forecast_daily(1)),'\n')
-#print(a.icon, '\n')
-#print(type(a.forecast_daily(3)),'\n')
-#print(a.icon, '\n')
-#print(type(a.forecast_daily(5)),'\n')
-#print(a.lang, '\n')
-#print(a.unit, '\n')
+#a = OpenWeatherMap('settings.xml')
+#print( a.current_weather(),'\n')
+#print( a.current_weather.icon, '\n')
+#hour1 = a.forecast_hourly(1)
+#print(a.forecast_hourly.icon[1], '\n')
+#hour2 = a.forecast_hourly(2)
+#print(a.forecast_hourly.icon[2], '\n')
+#hour3 = a.forecast_hourly(3)
+#print(a.forecast_hourly.icon[3], '\n')
