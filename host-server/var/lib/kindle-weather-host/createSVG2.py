@@ -20,7 +20,7 @@ from datetime import datetime, timedelta, date
 from pytz import timezone
 import pytz
 import locale
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal, ROUND_HALF_EVEN
 import extras.getextraicon as extraicon
 from subprocess import Popen
 from OpenWeatherMapAPI import OpenWeatherMap
@@ -31,7 +31,6 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
 
     today_forecast = p.forecast_daily(0)
     curt_weather = p.current_weather()
-    #icon_today = p.icon
 
     def add_header():
         if p.sunrise_and_sunset == 'True':
@@ -133,14 +132,12 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
     if (curt_weather[2] == 'Rain' or curt_weather[2] == 'Drizzle' or
             curt_weather[2] == 'Snow' or curt_weather[2] == 'Sleet' or curt_weather[2] == 'Clouds'):
 
-        s = curt_weather[14] * 100
-        f_svg.write('<text style="text-anchor:end;" font-size="45px" x="' + str(173 - int(s_padding(s) * 0.64)) + '" y="172">')
-        f_svg.write("%i" % s)
+        s = Decimal(curt_weather[14]).quantize(Decimal('0.1'), rounding=ROUND_HALF_EVEN)
+        f_svg.write('<text style="text-anchor:end;" font-size="45px" x="' + str(190 - int(s_padding(s) * 0.64)) + '" y="172">')
+        f_svg.write("%.1f" % s)
         f_svg.write('</text>\n')
 
-
    # add hourly forecast
-    #n = 60
     n = 70
     pos_y = 495
     hourly_icon = list()
@@ -177,13 +174,13 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
         if (forecast_hourly[2] == 'Rain' or forecast_hourly[2] == 'Drizzle' or
                 forecast_hourly[2] == 'Snow' or forecast_hourly[2] == 'Sleet' or forecast_hourly[2] == 'Clouds'):
 
+            s = Decimal(forecast_hourly[7]).quantize(Decimal('0.1'), rounding=ROUND_HALF_EVEN)
             f_svg.write('<text style="text-anchor:end;" font-size="25px" x="')
-            s = round(forecast_hourly[7] * 100)
-            f_svg.write("%i" % (n + 32 - int(s_padding(s) * 0.357)))
+            f_svg.write("%i" % (n + 42 - int(s_padding(s) * 0.357)))
             f_svg.write('" y="')
             f_svg.write("%i" % (pos_y - 84))
             f_svg.write('">')
-            f_svg.write("%i" % (s))
+            f_svg.write("%.1f" % s)
             f_svg.write('</text>\n')
 
         n += 200
@@ -192,9 +189,7 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
     f_svg.write('<line x1="400" x2="400" y1="' + str(pos_y - 185) + '" y2="' + str(pos_y) + '" style="fill:none;stroke:black;stroke-width:2px;"/>')
 
 
-    # add daly foredast
-    # Find min max for next days
-
+    # add daily foredast
     minTemp = math.floor(min([p.forecast_daily(1)[6], p.forecast_daily(2)[6] , p.forecast_daily(3)[6]]))
     maxTemp = math.ceil(max([p.forecast_daily(1)[7], p.forecast_daily(2)[7] , p.forecast_daily(3)[7]]))
 
@@ -320,10 +315,8 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
             img_convert(svgfile, pngfile, mode)
         else:
             # cloudconvert API
-
             import cloudconvert
             import json
-            #import shutil
 
             with open('cloudconvert.json') as f:
                 data = json.load(f)
@@ -368,7 +361,6 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
             file = res.get("result").get("files")[0]
             res = cloudconvert.download(filename=file['filename'], url=file['url'])  # download and return filename
 
-            #shutil.move(res, ('/tmp/www/' + res))
             args = ['convert', '-flatten', res,  ('pre-' + res)]
             output = Popen(args)
             time.sleep(3)
