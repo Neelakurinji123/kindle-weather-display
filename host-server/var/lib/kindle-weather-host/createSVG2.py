@@ -181,7 +181,7 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
             s = round(forecast_hourly[7] * 100)
             f_svg.write("%i" % (n + 32 - int(s_padding(s) * 0.357)))
             f_svg.write('" y="')
-            f_svg.write("%i" % (pos_y - 85))
+            f_svg.write("%i" % (pos_y - 84))
             f_svg.write('">')
             f_svg.write("%i" % (s))
             f_svg.write('</text>\n')
