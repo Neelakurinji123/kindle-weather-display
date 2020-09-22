@@ -114,7 +114,7 @@ EDIT: kindle-weather-host/extras/getextraicon.py
 Use createSVG2.py instead of createSVG.py.
 Not all locations working.
 
-<img src="sample_images/kindleStation-new.png" width="300" alt="new kindle weather" />
+<img src="sample_images/kindleStation-tokorozawa.png" width="300" alt="new kindle weather" />
 
 ### utf-8 encoding
 Converting SVG to PNG with cloudconvert API due to limitations of Imagemagick.
