@@ -41,14 +41,14 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
             maintenant = (str.lower(datetime.fromtimestamp(t_now, tz).strftime("%a, %d %b %H:%M")))
             s = '<text style="text-anchor:start;" font-size="30px" x="20" y="40">' + maintenant + '</text>\n'
 
-            if ("getSunrise" in dir(extraicon)) == True and ("getSunset" in dir(extraicon)) == True:
+            if ("getSunrise" in dir(extraicon.wi)) == True and ("getSunset" in dir(extraicon.wi)) == True:
                 # text
                 s += '<text style="text-anchor:end;" font-size="30px" x="445" y="' + str(40) + '">' + t_sunrise + '</text>\n'
                 s += '<text style="text-anchor:end;" font-size="30px" x="580" y="' + str(40) + '">' + t_sunset + '</text>\n'
 
                 # icon
-                s += '<g transform="matrix(0.05,0,0,0.05,335,' + str(15) + ')">' + extraicon.getSunrise() + '</g>\n'
-                s += '<g transform="matrix(0.05,0,0,0.05,470,' + str(15) + ')">' + extraicon.getSunset() + '</g>\n'
+                s += '<g transform="matrix(1.1,0,0,1.1,332,' + str(14) + ')">' + extraicon.wi.getSunrise() + '</g>\n'
+                s += '<g transform="matrix(1.1,0,0,1.1,467,' + str(14) + ')">' + extraicon.wi.getSunset() + '</g>\n'
             else:
                 s += '<text style="text-anchor:end;" font-size="30px" x="580" y="' + str(40) + '">'
                 s += 'daytime: ' + t_sunrise + ' - ' + t_sunset + '</text>\n'
@@ -102,7 +102,7 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
 
     # Wind
     f_svg.write('<text style="text-anchor:end;" font-size="30px" x="550" y="240">')
-    f_svg.write(curt_weather[9] if int(curt_weather[8]) != 0 else ' ')
+    if not "wi" in dir(extraicon): (f_svg.write(p.wind_direction(curt_weather[9]) if int(curt_weather[8]) != 0 else ' '))
     f_svg.write(' ')
     f_svg.write("%i" % (curt_weather[8]))
     f_svg.write(' ' + p.unit['wind_speed'] + '</text>\n')
@@ -178,7 +178,7 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
             f_svg.write('<text style="text-anchor:end;" font-size="25px" x="')
             f_svg.write("%i" % (n + 42 - int(s_padding(s) * 0.357)))
             f_svg.write('" y="')
-            f_svg.write("%i" % (pos_y - 80))
+            f_svg.write("%i" % (pos_y - 82))
             f_svg.write('">')
             f_svg.write("%.1f" % s)
             f_svg.write('</text>\n')
@@ -262,6 +262,30 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
     f_svg.write('<g transform="matrix(4,0,0,4,-35,-40)">')
     f_svg.write(p.current_weather.icon)
     f_svg.write('</g>\n')
+
+    # add Wind direction icon
+    if "wi" in dir(extraicon) and int(curt_weather[8]) != 0:
+
+        if p.wind_direction(curt_weather[9]) == 'N':
+            s = extraicon.wi.getDirectionUp()
+        elif p.wind_direction(curt_weather[9]) == 'NE':
+            s = extraicon.wi.getDirectionUpRight()
+        elif p.wind_direction(curt_weather[9]) == 'E':
+            s = extraicon.wi.getDirectionRight()
+        elif p.wind_direction(curt_weather[9]) == 'SE':
+            s = extraicon.wi.getDirectionDownRight()
+        elif p.wind_direction(curt_weather[9]) == 'S':
+            s = extraicon.wi.getDirectionDown()
+        elif p.wind_direction(curt_weather[9]) == 'SE':
+            s = extraicon.wi.getDirectionLeftDown()
+        elif p.wind_direction(curt_weather[9]) == 'E':
+            s = extraicon.wi.getDirectionLeft()
+        elif p.wind_direction(curt_weather[9]) == 'NE':
+            s = extraicon.wi.getDirectionUPLeft()
+
+        f_svg.write('<g transform="matrix(1.6,0,0,1.6,' + str(440 - len(str(int(curt_weather[8]))) * 17) + ',207)">')
+        f_svg.write(s)
+        f_svg.write('</g>\n')
 
     # add next hours icons
     n = 8

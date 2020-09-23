@@ -65,7 +65,7 @@ class OpenWeatherMap:
                d['current']['pressure'],
                d['current']['humidity'],
                d['current']['wind_speed'],
-               self.wind_direction(d['current']['wind_deg']),
+               d['current']['wind_deg'],
                d['current']['clouds'],
                d['current']['sunrise'],
                d['current']['sunset']]
@@ -189,43 +189,16 @@ class OpenWeatherMap:
 
         return dat
 
-
     def wind_direction(self, degree):
-        if degree >= 348.75 or degree <= 11.25:
-            s = 'N'
-        elif 11.25 < degree < 33.75:
-            s = 'NNE'
-        elif 33.75 <= degree <= 56.25:
-            s = 'NE'
-        elif 56.25 < degree < 78.75:
-            s = 'ENE'
-        elif 78.75 <= degree <= 101.25:
-            s = 'E'
-        elif 101.25 < degree < 123.75:
-            s = 'ESE'
-        elif 123.75 <= degree <= 146.25:
-            s = 'SE'
-        elif 146.25 < degree < 168.75:
-            s = 'SSE'
-        elif 168.75 <= degree <= 191.25:
-            s = 'S'
-        elif 191.25 < degree < 213.75:
-            s = 'SSW'
-        elif 213.75 <= degree <= 236.25:
-            s = 'SW'
-        elif 236.25 < degree < 258.75:
-            s = 'WSW'
-        elif 258.75 <= degree <= 281.25:
-            s = 'W'
-        elif 281.25 < degree < 303.75:
-            s = 'WNW'
-        elif 303.75 <= degree <= 326.25:
-            s = 'NW'
-        elif 326.25 < degree < 348.75:
-            s = 'NNW'
 
-        return s
-
+        if degree >= 348.75 or degree <= 33.75: return 'N'
+        elif 33.75 <= degree <= 78.75: return 'NE'
+        elif 78.75 <= degree <= 123.75: return 'E'
+        elif 123.75 <= degree <= 168.75: return 'SE'
+        elif 168.75 <= degree <= 213.75: return 'S'
+        elif 213.75 <= degree <= 258.75: return 'SW'
+        elif 258.75 <= degree <= 303.75: return 'W'
+        elif 303.75 <= degree <= 348.75: return 'NW'
 
     def add_icon(self, s):
         if s == 'Clear-day':
@@ -315,13 +288,3 @@ class OpenWeatherMap:
 
         return dat
 
-# test
-#a = OpenWeatherMap('settings.xml')
-#print( a.current_weather(),'\n')
-#print( a.current_weather.icon, '\n')
-#hour1 = a.forecast_hourly(1)
-#print(a.forecast_hourly.icon[1], '\n')
-#hour2 = a.forecast_hourly(2)
-#print(a.forecast_hourly.icon[2], '\n')
-#hour3 = a.forecast_hourly(3)
-#print(a.forecast_hourly.icon[3], '\n')
