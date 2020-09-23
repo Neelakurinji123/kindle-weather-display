@@ -125,8 +125,6 @@ Converting SVG to PNG with cloudconvert API due to limitations of Imagemagick.
 ### Option
 * [kindle-debian](https://mega.nz/folder/4XAlBK7Y#cSr2Gq8KxL6LkRe4SB0hqQ
 
-### Licensing
 
-* [sunrise icon, sunset icon and direction icons](https://erikflowers.github.io/weather-icons/) licensed under [SIL OFL 1.1](http://scripts.sil.org/OFL)
 
 
