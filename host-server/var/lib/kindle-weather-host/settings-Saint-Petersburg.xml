@@ -15,5 +15,6 @@
 		<units>metric</units>
 		<lang>ru</lang>
 		<exclude>minutely</exclude>
+		<alerts>True</alerts>
 	</service>
 </data>

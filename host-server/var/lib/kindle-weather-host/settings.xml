@@ -13,6 +13,7 @@
 		<lon>139.4275599</lon>
 		<units>metric</units>
 		<lang>en</lang>
-                <exclude>minutely</exclude>
+		<exclude>minutely</exclude>
+		<alerts>True</alerts>
 	</service>
 </data>

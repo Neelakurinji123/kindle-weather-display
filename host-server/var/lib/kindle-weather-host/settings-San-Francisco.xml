@@ -16,5 +16,6 @@
 		<units>imperial</units>
 		<lang>en</lang>
 		<exclude>minutely</exclude>
+		<alerts>True</alerts>
 	</service>
 </data>

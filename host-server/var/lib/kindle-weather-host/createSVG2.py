@@ -31,6 +31,7 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
 
     today_forecast = p.forecast_daily(0)
     curt_weather = p.current_weather()
+    alerts = p.weather_alerts()
 
     def add_header():
         if p.sunrise_and_sunset == 'True':
@@ -108,9 +109,14 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
     f_svg.write(' ' + p.unit['wind_speed'] + '</text>\n')
 
     # description
-    f_svg.write('<text style="text-anchor:end;" font-size="30px" x="550" y="280">')
-    f_svg.write(curt_weather[3])
-    f_svg.write('</text>\n')
+    if alerts != None:
+        f_svg.write('<text style="text-anchor:start;" font-weight="bold" font-size="30px" x="20" y="280">')
+        f_svg.write('ALERT: ' + alerts[0]['event'])
+        f_svg.write('</text>\n')
+    else:
+        f_svg.write('<text style="text-anchor:end;" font-size="30px" x="550" y="280">')
+        f_svg.write(curt_weather[3])
+        f_svg.write('</text>\n')
 
     # Max
     f_svg.write('<text style="text-anchor:end;" font-size="35px" x="550" y="110">')

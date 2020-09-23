@@ -15,5 +15,6 @@
 		<units>metric</units>
 		<lang>es</lang>
 		<exclude>minutely</exclude>
+		<alerts>True</alerts>
 	</service>
 </data>

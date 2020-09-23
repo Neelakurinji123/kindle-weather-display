@@ -35,6 +35,7 @@ class OpenWeatherMap:
                 self.units = service.find('units').text
                 self.lang = service.find('lang').text
                 self.exclude = service.find('exclude').text
+                self.alerts = bool(service.find('alerts').text)
 
             s += '&units=' + self.units if self.units != '' else ''
             s += '&lang=' + self.lang if self.lang != '' else ''
@@ -170,6 +171,14 @@ class OpenWeatherMap:
 
         return dat
 
+    def weather_alerts(self):
+        d = self.onecall
+        if 'alerts' in d and self.alerts == True:
+            dat = d['alerts']
+        else:
+            dat = None
+
+        return dat
 
     def fix_icon(self, id, weather, description, icon):
 
