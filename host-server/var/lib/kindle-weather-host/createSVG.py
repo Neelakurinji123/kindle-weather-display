@@ -289,14 +289,14 @@ def add_head():
         maintenant = (str.lower(datetime.fromtimestamp(curt_time, tz).strftime("%a, %d %b %H:%M")))
         s = '<text style="text-anchor:start;" font-size="30px" x="20" y="40">' + maintenant + '</text>\n'
 
-        if ("getSunrise" in dir(extraicon)) == True and ("getSunset" in dir(extraicon)) == True:
+        if ("getSunrise" in dir(extraicon.wi)) == True and ("getSunset" in dir(extraicon.wi)) == True:
             # text
             s += '<text style="text-anchor:end;" font-size="30px" x="445" y="' + str(40) + '">' + t_sunrise + '</text>\n'
             s += '<text style="text-anchor:end;" font-size="30px" x="580" y="' + str(40) + '">' + t_sunset + '</text>\n'
 
             # icon
-            s += '<g transform="matrix(0.06,0,0,0.06,330,' + str(12) + ')">' + extraicon.getSunrise() + '</g>\n'
-            s += '<g transform="matrix(0.06,0,0,0.06,465,' + str(12) + ')">' + extraicon.getSunset() + '</g>\n'
+            s += '<g transform="matrix(1.1,0,0,1.1,332,' + str(14) + ')">' + extraicon.wi.getSunrise() + '</g>\n'
+            s += '<g transform="matrix(1.1,0,0,1.1,467,' + str(14) + ')">' + extraicon.wi.getSunset() + '</g>\n'
         else:
             s += '<text style="text-anchor:end;" font-size="30px" x="580" y="' + str(40) + '">'
             s += 'daytime: ' + t_sunrise + ' - ' + t_sunset + '</text>\n'
