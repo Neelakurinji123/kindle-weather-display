@@ -123,7 +123,7 @@ Converting SVG to PNG with cloudconvert API due to limitations of Imagemagick.
 * add api key to cloudconvert.json
 
 ### Option
-* [kindle-debian](https://mega.nz/folder/4XAlBK7Y#cSr2Gq8KxL6LkRe4SB0hqQ
+* [kindle-debian](https://mega.nz/folder/4XAlBK7Y#cSr2Gq8KxL6LkRe4SB0hqQ)
 
 
 
