@@ -46,8 +46,8 @@ class OpenWeatherMap:
         self.onecall = requests.get(url).json()
         OpenWeatherMap.unit = self.set_unit(self.units)
         OpenWeatherMap.current_weather.icon = str()
-        OpenWeatherMap.forecast_hourly.icon = dict()
-        OpenWeatherMap.forecast_daily.icon = dict()
+        OpenWeatherMap.hourly_forecast.icon = dict()
+        OpenWeatherMap.daily_forecast.icon = dict()
 
     def current_weather(self):
 
@@ -103,7 +103,7 @@ class OpenWeatherMap:
         return dat
 
 
-    def forecast_hourly(self, hour):
+    def hourly_forecast(self, hour):
 
         # forecast data
         # list - 0:time  1:id  2:weather  3:description  4:icon  5:temp  6:clouds  7:pop  8:wind gust  9:rain or snow
@@ -132,11 +132,11 @@ class OpenWeatherMap:
         dat[2] = self.fix_icon(**p)
 
         OpenWeatherMap.icon = self.add_icon(dat[2])
-        OpenWeatherMap.forecast_hourly.icon[hour] = self.add_icon(dat[2])
+        OpenWeatherMap.hourly_forecast.icon[hour] = self.add_icon(dat[2])
 
         return dat
 
-    def forecast_daily(self, day):
+    def daily_forecast(self, day):
 
         # forecast data
         # list - 0:time  1:id  2:weather  3:description  4:icon  5:temp day 6:temp min  7:temp max  8:clouds  9: probability of precipitation
@@ -167,7 +167,7 @@ class OpenWeatherMap:
         dat[2] = self.fix_icon(**p)
 
         OpenWeatherMap.icon = self.add_icon(dat[2])
-        OpenWeatherMap.forecast_daily.icon[day] = self.add_icon(dat[2])
+        OpenWeatherMap.daily_forecast.icon[day] = self.add_icon(dat[2])
 
         return dat
 
@@ -175,6 +175,15 @@ class OpenWeatherMap:
         d = self.onecall
         if 'alerts' in d and self.alerts == True:
             dat = d['alerts']
+#        if not 'alerts' in d and self.alerts == True:
+#            dat =  [
+#    {
+#      "sender_name": "NWS Tulsa (Eastern Oklahoma)",
+#      "event": "Heat Advisory",
+#      "start": 1597341600,
+#      "end": 1597366800,
+#      "description": "...HEAT ADVISORY REMAINS IN EFFECT FROM 1 PM THIS AFTERNOON TO\n8 PM CDT THIS EVENING...\n* WHAT...Heat index values of 105 to 109 degrees expected.\n* WHERE...Creek, Okfuskee, Okmulgee, McIntosh, Pittsburg,\nLatimer, Pushmataha, and Choctaw Counties.\n* WHEN...From 1 PM to 8 PM CDT Thursday.\n* IMPACTS...The combination of hot temperatures and high\nhumidity will combine to create a dangerous situation in which\nheat illnesses are possible."
+#    }]
         else:
             dat = None
 

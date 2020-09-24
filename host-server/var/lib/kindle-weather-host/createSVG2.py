@@ -16,50 +16,20 @@
 import math
 import time
 import sys
+import re
 from datetime import datetime, timedelta, date
 from pytz import timezone
 import pytz
 import locale
 from decimal import Decimal, ROUND_HALF_EVEN
 import extras.getextraicon as extraicon
+import extras.weather_icons as wi
 from subprocess import Popen
 from OpenWeatherMapAPI import OpenWeatherMap
 
 
 # Create SVG file
 def create_svg(p, t_now, tz, utc, svgfile, pngfile):
-
-    today_forecast = p.forecast_daily(0)
-    curt_weather = p.current_weather()
-    alerts = p.weather_alerts()
-
-    def add_header():
-        if p.sunrise_and_sunset == 'True':
-            t_sunrise = str(datetime.fromtimestamp(curt_weather[11], tz).strftime("%H:%M"))
-            t_sunset = str(datetime.fromtimestamp(curt_weather[12], tz).strftime("%H:%M"))
-
-            # localtime
-            maintenant = (str.lower(datetime.fromtimestamp(t_now, tz).strftime("%a, %d %b %H:%M")))
-            s = '<text style="text-anchor:start;" font-size="30px" x="20" y="40">' + maintenant + '</text>\n'
-
-            if ("getSunrise" in dir(extraicon.wi)) == True and ("getSunset" in dir(extraicon.wi)) == True:
-                # text
-                s += '<text style="text-anchor:end;" font-size="30px" x="445" y="' + str(40) + '">' + t_sunrise + '</text>\n'
-                s += '<text style="text-anchor:end;" font-size="30px" x="580" y="' + str(40) + '">' + t_sunset + '</text>\n'
-
-                # icon
-                s += '<g transform="matrix(1.1,0,0,1.1,332,' + str(14) + ')">' + extraicon.wi.getSunrise() + '</g>\n'
-                s += '<g transform="matrix(1.1,0,0,1.1,467,' + str(14) + ')">' + extraicon.wi.getSunset() + '</g>\n'
-            else:
-                s += '<text style="text-anchor:end;" font-size="30px" x="580" y="' + str(40) + '">'
-                s += 'daytime: ' + t_sunrise + ' - ' + t_sunset + '</text>\n'
-        else:
-            maintenant = str.lower(datetime.fromtimestamp(t_now, tz).strftime("%a %Y/%m/%d %H:%M"))
-
-            s = '<text style="text-anchor:start;" font-size="30px" x="20" y="40">' + p.city + '</text>\n'
-            s += '<text style="text-anchor:end;" font-size="30px" x="580" y="40">' + maintenant + '</text>\n'
-
-        return f_svg.write(s)
 
     def s_padding(x):
         if x >= 100 : return -5
@@ -68,250 +38,222 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
         elif -10 < x < 0 : return 20
         elif x <= -10 : return 0
 
+    def add_header():
+        if p.sunrise_and_sunset == 'True':
+            t_sunrise = str(datetime.fromtimestamp(curt_weather[11], tz).strftime("%H:%M"))
+            t_sunset = str(datetime.fromtimestamp(curt_weather[12], tz).strftime("%H:%M"))
+
+            # localtime
+            maintenant = (str.lower(datetime.fromtimestamp(t_now, tz).strftime("%a, %d %b %H:%M")))
+            s = '<text style="text-anchor:start;" font-size="30px" x="20" y="40">{}</text>\n'.format(maintenant)
+
+            # text
+            s += '<text style="text-anchor:end;" font-size="30px" x="445" y="40">{}</text>\n'.format(t_sunrise)
+            s += '<text style="text-anchor:end;" font-size="30px" x="580" y="40">{}</text>\n'.format(t_sunset)
+
+            # icon
+            s += '<g transform="matrix(1.1,0,0,1.1,332,14)">{}</g>\n'.format(wi.getSunrise())
+            s += '<g transform="matrix(1.1,0,0,1.1,467,14)">{}</g>\n'.format(wi.getSunset())
+        else:
+            maintenant = str.lower(datetime.fromtimestamp(t_now, tz).strftime("%a %Y/%m/%d %H:%M"))
+
+            s = '<text style="text-anchor:start;" font-size="30px" x="20" y="40">{}</text>\n'.format(p.city)
+            s += '<text style="text-anchor:end;" font-size="30px" x="580" y="40">{}</text>\n'.format(maintenant)
+
+        return s
+
+    def add_curt_weather():
+        # Temperature
+        tempEntier = math.floor(curt_weather[5])
+        tempDecimale = 10 * (curt_weather[5] - tempEntier)
+        s = '<text style="text-anchor:end;" font-size="100px" x="425" y="150">{}</text>\n'.format(int(tempEntier))
+        s += '<text style="text-anchor:start;" font-size="50px" x="420" y="145">,{}</text>\n'.format(int(tempDecimale))
+        s += '<circle cx="440" cy="80" r="7" stroke="black" stroke-width="3" fill="none"/>\n'
+        s += '<text style="text-anchor:start;" font-size="35px" x="450" y="100">{}</text>\n'.format(p.unit['temp'])
+
+        # Humidity
+        s += '<text style="text-anchor:end;" font-size="30px" x="400" y="200">{}%</text>\n'.format(round(curt_weather[7]))
+
+        # Pressure
+        s += '<text style="text-anchor:end;" font-size="30px" x="550" y="200">'
+        s += '{0}{1}</text>\n'.format(round(curt_weather[6]), p.unit['pressure'])
+
+        # Wind
+        s += '<text style="text-anchor:end;" font-size="30px" x="550" y="240">'
+        s += ' {0} {1}</text>\n'.format(int(curt_weather[8]), p.unit['wind_speed'])
+        # description
+        if alerts != None:
+            s += '<text style="text-anchor:start;" font-weight="bold" font-size="30px" x="20" y="340">'
+            s += 'ALERT: {}</text>\n'.format(alerts[0]['event'])
+        else:
+            s += '<text style="text-anchor:end;" font-size="30px" x="550" y="280">{}</text>\n'.format(curt_weather[3])
+
+        # Max
+        s += '<text style="text-anchor:end;" font-size="35px" x="550" y="110">{}</text>\n'.format(int(math.ceil(today_forecast[7])))
+        s += '<circle cx="555" cy="90" r="4" stroke="black" stroke-width="3" fill="none"/>\n'
+        s += '<text style="text-anchor:start;" font-size="25px" x="560" y="102">{}</text>\n'.format(p.unit['temp'])
+        s += '<line x1="490" x2="590" y1="117" y2="117" style="fill:none;stroke:black;stroke-width:1px;"/>\n'
+
+        # Min
+        s += '<text style="text-anchor:end;" font-size="35px" x="550" y="150">{}</text>\n'.format(int(math.floor(today_forecast[6])))
+        s += '<circle cx="555" cy="130" r="4" stroke="black" stroke-width="3" fill="none"/>\n'
+        s += '<text style="text-anchor:start;" font-size="25px" x="560" y="142">{}</text>\n'.format(p.unit['temp'])
+
+        # probability of precipitation
+        if (curt_weather[2] == 'Rain' or curt_weather[2] == 'Drizzle' or
+                curt_weather[2] == 'Snow' or curt_weather[2] == 'Sleet' or curt_weather[2] == 'Clouds'):
+
+            r = Decimal(curt_weather[14]).quantize(Decimal('0.1'), rounding=ROUND_HALF_EVEN)
+            s += '<text style="text-anchor:end;" font-size="45px" x="{0}" y="175">{1:.1f}</text>\n'.format((190 - int(s_padding(r) * 0.64)), r)
+
+        return s
+
+
+    def add_hourly_forecast():
+        # add hourly forecast
+        n = 70
+        pos_y = 495
+        hourly_icon = list()
+        s = str()
+        for i in range(3, 12, 3):
+            hourly_forecast = p.hourly_forecast(i)
+            jour = datetime.fromtimestamp(hourly_forecast[0], tz)
+
+            s += '<text style="text-anchor:start;" font-size="30px" x="'
+            s += '{0}" y="{1}">{2}</text>\n'.format((n - 10), (pos_y - 160), jour.strftime("%H:%M"))
+            s += '<text style="text-anchor:end;" font-size="35px" x="{0}" y="{1}">'.format((n + 45), (pos_y))
+            s += '{}</text>\n'.format(round(hourly_forecast[5]))
+
+            s += '<circle cx="{0}" cy="{1}'.format((n + 5 + 45), (pos_y - 25))
+            s += '" r="4" stroke="black" stroke-width="2" fill="none"/>\n'
+
+            s += '<text style="text-anchor:start;" font-size="25px" '
+            s += 'x="{0}" y="{1}">{2}</text>\n'.format((n + 10 + 45), (pos_y - 10), p.unit['temp'])
+
+            w = hourly_forecast[2]
+            if w == 'Rain' or w == 'Drizzle' or w == 'Snow' or w == 'Sleet' or w == 'Clouds':
+                r = Decimal(hourly_forecast[7]).quantize(Decimal('0.1'), rounding=ROUND_HALF_EVEN)
+                s += '<text style="text-anchor:end;" font-size="25px" '
+                s += 'x="{0}" y="{1}">{2:.1f}</text>\n'.format(int(n + 42 - s_padding(r) * 0.357), (pos_y - 82), r)
+
+            n += 200
+
+        s += '<line x1="200" x2="200" y1="{0}" y2="{1}" style="fill:none;stroke:black;stroke-width:2px;"/>\n'.format((pos_y - 185), pos_y)
+        s += '<line x1="400" x2="400" y1="{0}" y2="{1}" style="fill:none;stroke:black;stroke-width:2px;"/>\n'.format((pos_y - 185), pos_y)
+
+        return s
+
+    def add_daily_forecast():
+        minTemp = math.floor(min([p.daily_forecast(1)[6], p.daily_forecast(2)[6] , p.daily_forecast(3)[6]]))
+        maxTemp = math.ceil(max([p.daily_forecast(1)[7], p.daily_forecast(2)[7] , p.daily_forecast(3)[7]]))
+
+        pasTemp = 120 / (maxTemp-minTemp)
+
+        n=575
+        daily_icon = list()
+        s = str()
+        for i in range(1, 4):
+            forecast = p.daily_forecast(i)
+            jour = datetime.fromtimestamp(forecast[0], tz)
+            s += '<text style="text-anchor:end;" font-size="35px" '
+            s += 'x="185" y="{0}">{1}</text>\n'.format(n, str.lower(jour.strftime("%A")))
+
+            tMin = (int)(355 + pasTemp * (math.floor(forecast[6]) - minTemp))
+            s += '<text style="text-anchor:end;" font-size="35px" '
+            s += 'x="{0}" y="{1}">{2}</text>\n'.format(tMin, n, int(math.floor(forecast[6])))
+
+            s += '<circle cx="{0}" cy="{1}" r="4" stroke="black" stroke-width="2" fill="none"/>\n'.format(tMin+5, (n-25))
+            s += '<text style="text-anchor:start;" font-size="25px" x="{0}" y="{1}">{2}</text>\n'.format((tMin+10), (n-10), p.unit['temp'])
+
+            tMax = (int)(440 + pasTemp * (math.ceil(forecast[7]) - minTemp))
+            s += '<text style="text-anchor:end;" font-size="35px" x="{0}" y="{1}">{2}</text>\n'.format(int(tMax - s_padding(forecast[7])), n, int(math.ceil(forecast[7])))
+
+            s += '<circle cx="{0}" cy="{1}"'.format(int(tMax + 5 - s_padding(forecast[7])), (n-25))
+            s += ' r="4" stroke="black" stroke-width="2" fill="none"/>\n'
+
+            s += '<text style="text-anchor:start;" font-size="25px" '
+            s += 'x="{0}" y="{1}">{2}</text>\n'.format(int(tMax + 10 - s_padding(forecast[7])), (n-10), p.unit['temp'])
+
+            s += '<line x1="{0}" x2="{1}" y1="{2}" y2="{3}" '.format(int(tMin + 40), int(tMax - 65), (n-10), (n-10))
+            s += 'style="fill:none;stroke:black;stroke-linecap:round;stroke-width:10px;"/>\n'
+
+            n += 90
+
+        return s
+
+
+    def add_today_icon():
+        s = '<g transform="matrix(4,0,0,4,-35,-40)">{}</g>\n'.format(p.current_weather.icon)
+
+        # add wind direction icon
+        if int(curt_weather[8]) != 0:
+            w = p.wind_direction(curt_weather[9])
+            if w == 'N':    r = wi.getDirectionDown()
+            elif w == 'NE': r = wi.getDirectionDownLeft()
+            elif w == 'E':  r = wi.getDirectionLeft()
+            elif w == 'SE': r = wi.getDirectionUpLeft()
+            elif w == 'S':  r = wi.getDirectionUp()
+            elif w == 'SW': r = wi.getDirectionUPRight()
+            elif w == 'W':  r = wi.getDirectionRight()
+            elif w == 'NW': r = wi.getDirectionDownRight()
+
+            s += '<g transform="matrix(1.5,0,0,1.5,{0},207)">{1}</g>\n'.format((440 - len(str(int(curt_weather[8]))) * 17), r)
+
+        return s
+
+    def add_next_hours_icons():
+        n = 8
+        s = str()
+        for i in range(3, 12, 3):
+            s += '<g transform="matrix(2.3,0,0,2.3,{0},290)">{1}</g>\n'.format((n-25), p.hourly_forecast.icon[i])
+            n += 200
+
+        return s
+
+    def add_next_days_icons():
+        n = 470
+        s = str()
+        for i in range(1, 4):
+            s += '<g transform="matrix(1.9,0,0,1.9,160,{0})">{1}</g>\n'.format(n, p.daily_forecast.icon[i])
+            n += 90
+
+        return s
+
+    today_forecast = p.daily_forecast(0)
+    curt_weather = p.current_weather()
+    alerts = p.weather_alerts()
 
     f_svg = open(svgfile,"w", encoding=p.encoding)
 
-    f_svg.write('<?xml version="1.0" encoding="' + p.encoding + '"?>\n')
+    f_svg.write('<?xml version="1.0" encoding="{}"?>\n'.format(p.encoding))
     f_svg.write('<svg xmlns="http://www.w3.org/2000/svg" height="800" width="600" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink">\n')
     #f_svg.write('<g font-family="Chalkboard">\n')
     #f_svg.write('<g font-family="Arial">\n')
-    f_svg.write('<g font-family="' + p.font + '">\n')
+    f_svg.write('<g font-family="{}">\n'.format(p.font))
+    f_svg.write(add_header())
+    f_svg.write(add_curt_weather())
 
-    add_header()
-
-    # Temperature
-    tempEntier = math.floor(curt_weather[5])
-    tempDecimale = 10 * (curt_weather[5] - tempEntier)
-    f_svg.write('<text style="text-anchor:end;" font-size="100px" x="425" y="150">')
-    f_svg.write("%i" % (tempEntier))
-    f_svg.write('</text>\n')
-    f_svg.write('<text style="text-anchor:start;" font-size="50px" x="420" y="145">,')
-    f_svg.write("%i" % (tempDecimale))
-    f_svg.write('</text>\n')
-    f_svg.write('<circle cx="440" cy="80" r="7" stroke="black" stroke-width="3" fill="none"/>')
-    f_svg.write('<text style="text-anchor:start;" font-size="35px" x="450" y="100">' + p.unit['temp'] + '</text>')
-
-    # Humidity
-    f_svg.write('<text style="text-anchor:end;" font-size="30px" x="400" y="200">')
-    f_svg.write("%i" % (round(curt_weather[7])))
-    f_svg.write('%</text>\n')
-
-    # Pressure
-    f_svg.write('<text style="text-anchor:end;" font-size="30px" x="550" y="200">')
-    f_svg.write("%i " % (round(curt_weather[6])) + p.unit['pressure'])
-    f_svg.write('</text>\n')
-
-    # Wind
-    f_svg.write('<text style="text-anchor:end;" font-size="30px" x="550" y="240">')
-    if not "wi" in dir(extraicon): (f_svg.write(p.wind_direction(curt_weather[9]) if int(curt_weather[8]) != 0 else ' '))
-    f_svg.write(' ')
-    f_svg.write("%i" % (curt_weather[8]))
-    f_svg.write(' ' + p.unit['wind_speed'] + '</text>\n')
-
-    # description
     if alerts != None:
-        f_svg.write('<text style="text-anchor:start;" font-weight="bold" font-size="30px" x="20" y="280">')
-        f_svg.write('ALERT: ' + alerts[0]['event'])
-        f_svg.write('</text>\n')
+        pass
     else:
-        f_svg.write('<text style="text-anchor:end;" font-size="30px" x="550" y="280">')
-        f_svg.write(curt_weather[3])
-        f_svg.write('</text>\n')
+        f_svg.write(add_hourly_forecast())
+        f_svg.write(add_daily_forecast())
+        f_svg.write('</g>\n')
 
-    # Max
-    f_svg.write('<text style="text-anchor:end;" font-size="35px" x="550" y="110">')
-    f_svg.write("%i" % (math.ceil(today_forecast[7])))
-    f_svg.write('</text>\n')
-    f_svg.write('<circle cx="555" cy="90" r="4" stroke="black" stroke-width="3" fill="none"/>')
-    f_svg.write('<text style="text-anchor:start;" font-size="25px" x="560" y="102">' + p.unit['temp'] + '</text>')
+    if alerts != None:
+        n = 385
+        s = str()
+        for r in re.split("\n", alerts[0]['description']):
+            s += '<text style="text-anchor:start;" font-size="16px" x="20" y="{0}">{1}</text>\n'.format(n, r)
+            n += 30
 
-    f_svg.write('<line x1="490" x2="590" y1="117" y2="117" style="fill:none;stroke:black;stroke-width:1px;"/>')
-
-    # Min
-    f_svg.write('<text style="text-anchor:end;" font-size="35px" x="550" y="150">')
-    f_svg.write("%i" % (math.floor(today_forecast[6])))
-    f_svg.write('</text>\n')
-    f_svg.write('<circle cx="555" cy="130" r="4" stroke="black" stroke-width="3" fill="none"/>')
-    f_svg.write('<text style="text-anchor:start;" font-size="25px" x="560" y="142">' + p.unit['temp'] + '</text>')
-
-    # probability of precipitation
-    if (curt_weather[2] == 'Rain' or curt_weather[2] == 'Drizzle' or
-            curt_weather[2] == 'Snow' or curt_weather[2] == 'Sleet' or curt_weather[2] == 'Clouds'):
-
-        s = Decimal(curt_weather[14]).quantize(Decimal('0.1'), rounding=ROUND_HALF_EVEN)
-        f_svg.write('<text style="text-anchor:end;" font-size="45px" x="' + str(190 - int(s_padding(s) * 0.64)) + '" y="175">')
-        f_svg.write("%.1f" % s)
-        f_svg.write('</text>\n')
-
-   # add hourly forecast
-    n = 70
-    pos_y = 495
-    hourly_icon = list()
-    for i in range(3, 12, 3):
-        forecast_hourly = p.forecast_hourly(i)
-        jour = datetime.fromtimestamp(forecast_hourly[0], tz)
-
-        f_svg.write('<text style="text-anchor:start;" font-size="30px" x="')
-        f_svg.write("%i" % (n - 10))
-        f_svg.write('" y="')
-        f_svg.write("%i" % (pos_y - 160))
-        f_svg.write('">')
-        f_svg.write(jour.strftime("%H:%M"))
-        f_svg.write('</text>')
-
-        f_svg.write('<text style="text-anchor:end;" font-size="35px" x="')
-        f_svg.write("%i" % (n + 45))
-        f_svg.write('" y="')
-        f_svg.write("%i" % (pos_y))
-        f_svg.write('">')
-        f_svg.write("%i" % (round(forecast_hourly[5])))
-        f_svg.write('</text>\n')
-        f_svg.write('<circle cx="')
-        f_svg.write("%i" % (n + 5 + 45))
-        f_svg.write('" cy="')
-        f_svg.write("%i" % (pos_y - 25))
-        f_svg.write('" r="4" stroke="black" stroke-width="2" fill="none"/>')
-        f_svg.write('<text style="text-anchor:start;" font-size="25px" x="')
-        f_svg.write("%i" % (n + 10 + 45))
-        f_svg.write('" y="')
-        f_svg.write("%i" % (pos_y - 10))
-        f_svg.write('">' + p.unit['temp'] + '</text>\n')
-
-        if (forecast_hourly[2] == 'Rain' or forecast_hourly[2] == 'Drizzle' or
-                forecast_hourly[2] == 'Snow' or forecast_hourly[2] == 'Sleet' or forecast_hourly[2] == 'Clouds'):
-
-            s = Decimal(forecast_hourly[7]).quantize(Decimal('0.1'), rounding=ROUND_HALF_EVEN)
-            f_svg.write('<text style="text-anchor:end;" font-size="25px" x="')
-            f_svg.write("%i" % (n + 42 - int(s_padding(s) * 0.357)))
-            f_svg.write('" y="')
-            f_svg.write("%i" % (pos_y - 82))
-            f_svg.write('">')
-            f_svg.write("%.1f" % s)
-            f_svg.write('</text>\n')
-
-        n += 200
-
-    f_svg.write('<line x1="200" x2="200" y1="' + str(pos_y - 185) + '" y2="' + str(pos_y) + '" style="fill:none;stroke:black;stroke-width:2px;"/>')
-    f_svg.write('<line x1="400" x2="400" y1="' + str(pos_y - 185) + '" y2="' + str(pos_y) + '" style="fill:none;stroke:black;stroke-width:2px;"/>')
-
-
-    # add daily foredast
-    minTemp = math.floor(min([p.forecast_daily(1)[6], p.forecast_daily(2)[6] , p.forecast_daily(3)[6]]))
-    maxTemp = math.ceil(max([p.forecast_daily(1)[7], p.forecast_daily(2)[7] , p.forecast_daily(3)[7]]))
-
-    pasTemp = 120 / (maxTemp-minTemp)
-
-    n=575
-    daily_icon = list()
-    for i in range(1, 4):
-        forecast = p.forecast_daily(i)
-        jour = datetime.fromtimestamp(forecast[0], tz)
-        f_svg.write('<text style="text-anchor:end;" font-size="35px" x="185" y="')
-        f_svg.write("%i" % (n))
-        f_svg.write('">')
-        f_svg.write(str.lower(jour.strftime("%A")))
-        f_svg.write('</text>\n')
-
-        tMin = (int)(355 + pasTemp * (math.floor(forecast[6]) - minTemp))
-        f_svg.write('<text style="text-anchor:end;" font-size="35px" x="')
-        f_svg.write("%i" % (tMin))
-        f_svg.write('" y="')
-        f_svg.write("%i" % (n))
-        f_svg.write('">')
-        f_svg.write("%i" % (math.floor(forecast[6])))
-        f_svg.write('</text>\n')
-        f_svg.write('<circle cx="')
-        f_svg.write("%i" % (tMin+5))
-        f_svg.write('" cy="')
-        f_svg.write("%i" % (n-25))
-        f_svg.write('" r="4" stroke="black" stroke-width="2" fill="none"/>')
-        f_svg.write('<text style="text-anchor:start;" font-size="25px" x="')
-        f_svg.write("%i" % (tMin+10))
-        f_svg.write('" y="')
-        f_svg.write("%i" % (n-10))
-        f_svg.write('">' + p.unit['temp'] + '</text>')
-
-        tMax = (int)(440 + pasTemp * (math.ceil(forecast[7]) - minTemp))
-        f_svg.write('<text style="text-anchor:end;" font-size="35px" x="')
-        f_svg.write("%i" % (tMax - s_padding(forecast[7])))
-        f_svg.write('" y="')
-        f_svg.write("%i" % (n))
-        f_svg.write('">')
-        f_svg.write("%i" % (math.ceil(forecast[7])))
-        f_svg.write('</text>\n')
-        f_svg.write('<circle cx="')
-        f_svg.write("%i" % (tMax + 5 - s_padding(forecast[7])))
-        f_svg.write('" cy="')
-        f_svg.write("%i" % (n-25))
-        f_svg.write('" r="4" stroke="black" stroke-width="2" fill="none"/>')
-        f_svg.write('<text style="text-anchor:start;" font-size="25px" x="')
-        f_svg.write("%i" % (tMax + 10 - s_padding(forecast[7])))
-        f_svg.write('" y="')
-        f_svg.write("%i" % (n-10))
-        f_svg.write('">' + p.unit['temp'] + '</text>')
-
-        f_svg.write('<line x1="')
-        f_svg.write("%i" % (tMin + 40))
-        f_svg.write('" x2="')
-        f_svg.write("%i" % (tMax - 65))
-        f_svg.write('" y1="')
-        f_svg.write("%i" % (n-10))
-        f_svg.write('" y2="')
-        f_svg.write("%i" % (n-10))
-        f_svg.write('" style="fill:none;stroke:black;stroke-linecap:round;stroke-width:10px;"/>\n')
-
-        n += 90
-
-    f_svg.write('</g>\n')
-
-    # add day icon
-    f_svg.write('<g transform="matrix(4,0,0,4,-35,-40)">')
-    f_svg.write(p.current_weather.icon)
-    f_svg.write('</g>\n')
-
-    # add Wind direction icon
-    if "wi" in dir(extraicon) and int(curt_weather[8]) != 0:
-
-        if p.wind_direction(curt_weather[9]) == 'N':
-            s = extraicon.wi.getDirectionUp()
-        elif p.wind_direction(curt_weather[9]) == 'NE':
-            s = extraicon.wi.getDirectionUpRight()
-        elif p.wind_direction(curt_weather[9]) == 'E':
-            s = extraicon.wi.getDirectionRight()
-        elif p.wind_direction(curt_weather[9]) == 'SE':
-            s = extraicon.wi.getDirectionDownRight()
-        elif p.wind_direction(curt_weather[9]) == 'S':
-            s = extraicon.wi.getDirectionDown()
-        elif p.wind_direction(curt_weather[9]) == 'SE':
-            s = extraicon.wi.getDirectionLeftDown()
-        elif p.wind_direction(curt_weather[9]) == 'E':
-            s = extraicon.wi.getDirectionLeft()
-        elif p.wind_direction(curt_weather[9]) == 'NE':
-            s = extraicon.wi.getDirectionUPLeft()
-
-        f_svg.write('<g transform="matrix(1.6,0,0,1.6,' + str(440 - len(str(int(curt_weather[8]))) * 17) + ',207)">')
         f_svg.write(s)
         f_svg.write('</g>\n')
+    else:
+        f_svg.write(add_next_hours_icons())
+        f_svg.write(add_next_days_icons())
 
-    # add next hours icons
-    n = 8
-    for i in range(3, 12, 3):
-        f_svg.write('<g transform="matrix(2.3,0,0,2.3,')
-        f_svg.write("%i" % (n-25))
-        f_svg.write(',290)">')
-        f_svg.write(p.forecast_hourly.icon[i])
-        f_svg.write('</g>\n')
-        n += 200
-
-    # add next days icons
-    n = 470
-    for i in range(1, 4):
-        f_svg.write('<g transform="matrix(1.9,0,0,1.9,160,')
-        f_svg.write("%i" % (n))
-        f_svg.write(')">')
-        f_svg.write(p.forecast_daily.icon[i])
-        f_svg.write('</g>\n')
-        n += 90
+    f_svg.write(add_today_icon())
 
     # close file
     f_svg.write('</svg>')
