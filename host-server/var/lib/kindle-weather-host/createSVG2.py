@@ -67,7 +67,7 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
         tempEntier = math.floor(curt_weather[5])
         tempDecimale = 10 * (curt_weather[5] - tempEntier)
         s = '<text style="text-anchor:end;" font-size="100px" x="425" y="150">{}</text>\n'.format(int(tempEntier))
-        s += '<text style="text-anchor:start;" font-size="50px" x="420" y="145">,{}</text>\n'.format(int(tempDecimale))
+        s += '<text style="text-anchor:start;" font-size="50px" x="420" y="145">.{}</text>\n'.format(int(tempDecimale))
         s += '<circle cx="440" cy="80" r="7" stroke="black" stroke-width="3" fill="none"/>\n'
         s += '<text style="text-anchor:start;" font-size="35px" x="450" y="100">{}</text>\n'.format(p.unit['temp'])
 
@@ -82,11 +82,7 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
         s += '<text style="text-anchor:end;" font-size="30px" x="550" y="240">'
         s += ' {0} {1}</text>\n'.format(int(curt_weather[8]), p.unit['wind_speed'])
         # description
-        if alerts != None:
-            s += '<text style="text-anchor:start;" font-weight="bold" font-size="30px" x="20" y="340">'
-            s += 'ALERT: {}</text>\n'.format(alerts[0]['event'])
-        else:
-            s += '<text style="text-anchor:end;" font-size="30px" x="550" y="280">{}</text>\n'.format(curt_weather[3])
+        s += '<text style="text-anchor:end;" font-size="30px" x="550" y="280">{}</text>\n'.format(curt_weather[3])
 
         # Max
         s += '<text style="text-anchor:end;" font-size="35px" x="550" y="110">{}</text>\n'.format(int(math.ceil(today_forecast[7])))
@@ -197,7 +193,7 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
             elif w == 'W':  r = wi.getDirectionRight()
             elif w == 'NW': r = wi.getDirectionDownRight()
 
-            s += '<g transform="matrix(1.5,0,0,1.5,{0},207)">{1}</g>\n'.format((440 - len(str(int(curt_weather[8]))) * 17), r)
+            s += '<g transform="matrix(1.5,0,0,1.5,{0},208)">{1}</g>\n'.format((440 - len(str(int(curt_weather[8]))) * 17), r)
 
         return s
 
@@ -241,8 +237,10 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
         f_svg.write('</g>\n')
 
     if alerts != None:
-        n = 385
+        n = 425
         s = str()
+        s += '<text style="text-anchor:start;" font-weight="bold" font-size="30px" x="20" y="380">'
+        s += 'ALERT: {}</text>\n'.format(alerts[0]['event'])
         for r in re.split("\n", alerts[0]['description']):
             s += '<text style="text-anchor:start;" font-size="16px" x="20" y="{0}">{1}</text>\n'.format(n, r)
             n += 30
