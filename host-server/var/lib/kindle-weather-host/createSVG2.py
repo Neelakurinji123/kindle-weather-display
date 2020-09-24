@@ -193,7 +193,7 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
             elif w == 'E':  r = wi.getDirectionLeft()
             elif w == 'SE': r = wi.getDirectionUpLeft()
             elif w == 'S':  r = wi.getDirectionUp()
-            elif w == 'SW': r = wi.getDirectionUPRight()
+            elif w == 'SW': r = wi.getDirectionUpRight()
             elif w == 'W':  r = wi.getDirectionRight()
             elif w == 'NW': r = wi.getDirectionDownRight()
 
