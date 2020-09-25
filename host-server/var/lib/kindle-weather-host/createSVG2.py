@@ -100,7 +100,8 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
                 curt_weather[2] == 'Snow' or curt_weather[2] == 'Sleet' or curt_weather[2] == 'Clouds'):
 
             r = Decimal(curt_weather[14]).quantize(Decimal('0.1'), rounding=ROUND_HALF_EVEN)
-            s += '<text style="text-anchor:end;" font-size="45px" x="{0}" y="175">{1:.1f}</text>\n'.format((190 - int(s_padding(r) * 0.64)), r)
+            s += '<text style="text-anchor:end;" font-size="45px" '
+            s += 'x="{0}" y="175">{1:.1f}</text>\n'.format((190 - int(s_padding(r) * 0.64)), r)
 
         return s
 
@@ -115,13 +116,13 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
             hourly_forecast = p.hourly_forecast(i)
             jour = datetime.fromtimestamp(hourly_forecast[0], tz)
 
-            s += '<text style="text-anchor:start;" font-size="30px" x="'
-            s += '{0}" y="{1}">{2}</text>\n'.format((n - 10), (pos_y - 160), jour.strftime("%H:%M"))
+            s += '<text style="text-anchor:start;" font-size="30px" '
+            s += 'x="{0}" y="{1}">{2}</text>\n'.format((n - 10), (pos_y - 160), jour.strftime("%H:%M"))
             s += '<text style="text-anchor:end;" font-size="35px" x="{0}" y="{1}">'.format((n + 45), (pos_y))
             s += '{}</text>\n'.format(round(hourly_forecast[5]))
 
-            s += '<circle cx="{0}" cy="{1}'.format((n + 5 + 45), (pos_y - 25))
-            s += '" r="4" stroke="black" stroke-width="2" fill="none"/>\n'
+            s += '<circle cx="{0}" cy="{1}" r="4" '.format((n + 5 + 45), (pos_y - 25))
+            s += 'stroke="black" stroke-width="2" fill="none"/>\n'
 
             s += '<text style="text-anchor:start;" font-size="25px" '
             s += 'x="{0}" y="{1}">{2}</text>\n'.format((n + 10 + 45), (pos_y - 10), p.unit['temp'])
@@ -162,10 +163,11 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
             s += '<text style="text-anchor:start;" font-size="25px" x="{0}" y="{1}">{2}</text>\n'.format((tMin+10), (n-10), p.unit['temp'])
 
             tMax = (int)(440 + pasTemp * (math.ceil(forecast[7]) - minTemp))
-            s += '<text style="text-anchor:end;" font-size="35px" x="{0}" y="{1}">{2}</text>\n'.format(int(tMax - s_padding(forecast[7])), n, int(math.ceil(forecast[7])))
+            s += '<text style="text-anchor:end;" font-size="35px" '
+            s += 'x="{0}" y="{1}">{2}</text>\n'.format(int(tMax - s_padding(forecast[7])), n, int(math.ceil(forecast[7])))
 
-            s += '<circle cx="{0}" cy="{1}"'.format(int(tMax + 5 - s_padding(forecast[7])), (n-25))
-            s += ' r="4" stroke="black" stroke-width="2" fill="none"/>\n'
+            s += '<circle cx="{0}" cy="{1}" r="4" '.format(int(tMax + 5 - s_padding(forecast[7])), (n-25))
+            s += 'stroke="black" stroke-width="2" fill="none"/>\n'
 
             s += '<text style="text-anchor:start;" font-size="25px" '
             s += 'x="{0}" y="{1}">{2}</text>\n'.format(int(tMax + 10 - s_padding(forecast[7])), (n-10), p.unit['temp'])
@@ -183,7 +185,7 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
 
         # add wind direction icon
         if int(curt_weather[8]) != 0:
-            w = p.wind_direction(curt_weather[9])
+            w = p.cardinal(curt_weather[9])
             if w == 'N':    r = wi.getDirectionDown()
             elif w == 'NE': r = wi.getDirectionDownLeft()
             elif w == 'E':  r = wi.getDirectionLeft()

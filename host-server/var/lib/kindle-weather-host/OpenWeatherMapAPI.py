@@ -198,7 +198,7 @@ class OpenWeatherMap:
 
         return dat
 
-    def wind_direction(self, degree):
+    def cardinal(self, degree):
 
         if degree >= 348.75 or degree <= 33.75: return 'N'
         elif 33.75 <= degree <= 78.75: return 'NE'
