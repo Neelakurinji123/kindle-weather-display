@@ -47,13 +47,8 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
             maintenant = (str.lower(datetime.fromtimestamp(t_now, tz).strftime("%a, %d %b %H:%M")))
             s = '<text style="text-anchor:start;" font-size="30px" x="20" y="40">{}</text>\n'.format(maintenant)
 
-            # text
             s += '<text style="text-anchor:end;" font-size="30px" x="445" y="40">{}</text>\n'.format(t_sunrise)
             s += '<text style="text-anchor:end;" font-size="30px" x="580" y="40">{}</text>\n'.format(t_sunset)
-
-            # icon
-            s += '<g transform="matrix(1.1,0,0,1.1,332,14)">{}</g>\n'.format(wi.getSunrise())
-            s += '<g transform="matrix(1.1,0,0,1.1,467,14)">{}</g>\n'.format(wi.getSunset())
         else:
             maintenant = str.lower(datetime.fromtimestamp(t_now, tz).strftime("%a %Y/%m/%d %H:%M"))
 
@@ -179,6 +174,11 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
 
         return s
 
+    def add_sunrise_and_sunset_icons():
+        s = '<g transform="matrix(1.1,0,0,1.1,332,14)">{}</g>\n'.format(wi.getSunrise())
+        s += '<g transform="matrix(1.1,0,0,1.1,467,14)">{}</g>\n'.format(wi.getSunset())
+
+        return s
 
     def add_today_icon():
         s = '<g transform="matrix(4,0,0,4,-35,-40)">{}</g>\n'.format(p.current_weather.icon)
@@ -195,7 +195,7 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
             elif w == 'W':  r = wi.getDirectionRight()
             elif w == 'NW': r = wi.getDirectionDownRight()
 
-            s += '<g transform="matrix(1.5,0,0,1.5,{0},208)">{1}</g>\n'.format((440 - len(str(int(curt_weather[8]))) * 17), r)
+            s += '<g transform="matrix(1.6,0,0,1.6,{0},206)">{1}</g>\n'.format((440 - len(str(int(curt_weather[8]))) * 17), r)
 
         return s
 
@@ -250,6 +250,9 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
         f_svg.write(s)
         f_svg.write('</g>\n')
     else:
+        if p.sunrise_and_sunset == 'True':
+            f_svg.write(add_sunrise_and_sunset_icons())
+
         f_svg.write(add_next_hours_icons())
         f_svg.write(add_next_days_icons())
 
