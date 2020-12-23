@@ -103,7 +103,9 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
 
     def add_hourly_forecast():
         # add hourly forecast
-        n = 70
+        base_x = 60
+        base_y = -5
+        pos_x = 45
         pos_y = 495
         hourly_icon = list()
         s = str()
@@ -111,27 +113,31 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
             hourly_forecast = p.hourly_forecast(i)
             jour = datetime.fromtimestamp(hourly_forecast[0], tz)
 
-            s += '<text style="text-anchor:start;" font-size="30px" '
-            s += 'x="{0}" y="{1}">{2}</text>\n'.format((n - 10), (pos_y - 160), jour.strftime("%H:%M"))
-            s += '<text style="text-anchor:end;" font-size="35px" x="{0}" y="{1}">'.format((n + 45), (pos_y))
+            s += '<text style="text-anchor:end;" font-size="30px" '
+            s += 'x="{0}" y="{1}">{2}</text>\n'.format((pos_x + 5), (pos_y - 150), str(i)+'h')
+
+            s += '<text style="text-anchor:end;" font-size="35px" x="{0}" y="{1}">'.format((base_x + pos_x), (base_y + pos_y))
             s += '{}</text>\n'.format(round(hourly_forecast[5]))
 
-            s += '<circle cx="{0}" cy="{1}" r="4" '.format((n + 5 + 45), (pos_y - 25))
+            s += '<circle cx="{0}" cy="{1}" r="4" '.format((base_x + pos_x + 5), (base_y + pos_y - 25))
             s += 'stroke="black" stroke-width="2" fill="none"/>\n'
 
             s += '<text style="text-anchor:start;" font-size="25px" '
-            s += 'x="{0}" y="{1}">{2}</text>\n'.format((n + 10 + 45), (pos_y - 10), p.unit['temp'])
+            s += 'x="{0}" y="{1}">{2}</text>\n'.format((base_x + pos_x + 10), (base_y + pos_y - 10), p.unit['temp'])
 
             w = hourly_forecast[2]
             if w == 'Rain' or w == 'Drizzle' or w == 'Snow' or w == 'Sleet' or w == 'Clouds':
                 r = Decimal(hourly_forecast[7]).quantize(Decimal('0.1'), rounding=ROUND_HALF_EVEN)
                 s += '<text style="text-anchor:end;" font-size="25px" '
-                s += 'x="{0}" y="{1}">{2:.1f}</text>\n'.format(int(n + 42 - s_padding(r) * 0.357), (pos_y - 82), r)
+                s += 'x="{0}" y="{1}">{2:.1f}</text>\n'.format(int(pos_x + 67 - s_padding(r) * 0.357), (pos_y - 92), r)
 
-            n += 200
+            pos_x += 200
 
-        s += '<line x1="200" x2="200" y1="{0}" y2="{1}" style="fill:none;stroke:black;stroke-width:2px;"/>\n'.format((pos_y - 185), pos_y)
-        s += '<line x1="400" x2="400" y1="{0}" y2="{1}" style="fill:none;stroke:black;stroke-width:2px;"/>\n'.format((pos_y - 185), pos_y)
+        s += '<line x1="0" x2="600" y1="{0}" y2="{0}" style="fill:none;stroke:black;stroke-width:2px;"/>\n'.format(pos_y + 10)
+        s += '<line x1="0" x2="600" y1="{0}" y2="{0}" style="fill:none;stroke:black;stroke-width:2px;"/>\n'.format(pos_y - 185)
+
+        s += '<line x1="200" x2="200" y1="{0}" y2="{1}" style="fill:none;stroke:black;stroke-width:2px;"/>\n'.format((pos_y - 185), (pos_y + 10))
+        s += '<line x1="400" x2="400" y1="{0}" y2="{1}" style="fill:none;stroke:black;stroke-width:2px;"/>\n'.format((pos_y - 185), (pos_y + 10))
 
         return s
 
@@ -146,26 +152,28 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
         s = str()
         for i in range(1, 4):
             forecast = p.daily_forecast(i)
+            tLow = math.floor(forecast[6])
+            tHigh = math.ceil(forecast[7])
             jour = datetime.fromtimestamp(forecast[0], tz)
             s += '<text style="text-anchor:end;" font-size="35px" '
             s += 'x="185" y="{0}">{1}</text>\n'.format(n, str.lower(jour.strftime("%A")))
 
-            tMin = (int)(355 + pasTemp * (math.floor(forecast[6]) - minTemp))
+            tMin = (int)(355 + pasTemp * (tLow - minTemp))
             s += '<text style="text-anchor:end;" font-size="35px" '
-            s += 'x="{0}" y="{1}">{2}</text>\n'.format(tMin, n, int(math.floor(forecast[6])))
+            s += 'x="{0}" y="{1}">{2}</text>\n'.format(tMin, n, int(tLow))
 
             s += '<circle cx="{0}" cy="{1}" r="4" stroke="black" stroke-width="2" fill="none"/>\n'.format(tMin+5, (n-25))
             s += '<text style="text-anchor:start;" font-size="25px" x="{0}" y="{1}">{2}</text>\n'.format((tMin+10), (n-10), p.unit['temp'])
 
-            tMax = (int)(440 + pasTemp * (math.ceil(forecast[7]) - minTemp))
+            tMax = (int)(440 + pasTemp * (tHigh - minTemp))
             s += '<text style="text-anchor:end;" font-size="35px" '
-            s += 'x="{0}" y="{1}">{2}</text>\n'.format(int(tMax - s_padding(forecast[7])), n, int(math.ceil(forecast[7])))
+            s += 'x="{0}" y="{1}">{2}</text>\n'.format(int(tMax - s_padding(tHigh)), n, int(tHigh))
 
-            s += '<circle cx="{0}" cy="{1}" r="4" '.format(int(tMax + 5 - s_padding(forecast[7])), (n-25))
+            s += '<circle cx="{0}" cy="{1}" r="4" '.format(int(tMax + 5 - s_padding(tHigh)), (n-25))
             s += 'stroke="black" stroke-width="2" fill="none"/>\n'
 
             s += '<text style="text-anchor:start;" font-size="25px" '
-            s += 'x="{0}" y="{1}">{2}</text>\n'.format(int(tMax + 10 - s_padding(forecast[7])), (n-10), p.unit['temp'])
+            s += 'x="{0}" y="{1}">{2}</text>\n'.format(int(tMax + 10 - s_padding(tHigh)), (n-10), p.unit['temp'])
 
             s += '<line x1="{0}" x2="{1}" y1="{2}" y2="{3}" '.format(int(tMin + 40), int(tMax - 65), (n-10), (n-10))
             s += 'style="fill:none;stroke:black;stroke-linecap:round;stroke-width:10px;"/>\n'
@@ -203,7 +211,8 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
         n = 8
         s = str()
         for i in range(3, 12, 3):
-            s += '<g transform="matrix(2.3,0,0,2.3,{0},290)">{1}</g>\n'.format((n-25), p.hourly_forecast.icon[i])
+#            s += '<g transform="matrix(2.3,0,0,2.3,{0},290)">{1}</g>\n'.format((n-25), p.hourly_forecast.icon[i])
+            s += '<g transform="matrix(2.3,0,0,2.3,{0},280)">{1}</g>\n'.format((n-25), p.hourly_forecast.icon[i])
             n += 200
 
         return s
