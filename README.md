@@ -8,7 +8,7 @@ This repo is display weather information on old kindle 3, based on the original 
 * any locales, languages and units
 
 ### Kindle 3 and TV-box (Armbian)
-<img src="screenshot-kindle-weather.jpg" width="300" alt="Kindle 3 screenshot" />
+<img src="sample_images/kindleStation.png" width="300" alt="Kindle 3 screenshot" />
 
 ## Setup
 ### kindle
