@@ -16,16 +16,16 @@ This repo is display weather information on old kindle 3, based on the original 
 1. jailbreak your Kindle
 2. access to kindle via usbnet:
 ```
-    ip a add 192.16.2.1/24 dev usb0
-    ip link set usb0 up
-    ssh root@192.168.2.2 (no password)
+ip a add 192.16.2.1/24 dev usb0
+ip link set usb0 up
+ssh root@192.168.2.2 (no password)
 ```
 3. create a directory: mntroot rw; mkdir /www; mntroot ro
 2. copy kindle-weather for kindle:
 ```
-    scp kindle/kindle-weather root@192.168.2.2:/tmp
-    ssh root@192.168.2.2 (no password)
-    mv /tmp/kindle-weather /mnt/us
+scp kindle/kindle-weather root@192.168.2.2:/tmp
+ssh root@192.168.2.2 (no password)
+mv /tmp/kindle-weather /mnt/us
 ```
 4. edit /etc/fstab: 
 ```
@@ -38,9 +38,9 @@ tmpfs             /www          tmpfs  defaults,size=16m 0 0
 ```
 6. setup usbnet:
 ```
-    cd /mnt/us/usbnet
-    cp DISABLED_auto auto
-    mv DISABLED_auto DISABLED_auto.orig
+cd /mnt/us/usbnet
+cp DISABLED_auto auto
+mv DISABLED_auto DISABLED_auto.orig
 ```
 7. optionally install kindle-debian, system can improve
 
@@ -48,7 +48,7 @@ tmpfs             /www          tmpfs  defaults,size=16m 0 0
 1. get free subscription plan from openweathermap.org
 2. setup usbnet: 
 ```
-    usbnet: /etc/network/interfaces
+usbnet: /etc/network/interfaces
     
     auto usb0
       iface usb0 inet static
@@ -59,15 +59,11 @@ tmpfs             /www          tmpfs  defaults,size=16m 0 0
 ```
 3. copy kindle-weather-host for server:
 ```
-    cp -a host-server/var/lib/kindle-weather-host /var/lib
+cp -a host-server/var/lib/kindle-weather-host /var/lib
 ```
 4. install packages and setup image processors, web server, firewall and ntp (eg. debian buster)
-
-
 ```
-
-
-    image processors:
+image processors:
     apt install imagemagick imagemagick-6-common imagemagick-6.q16 \
       imagemagick-common libgraphicsmagick-q16-3 libmagickcore-6.q16-6 \
       libmagickcore-6.q16-6-extra libmagickwand-6.q16-6 pngcrush
