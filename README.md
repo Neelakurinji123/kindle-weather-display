@@ -11,27 +11,42 @@ This repo is display weather information on old kindle 3, based on the original 
 <img src="sample_images/kindleStation.png" width="300" alt="Kindle 3 screenshot" />
 
 ## Setup
+
 ### kindle
 1. jailbreak your Kindle
-2. copy kindle/kindle-weather to /mnt/us folder
+2. access to kindle via usbnet:
+```
+    ip a add 192.16.2.1/24 dev usb0
+    ip link set usb0 up
+    ssh root@192.168.2.2 (no password)
+```
 3. create a directory: mntroot rw; mkdir /www; mntroot ro
+2. copy kindle-weather for kindle:
+```
+    scp kindle/kindle-weather root@192.168.2.2:/tmp
+    ssh root@192.168.2.2 (no password)
+    mv /tmp/kindle-weather /mnt/us
+```
 4. edit /etc/fstab: 
 ```
 tmpfs             /www          tmpfs  defaults,size=16m 0 0
 ```
-5. setup cron
-6. setup usbnet: rename to /mnt/us/usbnet/auto
+5. setup cron: (example)
+```
+/etc/crontab/root
+5,35 * * * * sh /mnt/us/kindle-weather/weather-script.sh
+```
+6. setup usbnet:
+```
+    cd /mnt/us/usbnet
+    cp DISABLED_auto auto
+    mv DISABLED_auto DISABLED_auto.orig
+```
 7. optionally install kindle-debian, system can improve
 
 ### server
 1. get free subscription plan from openweathermap.org
-2. setup usbnet
-3. copy host-server/var/lib/kindle-weather-host to /var/lib folder
-4. install packages and setup (eg. debian buster)
-5. install python3 modules: pytz, requests
-6. setup font
-7. setup cron
-
+2. setup usbnet: 
 ```
     usbnet: /etc/network/interfaces
     
@@ -41,6 +56,16 @@ tmpfs             /www          tmpfs  defaults,size=16m 0 0
       netmask 255.255.255.0
       broadcast 192.168.2.255
       network 192.168.2.0
+```
+3. copy kindle-weather-host for server:
+```
+    cp -a host-server/var/lib/kindle-weather-host /var/lib
+```
+4. install packages and setup image processors, web server, firewall and ntp (eg. debian buster)
+
+
+```
+
 
     image processors:
     apt install imagemagick imagemagick-6-common imagemagick-6.q16 \
@@ -58,14 +83,20 @@ tmpfs             /www          tmpfs  defaults,size=16m 0 0
     
     ntp server:
     apt install ntp
-
-    font:
+```
+5. install python3 modules: pytz, requests
+6. setup font
+```
     apt install fontconfig
 
     copy ttf font to /root/.fonts folder
     fc-cache -v -f
 ```
-
+7. setup cron : (example)
+```
+/etc/cron.d/kindle-weather
+0,30 * * * * root sh -c "/var/lib/kindle-weather-host/kindle-weather.sh"
+```
 ## setting
 Edit settings.xml
 
