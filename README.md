@@ -15,9 +15,13 @@ This repo is display weather information on old kindle 3, based on the original 
 1. jailbreak your Kindle
 2. copy kindle/kindle-weather to /mnt/us folder
 3. create a directory: mntroot rw; mkdir /www; mntroot ro
-4. setup cron
-5. setup usbnet: rename to /mnt/us/usbnet/auto
-6. optionally install kindle-debian, system can improve
+4. edit /etc/fstab: 
+```
+tmpfs             /www          tmpfs  defaults,size=16m 0 0
+```
+5. setup cron
+6. setup usbnet: rename to /mnt/us/usbnet/auto
+7. optionally install kindle-debian, system can improve
 
 ### server
 1. get free subscription plan from openweathermap.org
