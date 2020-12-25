@@ -2,11 +2,11 @@
 
 #cd "$(dirname "$0")"
 
-pidof powerd >/dev/null
-if [ $? -eq 0 ]; then
-    /etc/init.d/powerd stop
-    /etc/init.d/framework stop
-fi
+#pidof powerd >/dev/null
+#if [ $? -eq 0 ]; then
+#    /etc/init.d/powerd stop
+#    /etc/init.d/framework stop
+#fi
 
 DEBIAN_PATH=/mnt/us/DebianKindle/mnt
 
