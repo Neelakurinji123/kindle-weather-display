@@ -20,10 +20,11 @@ ip a add 192.16.2.1/24 dev usb0
 ip link set usb0 up
 ssh root@192.168.2.2 (no password)
 ```
-3. create a directory:
+3. create a directory and mount tmpfs:
 ```
 mntroot rw
 mkdir /www
+mount -t tmpfs tmpfs /www
 mntroot ro
 ```
 2. copy kindle-weather for kindle:
