@@ -42,7 +42,12 @@ cd /mnt/us/usbnet
 cp DISABLED_auto auto
 mv DISABLED_auto DISABLED_auto.orig
 ```
-7. optionally install kindle-debian, system can improve
+7. disable kindle
+```
+/etc/init.d/powerd stop
+/etc/init.d/framework stop
+```
+8. optionally install kindle-debian, system can improve
 
 ### server
 1. get free subscription plan from openweathermap.org
