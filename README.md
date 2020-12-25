@@ -160,7 +160,7 @@ Not all locations working.
 <img src="sample_images/kindleStation-Tokorozawa.png" width="300" alt="new kindle weather" />
 
 ### utf-8 encoding
-Converting SVG to PNG with cloudconvert API due to limitations of Imagemagick.
+Converting utf-8 SVG to PNG with cloudconvert API due to limitations of Imagemagick.
 * get any subscription plan from [cloudconvert.com](https://cloudconvert.com/). free plan for up to 25 conversions per day.
 * pip3 install cloudconvert
 * add api key to cloudconvert.json
