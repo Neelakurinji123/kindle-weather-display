@@ -20,7 +20,12 @@ ip a add 192.16.2.1/24 dev usb0
 ip link set usb0 up
 ssh root@192.168.2.2 (no password)
 ```
-3. create a directory: mntroot rw; mkdir /www; mntroot ro
+3. create a directory:
+```
+mntroot rw
+mkdir /www
+mntroot ro
+```
 2. copy kindle-weather for kindle:
 ```
 scp kindle/kindle-weather root@192.168.2.2:/tmp
