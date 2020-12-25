@@ -13,7 +13,7 @@ This repo is display weather information on old kindle 3, based on the original 
 ## Setup
 
 ### kindle
-1. jailbreak your Kindle
+1. jailbreak your Kindle and setup usbnet: https://blog.fsck.com/2009/03/tethering-your-kindle.html
 2. access to kindle via usbnet:
 ```
 ip a add 192.16.2.1/24 dev usb0
