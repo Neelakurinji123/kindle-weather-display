@@ -145,7 +145,7 @@ False or None: disable
 ```
 
 ### extra icons
-If adding extra icons or using different icon set, edit a python script. createSVG.py automatically uses extra icons.
+If adding extra icons or using different icon set, edit getextraicon.py. createSVG.py automatically uses extra icons.
 Note: extra icons are not included due to complicated licenses.
 ```
 EDIT: kindle-weather-host/extras/getextraicon.py
