@@ -9,7 +9,7 @@ if [ $? -eq 0 ]; then
     /etc/init.d/framework stop
 fi
 
-rm -f /tmp/kindleStation.png
-wget -q http://192.168.2.1:8080/kindleStation.png -O /tmp/kindleStation.png
+rm -f /www/kindleStation.png
+wget -q http://192.168.2.1:8080/kindleStation.png -O /www/kindleStation.png
 eips -c
-eips -g /tmp/kindleStation.png
+eips -g /www/kindleStation.png
