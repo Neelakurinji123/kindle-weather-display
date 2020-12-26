@@ -31,7 +31,8 @@ mntroot ro
 ```
 scp kindle/kindle-weather kindle/launchpad root@192.168.2.2:/tmp
 ssh root@192.168.2.2 (no password)
-mv /tmp/kindle-weather /tmp/kindle-weather/* mnt/us
+mv /tmp/kindle-weather /mnt/us
+mv /tmp/launchpad/* mnt/us/launchpad
 ```
 5. create a file
 ```
