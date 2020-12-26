@@ -27,11 +27,11 @@ mkdir /www
 mount -t tmpfs tmpfs /www
 mntroot ro
 ```
-4. copy kindle-weather for kindle:
+4. copy kindle-weather and launchpad for kindle:
 ```
-scp kindle/kindle-weather root@192.168.2.2:/tmp
+scp kindle/kindle-weather kindle/launchpad root@192.168.2.2:/tmp
 ssh root@192.168.2.2 (no password)
-mv /tmp/kindle-weather /mnt/us
+mv /tmp/kindle-weather /tmp/kindle-weather/* mnt/us
 ```
 5. create a file
 ```
