@@ -27,33 +27,37 @@ mkdir /www
 mount -t tmpfs tmpfs /www
 mntroot ro
 ```
-2. copy kindle-weather for kindle:
+4. copy kindle-weather for kindle:
 ```
 scp kindle/kindle-weather root@192.168.2.2:/tmp
 ssh root@192.168.2.2 (no password)
 mv /tmp/kindle-weather /mnt/us
 ```
-4. edit /etc/fstab: 
+5. create a file
+```
+touch /mnt/us/kindle-weather/enable
+```
+6. edit /etc/fstab: 
 ```
 tmpfs             /www          tmpfs  defaults,size=16m 0 0
 ```
-5. setup cron: (example)
+7. setup cron: (example)
 ```
 /etc/crontab/root
 5,35 * * * * sh /mnt/us/kindle-weather/weather-script.sh
 ```
-6. setup usbnet:
+8. setup usbnet:
 ```
 cd /mnt/us/usbnet
 cp DISABLED_auto auto
 mv DISABLED_auto DISABLED_auto.orig
 ```
-7. disable kindle
+9. disable kindle
 ```
 /etc/init.d/powerd stop
 /etc/init.d/framework stop
 ```
-8. optionally install kindle-debian, system can improve
+10. optionally install kindle-debian, system can improve
 
 ### server
 1. get free subscription plan from openweathermap.org
@@ -164,6 +168,10 @@ Converting utf-8 SVG to PNG with cloudconvert API due to limitations of Imagemag
 * get any subscription plan from [cloudconvert.com](https://cloudconvert.com/). free plan for up to 25 conversions per day.
 * pip3 install cloudconvert
 * add api key to cloudconvert.json
+
+### stop this program
+* remove /mnt/us/kindle-weather/enable
+* use shortcut: shift, a, q
 
 ### Option
 * [kindle-debian](https://mega.nz/folder/4XAlBK7Y#cSr2Gq8KxL6LkRe4SB0hqQ)
