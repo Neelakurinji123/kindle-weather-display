@@ -96,7 +96,10 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
 
             r = Decimal(curt_weather[14]).quantize(Decimal('0.1'), rounding=ROUND_HALF_EVEN)
             s += '<text style="text-anchor:end;" font-size="45px" '
-            s += 'x="{0}" y="175">{1:.1f}</text>\n'.format((190 - int(s_padding(r) * 0.64)), r)
+            if r == 0:
+                s += 'x="{0}" y="175">{1}</text>\n'.format((195 - int(s_padding(r) * 0.64)), 'n/a')
+            else:
+                s += 'x="{0}" y="175">{1:.1f}</text>\n'.format((190 - int(s_padding(r) * 0.64)), r)
 
         return s
 
@@ -129,7 +132,10 @@ def create_svg(p, t_now, tz, utc, svgfile, pngfile):
             if w == 'Rain' or w == 'Drizzle' or w == 'Snow' or w == 'Sleet' or w == 'Clouds':
                 r = Decimal(hourly_forecast[7]).quantize(Decimal('0.1'), rounding=ROUND_HALF_EVEN)
                 s += '<text style="text-anchor:end;" font-size="25px" '
-                s += 'x="{0}" y="{1}">{2:.1f}</text>\n'.format(int(pos_x + 67 - s_padding(r) * 0.357), (pos_y - 92), r)
+                if r == 0:
+                    s += 'x="{0}" y="{1}">{2}</text>\n'.format(int(pos_x + 70 - s_padding(r) * 0.357), (pos_y - 92), 'n/a')
+                else:
+                    s += 'x="{0}" y="{1}">{2:.1f}</text>\n'.format(int(pos_x + 67 - s_padding(r) * 0.357), (pos_y - 92), r)
 
             pos_x += 200
 
