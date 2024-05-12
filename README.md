@@ -277,7 +277,7 @@ Available options are as follows:
 <kbd><img src="sample_screenshots/readme_imgs/twitter.png" /></kbd>&nbsp;
 
 - config
-  - "twitter": {"caption": "ALERT", "screen\_name": "tenkijp", "translate": "True", "translate\_target": "en", "expiration": "3h", "alternate": ["graph", "daily\_xlabel", "graph"], "alternate_url": "https://tenki.jp/"}
+  - "twitter": {"caption": "ALERT", "screen\_name": "tenkijp", "translate": "True", "translate\_target": "en", "expiration": "3h", "alternate": \["graph", "daily\_xlabel", "graph"\], "alternate_url": "https:\//tenki.jp/"\}
    - screen_name: [@]Twitter Screen Name
    - translate: en(English), Other languages may work, but I did not test them.
    - expiration: Valid within Hours(h) or Minutes(m), otherwise, use "alternate" layout.
@@ -297,12 +297,12 @@ e.g.)
 
 ```
 0 */2 * * * sh -c "/opt/lib/kindle-weather-station/kindle-weather.sh 2>>/tmp/kindle-weather-station.err"
-0 1-23/2 * * * sh -c "/opt/lib/kindle-weather-station/kindle-weather.sh settings_twitter.json 2>>/tmp/kindle-weather-station.err"
+0 1-23/2 * * * sh -c "/opt/lib/kindle-weather-station/kindle-weather.sh /opt/lib/kindle-weather-station/settings_twitter.json 2>>/tmp/kindle-weather-station.err"
 ```
 
 ```
-# /etc/init.d/cron stop
-# /etc/init.d/cron start
+/etc/init.d/cron stop
+/etc/init.d/cron start
 ```
 
 # Credits
