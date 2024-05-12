@@ -132,23 +132,29 @@ USB cable uses for network and power supply.
 
 ### 1. set up usbnet
 
+The server: 192.168.2.1/24
+
+Kindle    : 192.168.2.2/24 (fixed)
+
 ```
- 				LOCAL NETWORK				USB NETWORK			
-  				e.g.(192.168.1.0/24)
+                LOCAL NETWORK               USB NETWORK			
+                e.g.(192.168.1.0/24)
  WAN <-> ROUTER <--------------> THE SERVER <------> KINDLE
-								192.168.2.1/24		192.168.2.2/24
+                                 192.168.2.1/24      192.168.2.2/24
 		
 ```
+
 When usbnet setup is finished, access to Kindle. (no password)
+
 ```
 ssh root@192.168.2.2
 ```
 
-### 2. setup dropbear Auth key
+### 2. Set up dropbear's Auth key
 
-- Create the server's pub key.
+- Create the server's pubkey.
 - Set up the server's ssh client environment.
-- Copy the server's ssh pub key to Kindle.
+- Copy the server's ssh pubkey to Kindle.
 
 e.g) 
 ```
