@@ -47,11 +47,15 @@ Both ImageMagick and graphicsMagick for Openwrt are lack of capabilities to mani
 Use CloudConvert.
 
 ## Set up server
+
 ### 1. Install the program
+
 Copy `(github)/server/opt/lib/kindle-weather-station` to `(server)/opt/lib/kindle-weather-station`.
 
 ### 2.Install Graphics converters, Python3 and modules.
+
 Grahpics: ImageMagick and graphicsMagick
+
 Python3 (v3.11 or newer): 
 
 ### 3. Set up user account
