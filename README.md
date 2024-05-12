@@ -191,8 +191,8 @@ The program's layout is as follows:
 | daily            | Daily weather              | 280           |
 | graph            | Graph  or tile             | 120           |
 | twitter          | Alert (Twitter)            | 280           |
-| daily_xlabel     | Label for daily weather    | 20            |
-| hourly_xlabel    | Label for hourly weather   | 20            |
+| daily_xlabel     | Label on daily weather    | 20            |
+| hourly_xlabel    | Label on hourly weather   | 20            |
 | padding[-+0-9]*  | Insert spaces (Y axis only)|               |
 
 Examples:
