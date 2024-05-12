@@ -1,0 +1,24 @@
+opkg install python3
+
+opkg install python3-pytz
+opkg install python3-requests
+opkg install python3-setuptools
+opkg install python3-pip
+opkg install graphicsmagick
+opkg install imagemagick
+
+pip3 install twikit
+pip3 install deep_translator
+pip3 install qrcode
+
+
+pip3 install cloudconvert
+
+pip3 install hijri_converter
+
+
+Kindle:
+/etc/dropbear/authorized_keys
+
+Openwork:
+Fix time

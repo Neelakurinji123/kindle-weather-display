@@ -1,0 +1,26 @@
+{
+    "station": {
+        "city": "Reykjavík",
+        "timezone": "Atlantic/Reykjavik",
+        "encoding": "utf-8",
+        "locale": "en_US.UTF-8",
+        "font": "Droid Sans",
+        "sunrise_and_sunset": "False",
+        "darkmode": "False",
+        "service": "onecall",
+        "lat": "64.1466",
+        "lon": "-21.9426",
+        "units": "metric",
+        "lang": "us",
+        "exclude": "minutely",
+		"version": "2.5",
+        "cloudconvert": "False",
+        "converter": "gm",
+		"layout": ["maintenant", "main", "daily"],
+		"twitter": {"caption": "alert", "screen_name": "tenkijp", "translate": "True", "translate_target": "en",
+				 "expiration": "3h", "alternate": ["graph", "daily_xlabel", "graph"], "alternate_url": "https://tenki.jp/"},
+		"twitter_keywords": {"include": "heavy,thunder", "exclude": ""},
+		"graph_objects": ["hourly_temperature", "hourly_precipitation"],
+		"graph_canvas": "default"
+    }
+}

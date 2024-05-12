@@ -1,0 +1,28 @@
+{
+	"graph": {
+		"canvas": {"default": {"width": 530, "height": 140, "bgcolor": "rgb(220,220,220)", "axis": 0,
+			"axis_color": "rgb(0,0,0)", "grid": 3, "grid_color": "rgb(255,255,255)"}
+		},	
+		"objects": {"hourly_temperature": {"title": "temperature", "start": 0, "end": 25, "step": 1, "basis": "hour",
+						"type": "line", "stroke": 4, "stroke-color": "rgb(105,105,105)", "fill": "rgb(169,169,169)",
+						"stroke-linecap": "round"},
+			"hourly_precipitation": {"title": "precipitation", "start": 0, "end": 25, "step": 1, "basis": "hour",
+						"type": "bar", "stroke": 15, "stroke-color": "rgb(105,105,105)", "fill": "rgb(245,245,245)",
+						"stroke-linecap": "butt"},
+			"daily_temperature": {"title": "temperature", "start": 0, "end": 8, "step": 1, "basis": "day",
+						"type": "line", "stroke": 4, "stroke-color": "rgb(105,105,105)", "fill": "rgb(169,169,169)",
+						"stroke-linecap": "round"},
+			"daily_precipitation": {"title": "precipitation", "start": 0, "end": 8, "step": 1, "basis": "day",
+						"type": "bar", "stroke": 15, "stroke-color": "rgb(105,105,105)", "fill": "rgb(245,245,245)",
+						"stroke-linecap": "butt"},
+			"moon_phase": {"title": "moon phase", "start": 0, "end": 8, "step": 1, "basis": "day",
+						"type": "tile", "stroke": 4, "stroke-color": "rgb(0,0,0)", "fill": "rgb(0,0,0)",
+						"stroke-linecap": "round"},
+            "daily_weather": {"title": "weather", "start": 0, "end": 8, "step": 1, "basis": "day", "type": "tile",
+						"stroke": 4, "stroke-color": "rgb(0,0,0)", "fill": "rgb(0,0,0)", "stroke-linecap": "round"}
+		},
+		"labels": {"hourly_xlabel": { "start": 0, "end": 25, "step": 1, "basis": "hour", "font-size": 15, "stroke-color": "rgb(105,105,105)"},
+			"daily_xlabel": { "start": 0, "end": 8, "step": 1, "basis": "day", "font-size": 15, "stroke-color": "rgb(105,105,105)"}
+		}
+	}
+}

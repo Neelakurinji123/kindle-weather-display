@@ -1,0 +1,24 @@
+{
+    "station": {
+        "city": "Kiyose,Tokyo",
+        "timezone": "Asia/Tokyo",
+        "encoding": "iso-8859-1",
+        "locale": "en_US.UTF-8",
+        "font": "Droid Sans",
+        "sunrise_and_sunset": "True",
+        "darkmode": "False",
+        "service": "onecall",
+        "lat": "35.7853",
+        "lon": "139.5268",
+        "units": "metric",
+        "lang": "en",
+        "exclude": "minutely",
+		"version": "2.5",
+        "cloudconvert": "False",
+        "converter": "gm",
+        "ramadhan": "True",
+		"layout": ["maintenant", "main", "graph", "daily_xlabel", "graph"],
+		"graph_objects": ["daily_temperature", "daily_precipitation"],
+		"graph_canvas": "default"
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "station": {
+        "city": "清瀬,東京",
+        "timezone": "Asia/Tokyo",
+        "encoding": "utf-8",
+        "locale": "ja_JP.UTF-8",
+        "font": "Hiragino Sans",
+        "sunrise_and_sunset": "False",
+        "darkmode": "False",
+        "service": "onecall",
+		"lat": "35.7853",
+		"lon": "139.5268",
+        "units": "metric",
+        "lang": "ja",
+        "exclude": "minutely",
+		"version": "2.5",
+        "cloudconvert": "True",
+        "converter": "convert",
+		"layout": ["maintenant", "main", "daily"],
+		"twitter": {"caption": "alert", "screen_name": "tenkijp", "translate": "True", "translate_target": "en",
+				 "expiration": "3h", "alternate": ["graph", "daily_xlabel", "graph"], "alternate_url": "https://tenki.jp/"},
+		"twitter_keywords": {"include": "heavy,thunder", "exclude": ""},
+		"graph_objects": ["hourly_temperature", "hourly_precipitation"],
+		"graph_canvas": "default"
+    }
+}

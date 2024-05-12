@@ -1,0 +1,44 @@
+{
+    "locale": {
+        "ja_JP.UTF-8": {
+            "hours": {
+                "three hours": "三時間",
+                "six hours": "六時間",
+                "nine hours": "九時間"
+            },
+            "abbreviated_month": {
+                "jan": "１月",
+                "feb": "２月",
+                "mar": "３月",
+                "apr": "４月",
+                "may": "５月",
+                "jun": "６月",
+                "jul": "７月",
+                "aug": "８月",
+                "sep": "９月",
+                "oct": "10月",
+                "nov": "11月",
+                "dec": "12月"
+            },
+            "abbreviated_weekday": {
+                "sun": "日",
+                "mon": "月",
+                "tue": "火",
+                "wed": "水",
+                "thu": "木",
+                "fri": "金",
+                "sat": "土"
+            },
+            "full_weekday": {
+                "sunday": "日曜日",
+                "monday": "月曜日",
+                "tuesday": "火曜日",
+                "wednesday": "水曜日",
+                "thursday": "木曜日",
+                "friday": "金曜日",
+                "saturday": "土曜日"
+            }
+        }
+    }
+}
+

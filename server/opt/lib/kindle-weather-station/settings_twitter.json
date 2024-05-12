@@ -1,0 +1,26 @@
+{
+	"station": {
+		"city": "Kiyose,Tokyo",
+		"timezone": "Asia/Tokyo",
+		"encoding": "iso-8859-1",
+		"locale": "en_US.UTF-8",
+		"font": "Droid Sans",
+		"sunrise_and_sunset": "True",
+		"darkmode": "False",
+		"service": "onecall",
+		"lat": "35.7853",
+		"lon": "139.5268",
+		"units": "metric",
+		"lang": "en",
+		"exclude": "minutely",
+		"version": "2.5",
+		"cloudconvert": "False",
+		"converter": "gm",
+		"layout": ["maintenant", "main", "twitter"],
+		"twitter": {"caption": "ALERT", "screen_name": "tenkijp", "translate": "True", "translate_target": "en",
+				 "expiration": "3h", "alternate": ["graph", "daily_xlabel", "graph"], "alternate_url": "https://tenki.jp/"},
+		"twitter_keywords": {"include": "heavy,thunder,disaster", "exclude": "sakura,zakura"},
+		"graph_objects": ["daily_temperature", "moon_phase"],
+		"graph_canvas": "default"
+	}
+}

@@ -1,0 +1,24 @@
+{
+    "station": {
+        "city": "Kiyose,Tokyo",
+        "timezone": "Asia/Tokyo",
+        "encoding": "iso-8859-1",
+        "locale": "en_US.UTF-8",
+        "font": "Droid Sans",
+        "sunrise_and_sunset": "True",
+        "darkmode": "False",
+        "service": "onecall",
+        "lat": "35.7853",
+        "lon": "139.5268",
+        "units": "metric",
+        "lang": "en",
+        "exclude": "minutely",
+		"version": "2.5",
+        "cloudconvert": "False",
+        "converter": "gm",
+        "ramadhan": "True",
+		"layout": ["maintenant", "main", "padding-10", "graph", "hourly_xlabel", "graph", "daily_xlabel"],
+		"graph_objects": ["hourly_temperature", "daily_temperature"],
+		"graph_canvas": "default"
+    }
+}

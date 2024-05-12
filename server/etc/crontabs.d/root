@@ -1,0 +1,2 @@
+0 */2 * * * sh -c '/opt/lib/kindle-weather-station/kindle-weather.sh' >/dev/null
+0 1-23/2 * * * sh -c '/opt/lib/kindle-weather-station/kindle-weather.sh /opt/lib/kindle-weather-station/settings_twitter.json' >/dev/null

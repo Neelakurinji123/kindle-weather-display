@@ -1,9 +1,0 @@
-*/15 * * * * /usr/sbin/checkpmond
-*/15 * * * * /usr/sbin/tinyrot
-*/60 * * * * /usr/sbin/loginfo tmpfs
-*/60 * * * * /usr/sbin/loginfo localVars
-*/60 * * * * /usr/sbin/loginfo memusedump
-*/15 * * * * /usr/sbin/loginfo powerdcheck
-#0,10,15,20,25,30,40,45,50,55 * * * * sh /mnt/us/timelit/timelit.sh
-5,35 * * * * sh /mnt/us/kindle-weather/weather-script.sh
-56 0,8,16 * * * sh /mnt/us/kindle-weather/update_time.sh
