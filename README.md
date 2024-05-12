@@ -25,7 +25,7 @@ This program is for a weather display on old Kindle 3 based on the original work
 - user account on X (twitter) (optional)
 
 
-## Create API key for CloudConvert (optional)
+## Create API key on CloudConvert (optional)
 
 Create API key with the following options:
 - user.read: View your user data 
