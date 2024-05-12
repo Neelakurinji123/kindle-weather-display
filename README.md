@@ -209,81 +209,82 @@ Examples:
 <kbd><img src="sample_screenshots/readme_imgs/maintenant_1.png" /></kbd>&nbsp;
 
 - config
- - "city": "Granada"
- - "sunrise\_and\_sunset": "False"
+  - "city": "Granada"
+  - "sunrise\_and\_sunset": "False"
 
 <kbd><img src="sample_screenshots/readme_imgs/maintenant_2.png" /></kbd>&nbsp;
 
 - config
- - "sunrise\_and\_sunset": "True"
+  - "sunrise\_and\_sunset": "True"
 
 ### 2. main
 
 <kbd><img src="sample_screenshots/readme_imgs/main.png" /></kbd>&nbsp;
 
 - config
- - "timezone": "Pacific/Auckland"
- - "encoding": "iso-8859-1"
- - "locale": "en_US.UTF-8"
- - "lat": "-77.8400829" 
- - "lon": "166.6445298"
- - "units": "metric"
- - "lang": "en"
+  - "timezone": "Pacific/Auckland"
+  - "encoding": "iso-8859-1"
+  - "locale": "en_US.UTF-8"
+  - "lat": "-77.8400829" 
+  - "lon": "166.6445298"
+  - "units": "metric"
+  - "lang": "en"
 
 ### 3. graph and tile
 
 Available options are as follows:
 
-- Daily Temperature
-- Daily Precipitation
-- Daily Weather
-- Hourly Temperature
-- Hourly Precipitation
-- Moon Phase
+- config
+  - Daily Temperature
+  - Daily Precipitation
+  - Daily Weather
+  - Hourly Temperature
+  - Hourly Precipitation
+  - Moon Phase
 
 #### 3.1 graph 1: Daily Temperature and Moon Phase. (settings_graph_1.json)
 
 <kbd><img src="sample_screenshots/readme_imgs/graph_1.png" /></kbd>&nbsp;
 
 - config
- - graph\_objects": ["daily\_temperature", "moon\_phase"]
- - "ramadhan": "True"
+  - graph\_objects": ["daily\_temperature", "moon\_phase"]
+  - "ramadhan": "True"
 
 #### 3.2 graph 2: Daily Temperature and Daily Precipitation. (settings_graph_2.json)
 
 <kbd><img src="sample_screenshots/readme_imgs/graph_2.png" /></kbd>&nbsp;
 
 - config
- - "graph\_objects": ["daily\_temperature", "daily_precipitation"]
+  - "graph\_objects": ["daily\_temperature", "daily_precipitation"]
 
 #### 3.3 graph 3: Daily Weather and Moon Phase. (settings_graph_3.json)
 
 <kbd><img src="sample_screenshots/readme_imgs/graph_3.png" /></kbd>&nbsp;
 
 - config
- - "graph\_objects": ["daily\_weather", "moon\_phase"]
- - "ramadhan": "True"
+  - "graph\_objects": ["daily\_weather", "moon\_phase"]
+  - "ramadhan": "True"
 
 #### 3.4 graph 4: Hourly Temperature and Hourly Precipitation. (settings_graph_4.json)
 
 <kbd><img src="sample_screenshots/readme_imgs/graph_4.png" /></kbd>&nbsp;
 
 - config
- - "graph\_objects": ["hourly\_temperature", "hourly\_precipitation"]
+  - "graph\_objects": ["hourly\_temperature", "hourly\_precipitation"]
 
 ### 4. Twitter (WIP)
 
 <kbd><img src="sample_screenshots/readme_imgs/twitter.png" /></kbd>&nbsp;
 
 - config
- - "twitter": {"caption": "ALERT", "screen\_name": "tenkijp", "translate": "True", "translate\_target": "en", "expiration": "3h", "alternate": ["graph", "daily\_xlabel", "graph"], "alternate_url": "https://tenki.jp/"}
-  - screen_name: [@]Twitter Screen Name
-  - translate: en(English), Other languages may work, but I did not test them.
-  - expiration: Valid within Hours(h) or Minutes(m), otherwise, use "alternate" layout.
-  - alternate_url: If extract URL from Twitter failed, use "alternate_url".
+  - "twitter": {"caption": "ALERT", "screen\_name": "tenkijp", "translate": "True", "translate\_target": "en", "expiration": "3h", "alternate": ["graph", "daily\_xlabel", "graph"], "alternate_url": "https://tenki.jp/"}
+   - screen_name: [@]Twitter Screen Name
+   - translate: en(English), Other languages may work, but I did not test them.
+   - expiration: Valid within Hours(h) or Minutes(m), otherwise, use "alternate" layout.
+   - alternate_url: If extract URL from Twitter failed, use "alternate_url".
  - "twitter\_keywords": {"include": "heavy,thunder,disaster", "exclude": "sakura,zakura"}
-  - include: If one of "include" keyword do match, display Twitter, otherwise, use "alternate" layout.
-  - exclude: If one of "exclude" keyword do match, use "alternate" layout. 
+   - include: If one of "include" keyword do match, display Twitter, otherwise, use "alternate" layout.
+   - exclude: If one of "exclude" keyword do match, use "alternate" layout. 
  
  
 ## Set up time schedule
