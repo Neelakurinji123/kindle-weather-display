@@ -33,7 +33,8 @@ Create API key with the following options:
 kindle requires special PNG format. Converting process is as follows:
 
 ```
- SVG image ------------> PNG image -------------> flattened PNG image
+											[Send a PNG file to Kindle and display it]
+ SVG image ------------> PNG image ----------> flattened PNG image --> Kindle Dispaly
 			converter:				converter:
 			a)convert			 	a)convert	
 			b)gm
