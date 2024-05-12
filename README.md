@@ -12,6 +12,7 @@ This program is for a weather display on old Kindle 3 based on the original work
 ## Requirements
 - Jailbroken Kindle 3: https://wiki.mobileread.com/wiki/Kindle_Hacks_Information
 - server: Minimum 256M/100M OpenWrt router or SBC (e.g. OrangePi zero)
+- server OS: Openwrt, Ubuntu and Debian, etc which work with Python3.
 - USB port x1
 - LAN port x1
 - API key for OpenWeatherMap
