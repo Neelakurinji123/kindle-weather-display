@@ -108,13 +108,13 @@ To retrieve data correctly, setup NTP server.
 
 All set up finished, then try it.
 
-```./CreateSVG.py```
+`./CreateSVG.py`
 
 or
 
-```./CreateSVG.py settings_****.json```
+`./CreateSVG.py settings_*.json`
 
-Check `/etc/KindleStation_flatten.png`
+Take a look at `/etc/KindleStation_flatten.png`.
 
 
 ### 7. Install USB network
@@ -134,7 +134,7 @@ USB cable uses for network and power supply.
 
 The server: 192.168.2.1/24
 
-Kindle    : 192.168.2.2/24 (fixed)
+Kindle    : 192.168.2.2/24 (fixed address)
 
 ```
                 LOCAL NETWORK               USB NETWORK			
