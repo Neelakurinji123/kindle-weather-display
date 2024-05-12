@@ -68,9 +68,9 @@ In config directory, edit `OWM_config.json`, `cloudconvert.json`(optional) and `
 
 ### 3. Edit config files
 
-Tempalate's names are settings_****.json.
+Tempalate's names are `settings_*.json`.
 
-Default config is settings.json
+Default config is `settings.json`.
 
 
 ### 4. Install Graphics converters, Python3 and modules.
