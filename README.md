@@ -70,7 +70,7 @@ In config directory, edit `OWM_config.json`, `cloudconvert.json`(optional) and `
 
 Tempalate's names are settings_****.json.
 
-Defailt config is settings.json
+Default config is settings.json
 
 
 ### 4. Install Graphics converters, Python3 and modules.
