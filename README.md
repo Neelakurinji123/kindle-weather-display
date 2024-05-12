@@ -1,15 +1,19 @@
 # Kindle Weather Display
+
 This program is for a weather display on old Kindle 3 based on the original work by [Kindle-weather-station](https://gitlab.com/iero/Kindle-weather-station)
 
 ## Weather API
+
 - Weather data from [OpenWeatherMap API](https://openweathermap.org/)
 
 ## Screenshots
+
 <img src="sample_screenshots/kindle_weather-display.jpg" height="360" alt="Kindle 3 Screenshot" />&nbsp;
 
-
 <kbd><img src="sample_screenshots/KindleStation_flatten_graph_1.png" height="360" alt="Kindle 3 Screenshot" /></kbd>&nbsp;
+
 ## Requirements
+
 - Jailbroken Kindle 3: https://wiki.mobileread.com/wiki/Kindle_Hacks_Information
 - server: Minimum 256M/100M OpenWrt router or SBC (e.g. OrangePi zero)
 - server OS: Openwrt, Ubuntu and Debian, etc which work with Python3.
@@ -22,6 +26,7 @@ This program is for a weather display on old Kindle 3 based on the original work
 
 
 ## Create API key for CloudConvert (optional)
+
 Create API key with the following options:
 - user.read: View your user data 
 - user.write: Update your user data 
@@ -30,6 +35,7 @@ Create API key with the following options:
 
 
 ## Kindle PNG format
+
 kindle requires special PNG format. Converting process is as follows:
 
 ```
@@ -41,9 +47,13 @@ kindle requires special PNG format. Converting process is as follows:
            c)CloudConvert(online)
 ```
 note:
+
 `convert` is converter of ImageMagick.
+
 `gm` is converter of graphicsMagick.
+
 Both ImageMagick and graphicsMagick for Openwrt are lack of capabilities to manipulate SVG format.
+
 Use CloudConvert.
 
 ## Set up server
@@ -52,22 +62,21 @@ Use CloudConvert.
 
 Copy `(github)/server/opt/lib/kindle-weather-station` to `(server)/opt/lib/kindle-weather-station`.
 
-### 2.Install Graphics converters, Python3 and modules.
+### 2. Set up user account
 
-Grahpics: ImageMagick and graphicsMagick
-
-Python3 (v3.11 or newer): 
-
-### 3. Set up user account
 In config directory, edit `OWM_config.json`, `cloudconvert.json`(optional) and `twitter_config.json`(optional)
 
-### 4. Edit config files
+### 3. Edit config files
+
 Tempalate's names are settings_****.json.
+
 Defailt config is settings.json
 
 
-### 5. Install the program
-#### Python3 module Requirements
+### 4. Install Graphics converters, Python3 and modules.
+
+#### Python3(v3.11 or newer) and module Requirements
+
 - pytz
 - requests
 - setuptools
@@ -91,25 +100,34 @@ pip3 install cloudconvert
 pip3 install hijri_converter
 ```
 
-### 7. Network Time Synchronization
+### 5. Network Time Synchronization
+
 To retrieve data correctly, setup NTP server.
 
-### 8. Test run
+### 6. Test run
+
 All set up finished, then try it.
+
 ```./CreateSVG.py```
+
 or
+
 ```./CreateSVG.py settings_****.json```
+
 Check `/etc/KindleStation_flatten.png`
 
 
-### Install USB network
+### 7. Install USB network
+
 e.g.)
 ```
 opkg install kmod-usb-net kmod-usb-net-rndis kmod-usb-net-cdc-ether usbutils
 ```
 
 ## Set up Kindle
+
 Connect a USB cable to both the server and Kindle.
+
 USB cable uses for network and power supply.
 
 ### 1. set up usbnet
@@ -121,14 +139,15 @@ USB cable uses for network and power supply.
 								192.168.2.1/24		192.168.2.2/24
 		
 ```
-When usbnet setup is finished, then access to Kindle without password.
+When usbnet setup is finished, access to Kindle. (no password)
 ```
 ssh root@192.168.2.2
 ```
 
 ### 2. setup dropbear Auth key
+
 - Create the server's pub key.
-- Set up the server's ssh environment.
+- Set up the server's ssh client environment.
 - Copy the server's ssh pub key to Kindle.
 
 e.g) 
@@ -147,6 +166,7 @@ ssh root@192.168.2.2  # test passwordless login
 ```
 
 ### 3. Test run
+
 ```
 cd /opt/lib/kindle-weather-station
 ./kindle-weather.sh [config.json]
@@ -154,7 +174,7 @@ cd /opt/lib/kindle-weather-station
 
 ## Layout
 Kindle display size is 600 x 800.
-Display layout is as follows:
+The program's layout is as follows:
 
 | Module name      | Function                   | Size (Y-axis) |
 |:-----------------|:---------------------------|--------------:|
@@ -178,7 +198,7 @@ Examples:
 
 ## Modules
 
-### maintenant
+### 1. maintenant
 
 <kbd><img src="sample_screenshots/readme_imgs/maintenant_1.png" /></kbd>&nbsp;
 
@@ -191,7 +211,7 @@ Examples:
 - config
  - "sunrise\_and\_sunset": "True"
 
-### main
+### 2. main
 
 <kbd><img src="sample_screenshots/readme_imgs/main.png" /></kbd>&nbsp;
 
@@ -204,7 +224,7 @@ Examples:
  - "units": "metric"
  - "lang": "en"
 
-### graph and tile
+### 3. graph and tile
 
 Available options are as follows:
 
@@ -215,7 +235,7 @@ Available options are as follows:
 - Hourly Precipitation
 - Moon Phase
 
-#### graph 1: Daily Temperature and Moon Phase
+#### 3.1 graph 1: Daily Temperature and Moon Phase. (settings_graph_1.json)
 
 <kbd><img src="sample_screenshots/readme_imgs/graph_1.png" /></kbd>&nbsp;
 
@@ -223,14 +243,14 @@ Available options are as follows:
  - graph\_objects": ["daily\_temperature", "moon\_phase"]
  - "ramadhan": "True"
 
-#### graph 2: Daily Temperature and Daily Precipitation
+#### 3.2 graph 2: Daily Temperature and Daily Precipitation. (settings_graph_2.json)
 
 <kbd><img src="sample_screenshots/readme_imgs/graph_2.png" /></kbd>&nbsp;
 
 - config
  - "graph\_objects": ["daily\_temperature", "daily_precipitation"]
 
-#### graph 3: Daily Weather and Moon Phase
+#### 3.3 graph 3: Daily Weather and Moon Phase. (settings_graph_3.json)
 
 <kbd><img src="sample_screenshots/readme_imgs/graph_3.png" /></kbd>&nbsp;
 
@@ -238,31 +258,31 @@ Available options are as follows:
  - "graph\_objects": ["daily\_weather", "moon\_phase"]
  - "ramadhan": "True"
 
-#### graph 4: Hourly Temperature and Hourly Precipitation
+#### 3.4 graph 4: Hourly Temperature and Hourly Precipitation. (settings_graph_4.json)
 
 <kbd><img src="sample_screenshots/readme_imgs/graph_4.png" /></kbd>&nbsp;
 
 - config
  - "graph\_objects": ["hourly\_temperature", "hourly\_precipitation"]
 
-### Twitter
+### 4. Twitter (WIP)
 
 <kbd><img src="sample_screenshots/readme_imgs/twitter.png" /></kbd>&nbsp;
 
 - config
  - "twitter": {"caption": "ALERT", "screen\_name": "tenkijp", "translate": "True", "translate\_target": "en", "expiration": "3h", "alternate": ["graph", "daily\_xlabel", "graph"], "alternate_url": "https://tenki.jp/"}
   - screen_name: [@]Twitter Screen Name
-  - translate: en(English), Other languages may work, but not sure.
-  - expiration: Valid within Hours(h) or Minutes(m), otherwise use "alternate" layout.
-  - alternate_url: If extract URL from Twitter is failed, use "alternate_url".
+  - translate: en(English), Other languages may work, but I did not test them.
+  - expiration: Valid within Hours(h) or Minutes(m), otherwise, use "alternate" layout.
+  - alternate_url: If extract URL from Twitter failed, use "alternate_url".
  - "twitter\_keywords": {"include": "heavy,thunder,disaster", "exclude": "sakura,zakura"}
-  - include: If one of "include" keyword do match, display Twitter, otherwise  use "alternate" layout.
+  - include: If one of "include" keyword do match, display Twitter, otherwise, use "alternate" layout.
   - exclude: If one of "exclude" keyword do match, use "alternate" layout. 
  
  
-# Set up time schedule
+## Set up time schedule
 
-Edit crontab and restart cron
+Edit the server's crontab and restart cron.
 
 e.g.)
 
