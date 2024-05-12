@@ -1,11 +1,8 @@
 # Kindle Weather Display
 This program is for a weather display on old Kindle 3 based on the original work by [Kindle-weather-station](https://gitlab.com/iero/Kindle-weather-station)
 
-## Features
-- Weather data is from [OpenWeatherMap API](https://openweathermap.org/)
-- Converting SVG to PNG is [CloudConvert API](https://cloudconvert.com/)
-- The weather information is current weather, 3 hour forecast and 3 day forecast
-- Almost any locales, languages and units are enabled
+## Weather API
+- Weather data from [OpenWeatherMap API](https://openweathermap.org/)
 
 ## Screenshots
 <img src="sample_screenshots/kindle_weather-display.jpg" height="360" alt="Kindle 3 Screenshot" />&nbsp;
