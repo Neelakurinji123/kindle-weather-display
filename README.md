@@ -234,13 +234,13 @@ Examples:
 
 Available options are as follows:
 
-- config
-  - Daily Temperature
-  - Daily Precipitation
-  - Daily Weather
-  - Hourly Temperature
-  - Hourly Precipitation
-  - Moon Phase
+- config: "graph\_objects"
+  - "daily\_temperature": Daily Temperature
+  - "daily_precipitation": Daily Precipitation
+  - "daily\_weather": Daily Weather
+  - "hourly\_temperature": Hourly Temperature
+  - "hourly\_precipitation": Hourly Precipitation
+  - "moon\_phase": Moon Phase
 
 #### 3.1 graph 1: Daily Temperature and Moon Phase. (settings_graph_1.json)
 
@@ -278,13 +278,14 @@ Available options are as follows:
 
 - config
   - "twitter": {"caption": "ALERT", "screen\_name": "tenkijp", "translate": "True", "translate\_target": "en", "expiration": "3h", "alternate": \["graph", "daily\_xlabel", "graph"\], "alternate_url": "https:\//tenki.jp/"\}
-   - screen_name: [@]Twitter Screen Name
-   - translate: en(English), Other languages may work, but I did not test them.
-   - expiration: Valid within Hours(h) or Minutes(m), otherwise, use "alternate" layout.
-   - alternate_url: If extract URL from Twitter failed, use "alternate_url".
- - "twitter\_keywords": {"include": "heavy,thunder,disaster", "exclude": "sakura,zakura"}
-   - include: If one of "include" keyword do match, display Twitter, otherwise, use "alternate" layout.
-   - exclude: If one of "exclude" keyword do match, use "alternate" layout. 
+    - "screen_name": [@]Twitter Screen Name
+    - "translate": If this option is "True", translate the text. 
+    - "translate\_target": en(English), Other languages may work, but I did not test them. See [deep-translator](https://pypi.org/project/deep-translator/).
+    - "expiration": Valid within hours(h) or minutes(m), otherwise, use "alternate" layout.
+    - "alternate_url": If extract URL from Twitter failed, use "alternate_url".
+  - "twitter\_keywords": {"include": "heavy,thunder,disaster", "exclude": "sakura,zakura"}
+    - "include": If one of "include" keyword do match, display Twitter, otherwise, use "alternate" layout.
+    - "exclude": If one of "exclude" keyword do match, use "alternate" layout. 
  
  
 ## Set up time schedule
