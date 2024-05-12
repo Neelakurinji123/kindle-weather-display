@@ -130,7 +130,7 @@ Connect a USB cable to both the server and Kindle.
 
 USB cable uses for network and power supply.
 
-### 1. set up usbnet
+### 1. Set up usbnet
 
 The server: 192.168.2.1/24
 
@@ -200,9 +200,6 @@ Examples:
 - maintenant + main2 + graph + \*\_xlabel + graph + \*\_xlabel + graph + padding20 (40 + 340 + 120 + 20 + 120 + 20 + 120 + 20 = 800)
 - maintenant + main + graph + \*\_xlabel + graph + padding20 (40 + 480 + 120 + 20 + 120 + 20 = 800)
 - maintenant + main + twitter (40 + 480 + 280 = 800)
-
-
-## Modules
 
 ### 1. maintenant
 
@@ -286,7 +283,6 @@ Available options are as follows:
   - "twitter\_keywords": {"include": "heavy,thunder,disaster", "exclude": "sakura,zakura"}
     - "include": If one of "include" keyword do match, display Twitter, otherwise, use "alternate" layout.
     - "exclude": If one of "exclude" keyword do match, use "alternate" layout. 
- 
  
 ## Set up time schedule
 
