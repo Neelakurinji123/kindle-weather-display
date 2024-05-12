@@ -17,8 +17,8 @@ This program is for a weather display on old Kindle 3 based on the original work
 - LAN port x1
 - API key for OpenWeatherMap
 - OpenWeatherMap One Call API subscription (v2.5)
-- API key for CloudConvert for online image converter (optional)
-- user account for X (twitter) (optional)
+- API key on CloudConvert for online image converter (optional)
+- user account on X (twitter) (optional)
 
 
 ## Create API key for CloudConvert (optional)
