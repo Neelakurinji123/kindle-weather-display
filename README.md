@@ -15,7 +15,7 @@ This program is for a weather display on old Kindle 3 based on the original work
 - server OS: Openwrt, Ubuntu and Debian, etc which work with Python3.
 - USB port x1
 - LAN port x1
-- API key for OpenWeatherMap
+- API key on OpenWeatherMap
 - OpenWeatherMap One Call API subscription (v2.5)
 - API key on CloudConvert for online image converter (optional)
 - user account on X (twitter) (optional)
