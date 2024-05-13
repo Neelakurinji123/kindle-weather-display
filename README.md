@@ -277,7 +277,7 @@ Available options are as follows:
   - "twitter": {"caption": "ALERT", "screen\_name": "tenkijp", "translate": "True", "translate\_target": "en", "expiration": "3h", "alternate": \["graph", "daily\_xlabel", "graph"\], "alternate_url": "https:\//tenki.jp/"\}
     - "screen_name": [@]Twitter Screen Name
     - "translate": If this option is "True", translate the text. 
-    - "translate\_target": en(English), Other languages may work, but I did not test them. See [deep-translator](https://pypi.org/project/deep-translator/).
+    - "translate\_target": en(English), Other languages may work, but I haven't test them yet. See [deep-translator](https://pypi.org/project/deep-translator/).
     - "expiration": Valid within hours(h) or minutes(m), otherwise, use "alternate" layout.
     - "alternate_url": If extract URL from Twitter failed, use "alternate_url".
   - "twitter\_keywords": {"include": "heavy,thunder,disaster", "exclude": "sakura,zakura"}
