@@ -12,9 +12,9 @@ import re
 from pytz import timezone
 import pytz
 import locale
+import json
 import shutil
 from subprocess import Popen
-from OpenWeatherMapOnecallAPIv3 import OpenWeatherMap
 from Modules import Maintenant, CurrentWeatherPane, CurrentWeatherPane2, HourlyWeatherPane, DailyWeatherPane, TwitterPane, GraphPane, GraphLabel
 import SVGtools
 
@@ -197,9 +197,8 @@ def img_processing(p, svgfile, pngfile, pngtmpfile):
     elif p.config['cloudconvert'] == True:
         # Use cloudconvert API
         import cloudconvert
-        import json
 
-        with open('cloudconvert.json') as f:
+        with open('./config/cloudconvert.json') as f:
             data = json.load(f)
 
         cloudconvert.configure(api_key=data['api_key'], sandbox=False)
@@ -265,24 +264,24 @@ if __name__ == "__main__":
         settings = sys.argv[1]
 
     try:
-        p = OpenWeatherMap(settings)
-    except Exception as e:
-        shutil.copyfile(error_image, flatten_pngfile)
-        print(e)
-        exit(1)
-        
-    # Hijri calendar
-    if p.config['ramadhan'] == True:
-        from hijri_converter import Hijri, Gregorian
+        with open(settings, 'r') as f:
+            a = json.load(f)['station']
+            api = a['api']
+            
+        if api == 'OpenWeatherMap':
+            from OpenWeatherMapOnecallAPIv3 import OpenWeatherMap     
+            p = OpenWeatherMap(settings)
 
-    # Locale
-    #locale.setlocale(locale.LC_TIME, p.config['locale'])
-    create_svg(p=p, svgfile=svgfile)
+        # Locale
+        #locale.setlocale(locale.LC_TIME, p.config['locale'])
 
-    t.sleep(1)
-    try:
+        create_svg(p=p, svgfile=svgfile)
+
+        t.sleep(1)
         img_processing(p=p, svgfile=svgfile, pngfile=pngfile, pngtmpfile=pngtmpfile)
+
     except Exception as e:
+        print(e)
         shutil.copyfile(error_image, flatten_pngfile)
         print(e)
         exit(1)

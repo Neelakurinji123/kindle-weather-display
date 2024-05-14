@@ -66,9 +66,6 @@ def split_text(wordwrap, text, max_row):
             s.append(w)
             d[row] = s
     for n in d.values():
-        #b = ' '.join(n) + '\n'
-        #b = b.encode()
-        #a += [ b ]
         a += [' '.join(n) + '\n']
     return a
 
@@ -80,13 +77,13 @@ def add_temp_unit(x, y, text, unit):
     return a
 
 def python_encoding(encoding):
-    encodeing_list={'us-ascii': 'ascii', 'iso-8859-1': 'latin_1', 'iso8859-1': 'latin_1', 'cp819': 'latin_1', \
+    encoding_list={'us-ascii': 'ascii', 'iso-8859-1': 'latin_1', 'iso8859-1': 'latin_1', 'cp819': 'latin_1', \
                         'iso-8859-2': 'iso8859_2', 'iso-8859-4': 'iso8859_4', 'iso-8859-5': 'iso8859_5', \
                         'iso-8859-6': 'iso8859_6', 'iso-8859-7': 'iso8859_7', 'iso-8859-8': 'iso8859_8', \
                         'iso-8859-9': 'iso8859_9', 'iso-8859-10': 'iso8859_10', 'iso-8859-11': 'iso8859_11', \
                         'iso-8859-13': 'iso8859_13', 'iso-8859-14': 'iso8859_14', 'iso-8859-15': 'iso8859_15', \
                         'iso-8859-16': 'iso8859_16', 'utf8': 'utf_8'}
-    return encodeing_list[encoding]
+    return encoding_list[encoding]
 
 class Maintenant:
     def __init__(self, p, x, y):
@@ -646,7 +643,6 @@ class TwitterPane:
         if not tw_config['caption'] == str() and not a == None:
             a += SVGtools.text("middle", "25px", (x + 95), (_y + 55), tw_config['caption']).svg()
             
-
         return a, url, processing
         
     def draw(self, url):
@@ -661,7 +657,6 @@ class TwitterPane:
         
         # define a method to choose which factory metho to use
         # possible values 'basic' 'fragment' 'path'
-
         method = "basic"
         if method == 'basic':
             # Simple factory, just a set of rects.
@@ -756,7 +751,7 @@ class GraphLabel:
             #if int(heure) % 3 == 0:
                 heure = re.sub('^0', '', heure)
                 a += SVGtools.text("middle", "16px", _x, (y - 9), "{}".format(heure)).svg()
-            #    #a += SVGtools.text("middle", "16px", _x, (y - 15), "{}:00".format(heure)).svg()
+                #a += SVGtools.text("middle", "16px", _x, (y - 15), "{}:00".format(heure)).svg()
             c += 1
 
         a += '</g>'
@@ -813,7 +808,6 @@ class GraphPane:
         w, h, bgcolor, axis = canvas["width"], canvas["height"], canvas["bgcolor"], canvas["axis"]
         axis_color, grid, grid_color = canvas["axis_color"], canvas["grid"], canvas["grid_color"]
         stroke, stroke_color, fill, stroke_linecap = obj["stroke"], obj["stroke-color"], obj["fill"], obj["stroke-linecap"]
-        #label, label_adjust, title  = bool(eval(obj["label"])), bool(eval(obj["label_adjust"])), obj["title"]
         title = obj["title"]
         start, end, step, basis = obj["start"], obj["end"], obj["step"], obj["basis"]
         a = '<g font-family="{}">\n'.format(p.config['font'])
@@ -886,14 +880,11 @@ class GraphPane:
         w, h, bgcolor, axis = canvas["width"], canvas["height"], canvas["bgcolor"], canvas["axis"]
         axis_color, grid, grid_color = canvas["axis_color"], canvas["grid"], canvas["grid_color"]
         stroke, stroke_color, fill, stroke_linecap = obj["stroke"], obj["stroke-color"], obj["fill"], obj["stroke-linecap"]
-        #label, label_adjust, title  = bool(eval(obj["label"])), bool(eval(obj["label_adjust"])), obj["title"]
         title = obj["title"]
         start, end, step, basis = obj["start"], obj["end"], obj["step"], obj["basis"]
         a = '<g font-family="{}">\n'.format(p.config['font'])
         i18n = read_i18n(p, i18nfile)
         tz = timezone(p.config['timezone'])
-        #data = p.daily_forecast(0)
-        #hourly  = p.hourly_forecast(5)
 
         # Canvas
         style = "fill:{};stroke:{};stroke-width:{}px;".format(bgcolor, bgcolor, (0))
@@ -985,7 +976,6 @@ class GraphPane:
             w, h, bgcolor, axis = canvas["width"], canvas["height"], canvas["bgcolor"], canvas["axis"]
             axis_color, grid_y, grid_y_color = canvas["axis_color"], canvas["grid"], canvas["grid_color"]
             stroke, stroke_color, fill, stroke_linecap = obj["stroke"], obj["stroke-color"], obj["fill"], obj["stroke-linecap"]
-            #label, label_adjust, title  = bool(eval(obj["label"])), bool(eval(obj["label_adjust"])), obj["title"]
             title = obj["title"]
             start, end, step, basis = obj["start"], obj["end"], obj["step"], obj["basis"]
             i18n = read_i18n(p, i18nfile)
@@ -1010,18 +1000,12 @@ class GraphPane:
                     style = "fill:none;stroke:{};stroke-linecap:{};stroke-width:{}px;".format(grid_y_color, stroke_linecap, grid_y)
                     i += SVGtools.line((_x + 30), (_x + 30), (_y - h + 55), (_y + 10), style).svg()
 
-                #if label == True and label_adjust == True:
-                #    s += SVGtools.text("middle", "16px", _x, (y - 9), "{}".format(jour)).svg()
-                #elif label == True and label_adjust == False:
-                #    s += SVGtools.text("middle", "16px", _x, (y - 15), "{}".format(jour)).svg()
-                
             return s,i
 
         def moon_phase(p, x, y, canvas, obj):
             w, h, bgcolor, axis = canvas["width"], canvas["height"], canvas["bgcolor"], canvas["axis"]
             axis_color, grid_y, grid_y_color = canvas["axis_color"], canvas["grid"], canvas["grid_color"]
             stroke, stroke_color, fill, stroke_linecap = obj["stroke"], obj["stroke-color"], obj["fill"], obj["stroke-linecap"]
-            #label, label_adjust, title  = bool(eval(obj["label"])), bool(eval(obj["label_adjust"])), obj["title"]
             title = obj["title"]
             start, end, step, basis = obj["start"], obj["end"], obj["step"], obj["basis"]
             i18n = read_i18n(p, i18nfile)
@@ -1029,6 +1013,11 @@ class GraphPane:
             ramadhan = p.config['ramadhan']
             i = str()
             s = str()
+            
+            # Hijri calendar
+            if p.config['ramadhan'] == True:
+                from hijridate import Hijri, Gregorian
+            
             for n in range(start, end, step):
                 weather = p.DailyForecast(n)
                 jour = str.lower(datetime.fromtimestamp(weather['dt'], tz).strftime('%a'))
@@ -1048,7 +1037,7 @@ class GraphPane:
                 # moon phase:  360d = 2pi(rad)
                 #lat = -1  # test
                 pi = math.pi
-                rad = weather['moon_phase'] * pi * 2  # One call API: 0,1=new moon, 0.25=1st qurater moon, 0.5=full moon, 0.75=lst quarter moon 
+                rad = weather['moon_phase'] * pi * 2  # One call API: 0 or 1:new moon, 0.25:first qurater moon, 0.5:full moon, 0.75:third quarter moon 
                 c = 0.025
                 m = rad * c * math.cos(rad)
                 rx = _x - 3
@@ -1061,26 +1050,24 @@ class GraphPane:
 
                 def phase(rad):
                     if (2 * pi / 60) > rad >= 0 or (2 * pi / 60) > (pi * 2 - rad) >= 0:
-                        r = 'n'
+                        a = 'n'
                     elif (2 * pi / 60) > abs(rad - pi * 0.5) >= 0:
-                        r = '1'
+                        a = '1'
                     elif (2 * pi / 60) > abs(rad - pi) >= 0:
-                        res = 'f'
+                        a = 'f'
                     elif (2 * pi / 60) > abs(rad - pi * 1.5) >= 0:
-                        r = '3'
+                        a = '3'
                     else:
-                        r = str()
-
-                    return r
+                        a = str()
+                    return a
 
                 def ramadhan(day, mon, yrs):
-                    a = Gregorian(yrs, mon, day).to_hijri()
-                    if a.month_name() == "Ramadhan":
-                        r = "r"
+                    g = Gregorian(yrs, mon, day).to_hijri()
+                    if g.month_name() == "Ramadhan":
+                        a = "r"
                     else:
-                        r = str()
-
-                    return r
+                        a = str()
+                    return a
 
                 if lat >= 0:
                     if phase(rad) == "n":

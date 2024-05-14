@@ -115,6 +115,11 @@ class OpenWeatherMap:
 
         self.timezone_offset = int(self.onecall['timezone_offset'])
 
+    def dump(self):
+        output = 'output.json'
+        with open(output, 'w', encoding='utf-8') as f:
+            json.dump(self.onecall, f, ensure_ascii=False, indent=4)
+
     def CurrentWeather(self):
         c = self.onecall['current']
         h = self.onecall['hourly'][0]
@@ -235,3 +240,4 @@ class OpenWeatherMap:
 #print('current',OpenWeatherMap('settings.json').CurrentWeather(), '\n')
 #print('hourly', OpenWeatherMap('settings.json').HourlyForecast(1), '\n')
 #print('daily', OpenWeatherMap('settings.json').DailyForecast(1), '\n')
+#OpenWeatherMap('settings.json').dump()

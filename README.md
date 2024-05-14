@@ -81,11 +81,11 @@ Default config is `settings.json`.
 - requests
 - setuptools
 - pip
-- twikit (optional)
-- deep_translator (optional)
-- qrcode (optional)
 - cloudconvert (optional)
-- hijri_converter (optional)
+- twikit (optional, for twitter module)
+- deep_translator (optional, for twitter module)
+- qrcode (optional, for twitter module)
+- hijridate (optional, for moon\_phase module)
 
 e.g.)
 ```
@@ -97,7 +97,7 @@ pip3 install twikit
 pip3 install deep_translator
 pip3 install qrcode
 pip3 install cloudconvert
-pip3 install hijri_converter
+pip3 install hijridate
 ```
 
 ### 5. Network Time Synchronization
@@ -191,8 +191,8 @@ The program's layout is as follows:
 | daily            | Daily weather              | 280           |
 | graph            | Graph  or tile             | 120           |
 | twitter          | Alert (Twitter)            | 280           |
-| daily_xlabel     | Label on daily weather    | 20            |
-| hourly_xlabel    | Label on hourly weather   | 20            |
+| daily_xlabel     | Label on daily weather     | 20            |
+| hourly_xlabel    | Label on hourly weather    | 20            |
 | padding[-+0-9]*  | Insert spaces (Y axis only)|               |
 
 Examples:
