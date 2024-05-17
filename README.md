@@ -14,7 +14,7 @@ Following APIs are available:
   - Hourly forecast for 120 hours
   - Daily forecast for 6 days
 
-Note: OpenWeatherMap onecall API v2.5 will discontine on july 1, 2024.
+Note: OpenWeatherMap onecall API v2.5 will discontinue on july 1, 2024.
 Subscribe to a v3.0 API.
  
 ## Screenshots
