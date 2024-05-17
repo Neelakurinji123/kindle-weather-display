@@ -284,6 +284,7 @@ class CurrentWeatherPane(CurrentData):
                 self.state = 'day'
             else:
                 self.state = 'night'
+        # The other way: Northern hemisphere: From Sep to Feb is night, from March to Aug is day, sorthern hemisphere is the exact opposite.
         except Exception as e:
             print(e)
             if float(p.config['lat']) < 0 and 3 < this_month <= 9:
@@ -366,33 +367,26 @@ class CurrentWeatherPane2(CurrentData):
         sunrise = weather['sunrise']
         sunset = weather['sunset']
         now = p.now
-        if now <= sunrise or now >= sunset:
-            self.state = 'night'
-        else:
-            self.state = 'day'
+        tz = timezone(p.config['timezone'])
+        this_month = int(datetime.fromtimestamp(now, tz).strftime("%m"))
 
-        # Fix icons: ClearDay, ClearNight, Few-clouds-day, Few-clouds-night
-        b = dict()       
-        for n in range(24):
-            weather = p.HourlyForecast(n)
-            probability = 0.98
-            probability **= n
-            if self.state == 'night':
-                if re.search('Day', weather['main']):
-                    c = re.sub('Day', 'Night', weather['main'])
-                else:
-                    c = weather['main']
+        try:            
+            a = self.daytime(dt=now, sunrise=sunrise, sunset=sunset)
+            if a == True:
+                self.state = 'day'
             else:
-                if re.search('Night', weather['main']):
-                    c = re.sub('Night', 'Day', weather['main'])
-                else:
-                    c = weather['main']
-                    
-            if c not in b:
-                b[c] = 0
-            b[c] += probability
-            
-        self.sub_main = max(b.items(), key=lambda x: x[1])[0]
+                self.state = 'night'
+        # The other way: Northern hemisphere: From Sep to Feb is night, from March to Aug is day, sorthern hemisphere is the exact opposite.
+        except Exception as e:
+            print(e)
+            if float(p.config['lat']) < 0 and 3 < this_month <= 9:
+                self.state = 'night'
+            elif float(p.config['lat']) < 0 and (0 < this_month <= 3 or 9 < this_month <= 12):
+                self.state = 'day'
+            elif float(p.config['lat']) > 0 and 3 < this_month <= 9:
+                self.state = 'day'
+            elif float(p.config['lat']) > 0 and (0 < this_month <= 3 or 9 < this_month <= 12):
+                self.state = 'night'
         
     def text(self):
         a = str()

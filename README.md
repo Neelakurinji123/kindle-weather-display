@@ -180,6 +180,8 @@ exit
 ssh root@192.168.2.2  # test passwordless login
 ```
 
+
+
 ### 3. Test run
 
 ```
@@ -236,6 +238,18 @@ Examples:
   - "units": "metric"
   - "lang": "en"
 
+
+#### 2.1 Value in cloud icon
+
+<kbd><img src="sample_screenshots/readme_imgs/inside_clouds.png" /></kbd>&nbsp;
+
+- config
+  - "in_clouds". : Value from 0 to 1.0 (0% to 100%)
+     - "probability" : Probability of precipitation
+     - "cloudCover" : Cloud thickness
+     - "(empty)" : None
+
+     
 ### 3. graph and tile
 
 Available options are as follows:
