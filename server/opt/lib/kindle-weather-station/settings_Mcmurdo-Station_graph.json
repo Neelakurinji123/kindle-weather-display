@@ -1,22 +1,21 @@
 {
     "station": {
-        "city": "Kiyose,Tokyo",
-        "timezone": "Asia/Tokyo",
+        "city": "McMurdo Station",
+        "timezone": "Pacific/Auckland",
         "encoding": "iso-8859-1",
         "locale": "en_US.UTF-8",
         "font": "Droid Sans",
         "sunrise_and_sunset": "True",
-        "darkmode": "False",
-        "api": "OpenWeatherMap",
-        "lat": "35.7853",
-        "lon": "139.5268",
+		"api": "TomorrowIo",
+        "lat": "-77.8400829",
+        "lon": "166.6445298",
         "units": "metric",
         "lang": "en",
+        "exclude": "minutely",
         "cloudconvert": "False",
         "converter": "gm",
-        "ramadhan": "True",
 		"layout": ["maintenant", "main", "graph", "daily_xlabel", "graph"],
-		"graph_objects": ["daily_temperature", "moon_phase"],
+		"graph_objects": ["daily_temperature", "daily_snow_accumulation"],
 		"graph_canvas": "default"
     }
 }

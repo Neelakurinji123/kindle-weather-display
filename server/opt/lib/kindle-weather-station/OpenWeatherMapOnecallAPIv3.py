@@ -8,11 +8,15 @@
 import time as t
 import json
 import requests
+#import pytz
+#from datetime import datetime,timedelta,timezone
+from pytz import timezone
+from datetime import datetime,timedelta
 
 def readSettings(settings):
-    OWM_config = './config/OWM_config.json'
+    OWM_config = './config/OWM_API_KEY.json'
     graph_config = './config/graph_config.json'
-    twitter_config = './config/twitter_config.json'
+    twitter_config = './config/twitter_ID.json'
     a = dict()
     with open(settings, 'r') as f:
         service = json.load(f)['station']
@@ -22,17 +26,16 @@ def readSettings(settings):
         a['encoding'] = service['encoding'] if 'encoding' in service else 'iso-8859-1'
         a['font'] = service['font'] if 'font' in service else 'Droid Sans'
         a['sunrise_and_sunset'] = bool(eval(service['sunrise_and_sunset'])) if 'sunrise_and_sunset' in service else True
-        a['darkmode'] = service['darkmode'] if 'darkmode' in service else False
-        a['service'] = service['service'] if 'darkmode' in service else 'onecall'
-        a['lat'] = service['lat'] if 'lat' in service else None
-        a['lon'] = service['lon'] if 'lon' in service else None
+        a['darkmode'] = service['darkmode'] if 'darkmode' in service else 'False'
+        a['api'] = service['api']
+        a['lat'] = service['lat']
+        a['lon'] = service['lon']
         a['units'] = service['units'] if 'units' in service else 'metric'
         a['lang'] = service['lang'] if 'lang' in service else 'en'
-        a['exclude'] = service['exclude']  if 'exclude' in service else None
-        a['version'] = service['version']
+        a['in_clouds'] = service['in_clouds'] if 'in_clouds' in service else str()  # Options: "cloudCover", "probability"
         a['cloudconvert'] = bool(eval(service['cloudconvert'])) if 'cloudconvert' in service else False
         a['converter'] = service['converter'] if 'converter' in service else None
-        a['layout'] = service['layout'] if 'layout' in service else None
+        a['layout'] = service['layout']
         a['ramadhan'] = bool(eval(service['ramadhan'])) if 'ramadhan' in service else False
         a['twitter'] = service['twitter'] if 'twitter' in service else False
         if 'twitter_keywords' in service:
@@ -41,7 +44,12 @@ def readSettings(settings):
         else:
              a['twitter_keywords'] = False
         c = service['graph_canvas'] if 'graph_canvas' in service else 'default'
-
+        # Add timezone offset
+        tz = timezone(a['timezone'])
+        _tz = tz.utcoffset(datetime.now(), is_dst = True)
+        offset = _tz.seconds if _tz.days == 0 else -_tz.seconds
+        a['timezone_offset'] = offset
+        
     try:
         b = list(reversed(service['graph_objects'])) if 'graph_objects' in service else None
         if not b == None:
@@ -72,128 +80,144 @@ def readSettings(settings):
     
     with open(OWM_config, 'r') as f:
         owm = json.load(f)['OWM']
-        a['api_key'] = owm['api_key'] if 'api_key' in owm else None
-
+        a['api_key'] = owm['api_key']
+        a['service'] = owm['service']        
+        a['api_version'] = owm['onecall_version']
+        a['exclude'] = owm['exclude']  if 'exclude' in service else None
     return a
-        
 
 class OpenWeatherMap:
     icon = str()
     units = dict()
     direction = str()
 
-    def __init__(self, settings):
+    def __init__(self, settings, api_data=None):
         s = str()
         self.now = int(t.time())
         self.config = readSettings(settings)
-        config = self.config
-        s += 'lat=' + config['lat'] + '&lon=' + config['lon']
-        s += '&units=' + config['units'] if 'units' in config and not config['units'] == None else ''
-        s += '&lang=' + config['lang'] if 'lang' in config and not config['lang'] == None else ''
-        s += ('&exclude=' + config['exclude'] if 'exclude' in config and not config['exclude'] == None else '')
-        s += '&appid=' + config['api_key']
-
-        url = 'https://api.openweathermap.org/data/' + config['version'] + '/onecall?' + s
-        self.onecall = requests.get(url).json()
-
-        # test
-        #with open('output.json', 'r') as f:
-        #    self.onecall = json.load(f)
-        #    print(json.dumps(self.onecall, ensure_ascii=False, indent=4))
-            
-        # sanity check
-        if 'cod' in self.onecall and self.onecall['cod'] == 401:
-            print('OpenWeatherMap: Invalid API Key')
-            exit(1)
-       
+        self.api_data = api_data
+        self.timezone_offset = self.config['timezone_offset']
         if self.config['units'] == 'metric':
             self.units = {'pressure': 'hPa', 'wind_speed': 'm/s', 'temp': 'C'}
         elif self.config['units'] == 'imperial':
             self.units = {'pressure': 'hPa', 'wind_speed': 'mph', 'temp': 'F'}
         else:
             self.units = {'pressure': 'hPa', 'wind_speed': 'm/s', 'temp': 'K'}
+        
 
-        self.timezone_offset = int(self.onecall['timezone_offset'])
-
-    def dump(self):
-        output = 'output.json'
-        with open(output, 'w', encoding='utf-8') as f:
-            json.dump(self.onecall, f, ensure_ascii=False, indent=4)
+    def ApiCall(self):
+        s = str()
+        now = self.now
+        config = self.config
+        s += 'lat=' + config['lat'] + '&lon=' + config['lon']
+        s += '&units=' + config['units'] if 'units' in config and not config['units'] == None else ''
+        s += '&lang=' + config['lang'] if 'lang' in config and not config['lang'] == None else ''
+        s += ('&exclude=' + config['exclude'] if 'exclude' in config and not config['exclude'] == None else '')
+        s += '&appid=' + config['api_key']
+        url = 'https://api.openweathermap.org/data/' + config['api_version'] + '/onecall?' + s
+        api_data = requests.get(url).json()            
+        # sanity check
+        if 'cod' in api_data and api_data['cod'] == 401:
+            print('OpenWeatherMap: Invalid API Key, requests call rejected.')
+            exit(1)         
+        return api_data    
 
     def CurrentWeather(self):
-        c = self.onecall['current']
-        h = self.onecall['hourly'][0]
+        config = self.config
+        c = self.api_data['current']
+        h = self.api_data['hourly'][0]
         if not 'sunrise' in c:
             c['sunrise'] = None
         if not 'sunset' in c:
             c['sunset'] = None
-
         # Add hourly precipitation of rain or snow
         if 'rain' in h:
-            c['precipitation'] = float(h['rain']['1h'])
-        elif 'snow' in h:
-            c['precipitation'] = float(h['snow']['1h'])
+            c['rainAccumulation'] = float(h['rain']['1h'])
         else:
-            c['precipitation'] = 0
-            
-        # Add hourly pop
-        c['pop'] = h['pop']
-        
+            c['rainAccumulation'] = 0
+        if 'snow' in h:
+            c['snowAccumulation'] = float(h['snow']['1h'])
+        else:
+            c['snowAccumulation'] = 0
+        # Add 'in_clouds'
+        c['cloudCover'] = c['clouds']
+        #c['pop'] = round(c['cloudCover'] / 100,1)
+        if config['in_clouds'] == 'cloudCover':
+            c['in_clouds'] = round(c['cloudCover'] / 100,1)
+        elif config['in_clouds'] == 'probability':
+            c['in_clouds'] = round(c['pop'],1) if 'pop' in c else 0
+        else:
+            c['in_clouds'] = 0   
         # Add cardinal direction
         c['cardinal'] = self.cardinal(c['wind_deg'])
-
         # Get simplicity
         c['id'] = int(c['weather'][0]['id'])
         c['main'] = str(c['weather'][0]['main'])
         c['description'] = str(c['weather'][0]['description'])
         c['icon'] = str(c['weather'][0]['icon'])
         c['main'] = self.fixIcon(c)
+        c['main'] = self.rename_weather(c['main'])
         return c
 
     def HourlyForecast(self, hour):
-        h = self.onecall['hourly'][hour]
+        config = self.config
+        h = self.api_data['hourly'][hour]
         wind_gust = float(h['wind_gust']) if 'wind_gust' in h else None
         wind_deg = float(h['wind_deg']) if 'wind_deg' in h else None
-
         # Add hourly precipitation of rain or snow
         if 'rain' in h:
-            h['precipitation'] = float(h['rain']['1h'])
-        elif 'snow' in h:
-            h['precipitation'] = float(h['snow']['1h'])
+            h['rainAccumulation'] = float(h['rain']['1h'])
         else:
-            h['precipitation'] = 0
-            
+            h['rainAccumulation'] = 0
+        if 'snow' in h:
+            h['snowAccumulation'] = float(h['snow']['1h'])
+        else:
+            h['snowAccumulation'] = 0
+        # Add 'in_clouds'
+        h['cloudCover'] = h['clouds']
+        if config['in_clouds'] == 'cloudCover':
+            h['in_clouds'] = round(h['cloudCover'] / 100,1)
+        elif config['in_clouds'] == 'probability':
+            h['in_clouds'] = round(h['pop'],1) if 'pop' in h else 0
+        else:
+            h['in_clouds'] = 0
         # Add cardinal direction
         h['cardinal'] = self.cardinal(h['wind_deg'])
-
         # Get simplicity
         h['id'] = int(h['weather'][0]['id'])
         h['main'] = str(h['weather'][0]['main'])
         h['description'] = str(h['weather'][0]['description'])
         h['icon'] = str(h['weather'][0]['icon'])
-        h['main'] = self.fixIcon(h)    
+        h['main'] = self.fixIcon(h)
+        h['main'] = self.rename_weather(h['main'])
         return h
 
-
     def DailyForecast(self, day):
-        d = self.onecall['daily'][day]
+        config = self.config
+        d = self.api_data['daily'][day]
         wind_gust = float(d['wind_gust']) if 'wind_gust' in d else None
         wind_deg = float(d['wind_deg']) if 'wind_deg' in d else None
-
         # Add hourly precipitation of rain or snow
         if 'rain' in d:
-            d['precipitation'] = float(d['rain'])
-        elif 'snow' in d:
-            d['precipitation'] = float(d['snow'])
+            d['rainAccumulation'] = float(d['rain'])
         else:
-            d['precipitation'] = 0
-            
+            d['rainAccumulation'] = 0
+        if 'snow' in d:
+            d['snowAccumulation'] = float(d['snow'])
+        else:
+            d['snowAccumulation'] = 0
+        # Add 'in_clouds'
+        d['cloudCover'] = d['clouds']
+        if config['in_clouds'] == 'cloudCover':
+            d['in_clouds'] = round(d['cloudCover'] / 100,1)
+        elif config['in_clouds'] == 'probability':
+            d['in_clouds'] = round(d['pop'],1) if 'pop' in d else 0
+        else:
+            d['in_clouds'] = 0 
         # Add wind gust
-        d['wind_gust'] = wind_gust
-        
+        d['wind_gust'] = wind_gust       
         # Add cardinal direction
         d['cardinal'] = self.cardinal(wind_deg)
-
         # Get simplicity
         d['id'] = int(d['weather'][0]['id'])
         d['main'] = str(d['weather'][0]['main'])
@@ -205,9 +229,9 @@ class OpenWeatherMap:
         d['temp_night'] = float(d['temp']['night'])
         d['temp_eve'] = float(d['temp']['eve'])
         d['temp_morn'] = float(d['temp']['morn'])
-        d['main'] = self.fixIcon(d)
+        d['main'] = self.fixIcon(d)       
+        d['main'] = self.rename_weather(d['main'])
         return d
-
 
     def fixIcon(self, p):
         daytime = 'day' if p['icon'][-1] == 'd' else 'night'
@@ -223,6 +247,16 @@ class OpenWeatherMap:
             a = p['main']
         return a
 
+    def rename_weather(self, s):
+        d = {'Clear-day': 'ClearDay',
+            'Clear-night': 'ClearNight',
+            'Clouds': 'Cloudy',
+            'Few-clouds': 'PartlyCloudy',
+            'Few-clouds-day': 'PartlyCloudyDay',
+            'Few-clouds-night': 'PartlyCloudyNight'
+        } 
+        a = d[s] if s in d else s
+        return a
 
     def cardinal(self, degree):
         if degree >= 348.75 or degree <= 33.75: return 'N'
@@ -240,4 +274,3 @@ class OpenWeatherMap:
 #print('current',OpenWeatherMap('settings.json').CurrentWeather(), '\n')
 #print('hourly', OpenWeatherMap('settings.json').HourlyForecast(1), '\n')
 #print('daily', OpenWeatherMap('settings.json').DailyForecast(1), '\n')
-#OpenWeatherMap('settings.json').dump()

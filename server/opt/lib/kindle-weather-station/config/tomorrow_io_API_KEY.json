@@ -1,0 +1,7 @@
+{
+	"tomorrow.io": {
+		"api_key": "xxxxxxxxxxxxxxxxxxxxxxxxxxx",
+		"service": "timelines",
+		"version": "v4"
+	}
+}

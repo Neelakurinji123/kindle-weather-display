@@ -1,0 +1,386 @@
+#!/usr/bin/env python3
+# encoding=utf-8
+# -*- coding: utf-8 -*-
+
+# Written by : krishna@hottunalabs.net
+# Date       : 24 April 2024 
+
+import time as t
+import json
+import re
+import requests
+from pytz import timezone
+from datetime import datetime,timedelta
+#from datetime import datetime, timedelta, date, timezone
+
+wether_codes_config = './config/tomorrow_codes.json'
+    
+def readSettings(settings):
+    tomorrow_io_config = './config/tomorrow_io_API_KEY.json'
+    graph_config = './config/graph_config.json'
+    twitter_config = './config/twitter_ID.json'
+    a = dict()
+    with open(settings, 'r') as f:
+        service = json.load(f)['station']
+        a['city'] = service['city'] if 'city' in service else None
+        a['timezone'] = service['timezone'] if 'timezone' in service else None
+        a['locale'] = service['locale'] if 'locale' in service else 'en_US.UTF-8'
+        a['encoding'] = service['encoding'] if 'encoding' in service else 'iso-8859-1'
+        a['font'] = service['font'] if 'font' in service else 'Droid Sans'
+        a['sunrise_and_sunset'] = bool(eval(service['sunrise_and_sunset'])) if 'sunrise_and_sunset' in service else True
+        a['darkmode'] = service['darkmode'] if 'darkmode' in service else 'False'
+        a['api'] = service['api']
+        a['lat'] = service['lat']
+        a['lon'] = service['lon']
+        a['units'] = service['units'] if 'units' in service else 'metric'
+        a['lang'] = service['lang'] if 'lang' in service else 'en'
+        a['in_clouds'] = service['in_clouds'] if 'in_clouds' in service else str()  # Options: "cloudCover", "probability"
+        a['cloudconvert'] = bool(eval(service['cloudconvert'])) if 'cloudconvert' in service else False
+        a['converter'] = service['converter'] if 'converter' in service else None
+        a['layout'] = service['layout']
+        a['ramadhan'] = bool(eval(service['ramadhan'])) if 'ramadhan' in service else False
+        a['twitter'] = service['twitter'] if 'twitter' in service else False
+        if 'twitter_keywords' in service:
+            a['twitter_include_keywords'] = service['twitter_keywords']['include'] if 'include' in service['twitter_keywords'] else str()
+            a['twitter_exclude_keywords'] = service['twitter_keywords']['exclude'] if 'exclude' in service['twitter_keywords'] else str()
+        else:
+             a['twitter_keywords'] = False
+        c = service['graph_canvas'] if 'graph_canvas' in service else 'default'
+        # Add timezone offset
+        tz = timezone(a['timezone'])
+        _tz = tz.utcoffset(datetime.now(), is_dst = True)
+        offset = _tz.seconds if _tz.days == 0 else -_tz.seconds
+        a['timezone_offset'] = offset
+
+    try:
+        b = list(reversed(service['graph_objects'])) if 'graph_objects' in service else None
+        with open(graph_config, 'r') as f:
+            graph = json.load(f)['graph']
+            a['graph_canvas'] = graph['canvas'][service['graph_canvas']]
+            a['graph_objects'] = list()
+            a['graph_labels'] = graph['labels']
+            for n in b:
+                a['graph_objects'].append(graph['objects'][n])           
+    except Exception as e:
+        a['graph_canvas'] = dict()
+        a['graph_objects'] = list()
+        a['graph_labels'] = dict()
+
+    try:
+        with open(twitter_config, 'r') as f:
+            t = json.load(f)['twitter']
+            a['twitter_screen_name'] =  t["user_screen_name"]
+            a['twitter_password'] =  t["password"]
+    except Exception as e:
+        a['twitter_screen_name'] = None
+        a['twitter_password'] = None
+    
+    with open(tomorrow_io_config, 'r') as f:
+        c = json.load(f)['tomorrow.io']
+        a['api_key'] = c['api_key']
+        a['api_version'] = c['version']
+        a['service'] = c['service']        
+        #a['service_timesteps'] = ['1m', '1h', '1d']
+        a['service_timesteps'] = ['1h', '1d']
+        a['service_1m_rows'] = 6
+        a['service_fields'] = { '1h': ['temperature', 'humidity', 'windSpeed', 'windDirection','pressureSeaLevel', \
+                                        'weatherCode','precipitationProbability','cloudCover', 'rainAccumulation', 'snowAccumulation', \
+                                        ],
+                                '1d': ['temperature', 'humidity', 'windSpeed', 'windDirection','pressureSeaLevel', \
+                                        'sunriseTime','sunsetTime','weatherCodeFullDay','weatherCode','precipitationProbability', \
+                                        'cloudCover', 'moonriseTime', 'moonsetTime', 'temperatureMax', 'temperatureMin', \
+                                        'rainAccumulation', 'snowAccumulation']
+                                }
+        #a['service_fields'] = {'1m': ['temperature', 'humidity', 'windSpeed', 'windDirection','pressureSeaLevel', \
+        #                                'weatherCode','precipitationProbability','cloudCover'],
+        #                        '1h': ['temperature', 'humidity', 'windSpeed', 'windDirection','pressureSeaLevel', \
+        #                                'weatherCode','precipitationProbability','cloudCover', 'rainAccumulation', 'snowAccumulation'],
+        #                        '1d': ['temperature', 'humidity', 'windSpeed', 'windDirection','pressureSeaLevel', \
+        #                                'sunriseTime','sunsetTime','weatherCodeFullDay','weatherCode','precipitationProbability', \
+        #                                'cloudCover', 'moonriseTime', 'moonsetTime', 'temperatureMax', 'temperatureMin', \
+        #                                'rainAccumulation', 'snowAccumulation']
+        #                        }
+    return a
+        
+
+class TomorrowIo:
+    icon = str()
+    units = dict()
+    direction = str()
+
+    def __init__(self, settings, api_data=None):
+        s = str()
+        now = int(t.time())
+        self.now = now
+        self.config = readSettings(settings)
+        self.api_data = api_data
+        config = self.config
+        self.timezone_offset = config['timezone_offset']
+        location = config['lat'] + ',' + config['lon']
+        fields = config['service_fields']
+        url = "https://api.tomorrow.io/" + config['api_version'] + "/timelines"
+
+        with open(wether_codes_config, 'r') as f:
+            tomorrow_codes = json.load(f)
+        self.tomorrow_codes = tomorrow_codes
+       
+        if self.config['units'] == 'metric':
+            self.units = {'pressure': 'hPa', 'wind_speed': 'm/s', 'temp': 'C'}
+        elif self.config['units'] == 'imperial':
+            self.units = {'pressure': 'hPa', 'wind_speed': 'mph', 'temp': 'F'}
+        else:
+            self.units = {'pressure': 'hPa', 'wind_speed': 'm/s', 'temp': 'K'}
+
+    def ApiCall(self):
+        s = str()
+        now = self.now
+        config = self.config
+        location = config['lat'] + ',' + config['lon']
+        fields = config['service_fields']
+        url = "https://api.tomorrow.io/" + config['api_version'] + "/timelines"
+        api_data = dict()
+        for n in config['service_timesteps']:
+            if n == '1m':
+                tz = timezone('utc')
+                #a = datetime.fromtimestamp(now, timezone.utc)
+                a = datetime.fromtimestamp(now, tz)
+                yrs, mons, days, hrs, mins, _, _, _, _ = a.timetuple()
+                endtime = str(yrs) + '-' + str(mons) + '-' + str(days) + 'T' + str(hrs) + ':' + str(int(mins) + int(config['service_1m_rows'])) + ':00Z'
+                querystring = {
+                    'location': location,
+                    'fields': fields[n],
+                    'units': config['units'],
+                    'timesteps': n,
+                    'apikey': config['api_key'],
+                    'endtime': endtime}
+            else:
+                querystring = {
+                    "location":location,
+                    "fields":fields[n],
+                    "units":config['units'],
+                    "timesteps":n,
+                    "apikey":config['api_key']}
+                    
+            r = requests.request("GET", url, params=querystring)
+            if  r.ok:
+                api_data[n] = r.json()
+                t.sleep(1)
+            else:
+                print('API: Requests call rejected.')
+                exit(1)    
+        return api_data
+
+    def CurrentWeather(self):
+        config = self.config
+        #c = self.api_data['1m']['data']['timelines'][0]['intervals'][0]['values']
+        c = self.api_data['1h']['data']['timelines'][0]['intervals'][0]['values']
+        s = self.api_data['1h']['data']['timelines'][0]['intervals'][0]['startTime']
+        d = self.api_data['1d']['data']['timelines'][0]['intervals'][0]['values']
+        tomorrow_codes = self.tomorrow_codes
+        
+        # Time
+        c['dt'] = self.conv_epoch(s)
+        # Sunrise and Sunset
+        c['sunrise'] = self.conv_epoch(d['sunriseTime']) if not d['sunriseTime'] == None else 0
+        c['sunset'] = self.conv_epoch(d['sunsetTime']) if not d['sunsetTime'] == None else 0
+        # daitime
+        c['daytime'] = self.daytime(dt=c['dt'], sunrise=c['sunrise'], sunset=c['sunset'])
+        # Temperature
+        c['temp'] = float(c['temperature'])
+        # Pressure
+        c['pressure'] = float(c['pressureSeaLevel'])
+        # Clouds
+        c['clouds'] = float(c['cloudCover'])
+        # Wind speed and Cardinal direction
+        c['wind_speed'] = float(c['windSpeed'])
+        c['cardinal'] = self.cardinal(float(c['windDirection']))
+        # Weather disc
+        code_fullday = str(d['weatherCodeFullDay']) # int() to str() data
+        code_fullday = self.fix_weather(daytime=c['daytime'], code=code_fullday)
+        c['description'] = tomorrow_codes['weatherCodeFullDay'][code_fullday]
+        # Main weather
+        code_day = str(c['weatherCode']) # int() to str() data
+        code_day = self.fix_weather(daytime=c['daytime'], code=code_day) 
+        w = tomorrow_codes["weatherCode"][code_day]    
+        c['main'] = self.fix_kindle_weather(w)
+        # Add pop
+        c['pop'] = round(float(c['precipitationProbability']) / 100,1)
+        # Add 'in_clouds'
+        if config['in_clouds'] == 'cloudCover':
+            c['in_clouds'] = round(float(c['cloudCover']) / 100,1)
+        elif config['in_clouds'] == 'probability':
+            c['in_clouds'] = round(c['pop'],1) if 'pop' in c else 0
+        else:
+            c['in_clouds'] = 0
+        return c
+
+    def HourlyForecast(self, hour):
+        config = self.config
+        h = self.api_data['1h']['data']['timelines'][0]['intervals'][hour]['values']
+        s = self.api_data['1h']['data']['timelines'][0]['intervals'][hour]['startTime']
+        d = self.api_data['1d']['data']['timelines'][0]['intervals'][0]['values']
+        tomorrow_codes = self.tomorrow_codes       
+        # Time
+        h['dt'] = self.conv_epoch(s)
+        # Sunrise and Sunset
+        h['sunrise'] = self.conv_epoch(d['sunriseTime']) if not d['sunriseTime'] == None else 0
+        h['sunset'] = self.conv_epoch(d['sunsetTime']) if not d['sunsetTime'] == None else 0
+        # daitime
+        h['daytime'] = self.daytime(dt=h['dt'], sunrise=h['sunrise'], sunset=h['sunset'])
+        # Temperature
+        h['temp'] = float(h['temperature'])
+        # Pressure
+        h['pressure'] = float(h['pressureSeaLevel'])
+        # Clouds
+        h['clouds'] = float(h['cloudCover'])
+        # Wind speed
+        h['wind_speed'] = float(h['windSpeed'])
+        # Cardinal direction
+        h['cardinal'] = self.cardinal(float(h['windDirection']))
+        # Main weather
+        code_day = str(h['weatherCode']) # int() to str() data
+        code_day = self.fix_weather(daytime=h['daytime'], code=code_day) 
+        w = tomorrow_codes["weatherCode"][code_day]
+        h['main'] = self.fix_kindle_weather(w)
+        # Add pop
+        h['pop'] = round(float(h['precipitationProbability']) / 100,1)
+        # Add 'in_clouds'
+        if config['in_clouds'] == 'cloudCover':
+            h['in_clouds'] = round(float(h['cloudCover']) / 100,1)
+        elif config['in_clouds'] == 'probability':
+            h['in_clouds'] = round(h['pop'],1) if 'pop' in h else 0
+        else:
+            h['in_clouds'] = 0
+        return h
+
+    def DailyForecast(self, day):
+        config = self.config
+        d = self.api_data['1d']['data']['timelines'][0]['intervals'][day]['values']
+        s = self.api_data['1d']['data']['timelines'][0]['intervals'][day]['startTime']
+        tomorrow_codes = self.tomorrow_codes
+        # Time
+        d['dt'] = self.conv_epoch(s)
+        # Sunrise and Sunset
+        d['sunrise'] = self.conv_epoch(d['sunriseTime']) if not d['sunriseTime'] == None else 0
+        d['sunset'] = self.conv_epoch(d['sunsetTime']) if not d['sunsetTime'] == None else 0
+        # daitime
+        d['daytime'] = self.daytime(dt=d['dt'], sunrise=d['sunrise'], sunset=d['sunset'])
+        # Moonrise and Moonset
+        d['moonrise'] = self.conv_epoch(d['moonriseTime']) if not d['moonriseTime'] == None else 0
+        d['moonset'] = self.conv_epoch(d['moonsetTime']) if not d['moonsetTime'] == None else 0
+        # Temperature
+        d['temp_day'] = float(d['temperature'])
+        d['temp_min'] = float(d['temperatureMin'])
+        d['temp_max'] = float(d['temperatureMax'])
+        # Pressure
+        d['pressure'] = float(d['pressureSeaLevel'])
+        # Clouds
+        d['clouds'] = float(d['cloudCover'])
+        # Wind speed
+        d['wind_speed'] = float(d['windSpeed'])
+        # Cardinal direction
+        d['cardinal'] = self.cardinal(float(d['windDirection']))
+        # Add pop
+        d['pop'] = round(float(d['precipitationProbability']) / 100,1)
+        # Add 'in_clouds'
+        if config['in_clouds'] == 'cloudCover':
+            d['in_clouds'] = round(float(d['cloudCover']) / 100,1)
+        elif config['in_clouds'] == 'probability':
+            d['in_clouds'] = round(d['pop'],1) if 'pop' in d else 0
+        else:
+            d['in_clouds'] = 0
+        # Main weather
+        code_day = str(d['weatherCode']) # int() to str() data
+        code_day = self.fix_weather(daytime=d['daytime'], code=code_day) 
+        w = tomorrow_codes["weatherCode"][code_day]    
+        d['main'] = self.fix_kindle_weather(w)
+        return d
+
+    def fix_weather(self, daytime, code):
+        db = ('1000', '1100', '1101', '10000')
+        if code in db:
+            if  daytime == True:
+                # Daytime
+                code = code + 'd'
+            else:
+                # Night time
+                code = code + 'n'
+            return code
+        else:
+            return code
+
+    def daytime(self, dt, sunrise, sunset):
+        config = self.config
+        tz = timezone(config['timezone'])
+        d = datetime.fromtimestamp(dt, tz)
+        yrs, mons, days, hrs, mins, _, _, _, _ = d.timetuple()
+        _dt = hrs * 60 + mins
+        d = datetime.fromtimestamp(sunrise, tz)
+        yrs, mons, days, hrs, mins, _, _, _, _ = d.timetuple()
+        _sunrise = hrs * 60 + mins
+        d = datetime.fromtimestamp(sunset, tz)
+        yrs, mons, days, hrs, mins, _, _, _, _ = d.timetuple()
+        _sunset = hrs * 60 + mins
+        if _dt > _sunrise and _dt < _sunset:
+            return True
+        else:
+            return False
+        
+    def fix_kindle_weather(self, name):
+        d = {
+            'Sunny': 'ClearDay',
+            'Clear Sky': 'ClearNight',
+            'Mostly Clear Day': 'PartlyCloudyDay',
+            'Mostly Clear Night': 'PartlyCloudyNight',
+            'Partly Cloudy Day': 'PartlyCloudyDay',
+            'Partly Cloudy Night': 'PartlyCloudyNight',
+            'Mostly Cloudy': 'Cloudy',
+            'Cloudy': 'Cloudy',
+            'Fog': 'Fog',
+            'Light Fog': 'Fog',
+            'Drizzle': 'Drizzle',
+            'Rain': 'Rain',
+            'Light Rain': 'Rain',
+            'Heavy Rain': 'Rain',
+            'Snow': 'Snow',
+            'Flurries': 'Wind',
+            'Light Snow': 'Snow',
+            'Heavy Snow': 'Snow',
+            'Freezing Drizzle': 'Drizzle',
+            'Freezing Rain': 'Rain',
+            'Light Freezing Rain': 'Rain',
+            'Heavy Freezing Rain': 'Rain',
+            'Ice Pellets': 'Snow',
+            'Heavy Ice Pellets': 'Snow',
+            'Light Ice Pellets': 'Snow',
+            'Thunderstorm': 'Thunderstorm'
+        }
+        return d[name]
+
+    def cardinal(self, degree):
+        if degree >= 348.75 or degree <= 33.75: return 'N'
+        elif 33.75 <= degree <= 78.75: return 'NE'
+        elif 78.75 <= degree <= 123.75: return 'E'
+        elif 123.75 <= degree <= 168.75: return 'SE'
+        elif 168.75 <= degree <= 213.75: return 'S'
+        elif 213.75 <= degree <= 258.75: return 'SW'
+        elif 258.75 <= degree <= 303.75: return 'W'
+        elif 303.75 <= degree <= 348.75: return 'NW'
+        else: return None
+
+    def conv_epoch(self, s):
+        if not s == None:            
+            a = datetime.fromisoformat(s)
+            return int(a.timestamp())
+        else:
+            return s
+
+
+## test API
+#dumpAPI = 'output.json'
+#with open(dumpAPI, 'r', encoding='utf-8') as f:
+#    api_data = json.load(f)
+#print('config',TomorrowIo(settings='settings.json', api_data=api_data).config, '\n')
+#print('current',TomorrowIo(settings='settings.json', api_data=api_data).CurrentWeather(), '\n')
+#print('hourly', TomorrowIo(settings='settings.json', api_data=api_data).HourlyForecast(0), '\n')
+#print('daily', TomorrowIo(settings='settings.json', api_data=api_data).DailyForecast(1), '\n')

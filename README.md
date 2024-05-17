@@ -4,8 +4,19 @@ This program is for a weather display on old Kindle 3 based on the original work
 
 ## Weather API
 
-- Weather data from [OpenWeatherMap API](https://openweathermap.org/)
+Following APIs are available:
 
+- [OpenWeatherMap onecall API v2.5](https://openweathermap.org/) (Free Tier)
+  - Current weather
+  - Hourly forecast for 48 hours
+  - Daily forecast for 8 days
+- [Tomorrow.io](https://www.tomorrow.io/) (Free Tier)
+  - Hourly forecast for 120 hours
+  - Daily forecast for 6 days
+
+Note: OpenWeatherMap onecall API v2.5 will discontine on july 1, 2024.
+Subscribe to a v3.0 API.
+ 
 ## Screenshots
 
 <img src="sample_screenshots/kindle_weather-display.jpg" height="360" alt="Kindle 3 Screenshot" />&nbsp;
@@ -15,12 +26,10 @@ This program is for a weather display on old Kindle 3 based on the original work
 ## Requirements
 
 - Jailbroken Kindle 3: https://wiki.mobileread.com/wiki/Kindle_Hacks_Information
-- server: Minimum 256M/100M OpenWrt router or SBC (e.g. OrangePi zero)
-- server OS: Openwrt, Ubuntu and Debian, etc which work with Python3.
-- USB port x1
-- LAN port x1
-- API key on OpenWeatherMap
-- OpenWeatherMap One Call API subscription (v2.5)
+- Server: Minimum 256M/100M OpenWrt router or SBC (e.g. OrangePi zero)
+- Server OS: Openwrt, Ubuntu and Debian, etc which work with Python v3.11 or newer.
+- Server's devices: USB port x1, LAN port x1
+- WeatherAPI key
 - API key on CloudConvert for online image converter (optional)
 - user account on X (twitter) (optional)
 
@@ -64,7 +73,7 @@ Copy `(github)/server/opt/lib/kindle-weather-station` to `(server)/opt/lib/kindl
 
 ### 2. Set up user account
 
-In config directory, edit `OWM_config.json`, `cloudconvert.json`(optional) and `twitter_config.json`(optional)
+In config directory, edit `OWM_API_KEY.json` or `tomorrow_io_API_KEY.json`, `cloudconvert.json`(optional) and `twitter_ID.json`(optional)
 
 ### 3. Edit config files
 
@@ -108,11 +117,11 @@ To retrieve data correctly, setup NTP server.
 
 All set up finished, then try it.
 
-`./CreateSVG.py`
+`./CreateSVG.py` # use default config
 
-or
+or one of config files:
 
-`./CreateSVG.py settings_*.json`
+`./CreateSVG.py settings_######.json`
 
 Take a look at `/etc/KindleStation_flatten.png`.
 
@@ -182,18 +191,18 @@ cd /opt/lib/kindle-weather-station
 Kindle display size is 600 x 800.
 The program's layout is as follows:
 
-| Module name      | Function                   | Size (Y-axis) |
-|:-----------------|:---------------------------|--------------:|
-| maintenant       | Time information           | 40            |
-| main             | Current and hourly weather | 480           |
-| main2            | Current weather            | 340           |
-| hourly           | Hourly weather             | 480           |
-| daily            | Daily weather              | 280           |
-| graph            | Graph  or tile             | 120           |
-| twitter          | Alert (Twitter)            | 280           |
-| daily_xlabel     | Label on daily weather     | 20            |
-| hourly_xlabel    | Label on hourly weather    | 20            |
-| padding[-+0-9]*  | Insert spaces (Y axis only)|               |
+| Module name       | Function                   | Size (Y-axis) |
+|:------------------|:---------------------------|--------------:|
+| maintenant        | Time information           | 40            |
+| main              | Current and hourly weather | 480           |
+| main2             | Current weather            | 340           |
+| hourly            | Hourly weather             | 480           |
+| daily             | Daily weather              | 280           |
+| graph             | Graph  or tile             | 120           |
+| twitter           | Alert (Twitter)            | 280           |
+| daily_xlabel[6\\8]| Label on daily weather     | 20            |
+| hourly_xlabel     | Label on hourly weather    | 20            |
+| padding[-+0-9]*   | Insert spaces (Y axis only)|               |
 
 Examples:
 - maintenant + main + daily (40 + 480 + 280 = 800)
@@ -233,28 +242,30 @@ Available options are as follows:
 
 - config: "graph\_objects"
   - "daily\_temperature": Daily Temperature
-  - "daily_precipitation": Daily Precipitation
+  - "daily\_rain\_precipitation": Daily Rain Precipitation
+  - "daily\_snow\_accumulation": Daily Snow Accumulation
   - "daily\_weather": Daily Weather
   - "hourly\_temperature": Hourly Temperature
-  - "hourly\_precipitation": Hourly Precipitation
+  - "hourly\_rain\_precipitation": Hourly Rain Precipitation
+  - "hourly\_snow\_accumulation": Hourly Snow Accumulation 
   - "moon\_phase": Moon Phase
 
-#### 3.1 graph 1: Daily Temperature and Moon Phase. (settings_graph_1.json)
+#### 3.1 graph 1: Daily Temperature and Moon Phase. (settings\_graph\_1.json)
 
 <kbd><img src="sample_screenshots/readme_imgs/graph_1.png" /></kbd>&nbsp;
 
 - config
-  - graph\_objects": ["daily\_temperature", "moon\_phase"]
+  - "graph\_objects": ["daily\_temperature", "moon\_phase"]
   - "ramadhan": "True"
 
-#### 3.2 graph 2: Daily Temperature and Daily Precipitation. (settings_graph_2.json)
+#### 3.2 graph 2: Daily Temperature and Daily Precipitation. (settings\_graph\_2.json)
 
 <kbd><img src="sample_screenshots/readme_imgs/graph_2.png" /></kbd>&nbsp;
 
 - config
   - "graph\_objects": ["daily\_temperature", "daily_precipitation"]
 
-#### 3.3 graph 3: Daily Weather and Moon Phase. (settings_graph_3.json)
+#### 3.3 graph 3: Daily Weather and Moon Phase. (settings\_graph\_3.json)
 
 <kbd><img src="sample_screenshots/readme_imgs/graph_3.png" /></kbd>&nbsp;
 
@@ -262,7 +273,7 @@ Available options are as follows:
   - "graph\_objects": ["daily\_weather", "moon\_phase"]
   - "ramadhan": "True"
 
-#### 3.4 graph 4: Hourly Temperature and Hourly Precipitation. (settings_graph_4.json)
+#### 3.4 graph 4: Hourly Temperature and Hourly Precipitation. (settings\_graph\_4.json)
 
 <kbd><img src="sample_screenshots/readme_imgs/graph_4.png" /></kbd>&nbsp;
 
@@ -274,12 +285,12 @@ Available options are as follows:
 <kbd><img src="sample_screenshots/readme_imgs/twitter.png" /></kbd>&nbsp;
 
 - config
-  - "twitter": {"caption": "ALERT", "screen\_name": "tenkijp", "translate": "True", "translate\_target": "en", "expiration": "3h", "alternate": \["graph", "daily\_xlabel", "graph"\], "alternate_url": "https:\//tenki.jp/"\}
+  - "twitter": {"caption": "ALERT", "screen\_name": "tenkijp", "translate": "True", "translate\_target": "en", "expiration": "3h", "alternate": \["graph", "daily\_xlabel[6|8]", "graph"\], "alternate_url": "https:\//tenki.jp/"\}
     - "screen_name": [@]Twitter Screen Name
     - "translate": If this option is "True", translate the text. 
     - "translate\_target": en(English), Other languages may work, but I haven't test them yet. See [deep-translator](https://pypi.org/project/deep-translator/).
     - "expiration": Valid within hours(h) or minutes(m), otherwise, use "alternate" layout.
-    - "alternate_url": If extract URL from Twitter failed, use "alternate_url".
+    - "alternate\_url": If extract URL from Twitter failed, use "alternate_url".
   - "twitter\_keywords": {"include": "heavy,thunder,disaster", "exclude": "sakura,zakura"}
     - "include": If one of "include" keyword do match, display Twitter, otherwise, use "alternate" layout.
     - "exclude": If one of "exclude" keyword do match, use "alternate" layout. 
@@ -304,6 +315,7 @@ e.g.)
 
 # Credits
 
-- [OpenWeatherMap](https://openweathermap.org/) Weather data API
+- [OpenWeatherMap](https://openweathermap.org/) , Weather API
+- [Tomorrow.io](https://www.tomorrow.io/) , Weather API
 - [CloudConvert](https://cloudconvert.com/) An online file converter
 - [X (Twitter)](https://twitter.com/home?lang=en) Twitter, Inc. is an American social media company.

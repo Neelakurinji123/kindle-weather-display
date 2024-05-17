@@ -1,0 +1,8 @@
+{
+	"OWM": {
+		"api_key": "xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+		"service": "onecall",		
+		"onecall_version": "2.5",
+		"exclude": "minutely"		
+	}
+}

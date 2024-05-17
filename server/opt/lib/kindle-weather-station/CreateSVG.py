@@ -10,7 +10,7 @@ import time as t
 import sys
 import re
 from pytz import timezone
-import pytz
+#import pytz
 import locale
 import json
 import shutil
@@ -29,12 +29,10 @@ i18nfile = "./config/i18n.json"
     
 def create_svg(p, svgfile):
     header, text, draw, footer = str(), str(), str(), str()
-    layout = p.config['layout']
-
-    # timezone setting
     now = p.now
     tz = timezone(p.config['timezone'])
-    utc = pytz.utc
+    #utc = pytz.utc
+    utc = timezone('utc')
     f_svg = open(svgfile,"w", encoding=p.config['encoding'])
     layout = p.config['layout']
     graph_objects = p.config['graph_objects']
@@ -45,7 +43,7 @@ def create_svg(p, svgfile):
     header += '<g font-family="{}">\n'.format(p.config['font'])
     #svg_header += '<g font-family="{}">\n'.format("Chalkboard")
     #svg_header += '<g font-family="{}">\n'.format("Arial")
-
+ 
     def maintenant_pane(p, x, y, text, draw):
         # Maintenant: y=40        
         a = Maintenant(p=p, x=x, y=y)
@@ -61,7 +59,6 @@ def create_svg(p, svgfile):
         a = CurrentWeatherPane(p=p, x=x+5, y=y, offset=offset, wordwrap=wordwrap)
         text += a.text()
         draw += a.icon()
-        
         # Hourly weather: size(x=235, y=480)
         hour, span, step, pitch = 3, 12, 3, 155
         a = HourlyWeatherPane(p=p, x=x+370, y=y, hour=hour, span=span, step=step, pitch=pitch)
@@ -147,13 +144,12 @@ def create_svg(p, svgfile):
         text += a.text()
         y += 20
         return x, y, text, draw
-        
-    objects = p.config['graph_objects']        
+      
     for s in layout:
         if s == 'maintenant':
             x, y, text, draw = maintenant_pane(p=p, x=x, y=y, text=text, draw=draw)
-        elif s == 'main':
-            x, y, text, draw = main_pane(p=p, x=x, y=y, text=text, draw=draw)
+        elif s == 'main':          
+            x, y, text, draw = main_pane(p=p, x=x, y=y, text=text, draw=draw)          
         elif s == 'main2':
             x, y, text, draw = main2_pane(p=p, x=x, y=y, text=text, draw=draw)
         elif s == 'houly':
@@ -161,11 +157,12 @@ def create_svg(p, svgfile):
         elif s == 'daily':
             x, y, text, draw = daily_pane(p=p, x=x, y=y, text=text, draw=draw)
         elif s == 'twitter':
-            x, y, text, draw = twitter_pane(p=p, x=x, y=y, objects=objects, text=text, draw=draw)
+            x, y, text, draw = twitter_pane(p=p, x=x, y=y, objects=graph_objects, text=text, draw=draw)
         elif s == 'graph':
-            obj = objects.pop()
+            obj = graph_objects.pop()
             x, y, text, draw = graph_pane(p=p, x=x, y=y, obj=obj, text=text, draw=draw)
-        elif s == 'hourly_xlabel' or s == 'daily_xlabel':
+        #elif s == 'hourly_xlabel' or s == 'daily_xlabel':
+        elif re.search('label', s):
             x, y, text, draw = label_pane(p=p, x=x, y=y, s=s, text=text, draw=draw)
         elif re.match(r'(padding[\+\-0-9]*)', s):
             y += int(re.sub('padding', '', s))
@@ -259,7 +256,12 @@ def img_processing(p, svgfile, pngfile, pngtmpfile):
     #t.sleep(3)
 
 if __name__ == "__main__":
-    # Use custom settings
+    if 'dump' in sys.argv:
+        dump = True
+        sys.argv.remove('dump')
+    else:
+        dump = False
+    # Use custom settings    
     if len(sys.argv) > 1:
         settings = sys.argv[1]
 
@@ -269,9 +271,26 @@ if __name__ == "__main__":
             api = a['api']
             
         if api == 'OpenWeatherMap':
-            from OpenWeatherMapOnecallAPIv3 import OpenWeatherMap     
-            p = OpenWeatherMap(settings)
-
+            from OpenWeatherMapOnecallAPIv3 import OpenWeatherMap
+            api_data = OpenWeatherMap(settings).ApiCall()
+            if not dump == True:   
+                p = OpenWeatherMap(settings=settings, api_data=api_data)
+        elif api == 'TomorrowIo':
+            from TomorrowIoAPI import TomorrowIo
+            #test
+            #with open('TomorrowIoAPI_output.json', 'r') as f:
+            #    api_data = json.load(f)             
+            api_data = TomorrowIo(settings).ApiCall()
+            if not dump == True:
+                p = TomorrowIo(settings=settings, api_data=api_data)
+            
+        ## test: API data dump
+        if dump == True:
+            output = api + 'API' + '_output.json'
+            with open(output, 'w', encoding='utf-8') as f:
+                json.dump(api_data, f, ensure_ascii=False, indent=4)
+                exit(0)
+        
         # Locale
         #locale.setlocale(locale.LC_TIME, p.config['locale'])
 
@@ -283,5 +302,4 @@ if __name__ == "__main__":
     except Exception as e:
         print(e)
         shutil.copyfile(error_image, flatten_pngfile)
-        print(e)
         exit(1)

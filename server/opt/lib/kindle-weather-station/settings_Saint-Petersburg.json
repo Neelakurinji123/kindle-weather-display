@@ -7,20 +7,13 @@
         "font": "Droid Sans",
         "sunrise_and_sunset": "False",
         "darkmode": "False",
-        "service": "onecall",
+		"api": "OpenWeatherMap",
         "lat": "59.9392259",
         "lon": "29.5342917",
         "units": "metric",
         "lang": "ru",
-        "exclude": "minutely",
-		"version": "2.5",
         "cloudconvert": "False",
         "converter": "gm",
-		"layout": ["maintenant", "main", "daily"],
-		"twitter": {"caption": "alert", "screen_name": "tenkijp", "translate": "True", "translate_target": "en",
-				 "expiration": "3h", "alternate": ["graph", "daily_xlabel", "graph"], "alternate_url": "https://tenki.jp/"},
-		"twitter_keywords": {"include": "heavy,thunder", "exclude": ""},
-		"graph_objects": ["hourly_temperature", "hourly_precipitation"],
-		"graph_canvas": "default"
+		"layout": ["maintenant", "main", "daily"]
     }
 }
