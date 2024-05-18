@@ -815,7 +815,7 @@ class GraphPane:
         tz = timezone(p.config['timezone'])       
         # Canvas
         style = "fill:{};stroke:{};stroke-width:{}px;".format(bgcolor, bgcolor, (0))
-        a += SVGtools.rect(x=(x - 10), y=(y - h + 10), width=(w + 10), height=(h - 45), style=style).svg()
+        a += SVGtools.rect(x=(x - 5), y=(y - h + 10), width=(w + grid - 5), height=(h - 45), style=style).svg()
         style = "fill:none;stroke:{};stroke-width:{}px;".format(axis_color, axis)
         # Graph
         points = str()
@@ -828,10 +828,10 @@ class GraphPane:
             for n in range(0, end, step):
                 weather = p.HourlyForecast(n)
                 #heure = datetime.fromtimestamp(h_weather['dt'], tz).strftime('%H')
-                _x = int(x + box_size_x * n + box_size_x * 0.5)
+                _x = int(x + box_size_x * n + box_size_x * 0.5 - 5)
                 _y = y - (weather['temp'] - tMin) * tStep - 45
                 points += "{},{} ".format(_x, _y)
-                points2 = points + "{},{} {},{}".format(_x, (y - 35), (x + int(box_size_x * 0.5)), (y - 35))
+                points2 = points + "{},{} {},{}".format(_x, (y - 35), (x + int(box_size_x * 0.5) - 5), (y - 35))
                 #if int(heure) % 3 == 0:
                 if c % 3 == 0:    
                     a += SVGtools.text("end", "16px", (_x + 14), (_y - 9), "{} {}".format(round(int(weather['temp'])), p.units['temp'])).svg()
@@ -880,7 +880,7 @@ class GraphPane:
         tz = timezone(p.config['timezone'])
         # Canvas
         style = "fill:{};stroke:{};stroke-width:{}px;".format(bgcolor, bgcolor, (0))
-        a += SVGtools.rect(x=(x - 10), y=(y - h + 10), width=(w + 10), height=(h - 45), style=style).svg()
+        a += SVGtools.rect(x=(x - 5), y=(y - h + 10), width=(w + grid - 5), height=(h - 45), style=style).svg()
         if basis == "hour" and title == "rain precipitation":
             # Graph
             th = 10.0 # threshold
@@ -927,7 +927,7 @@ class GraphPane:
 
         # Baseline
         style = "fill:none;stroke:{};stroke-width:{}px;".format(axis_color, 1)
-        a += SVGtools.line(x1=(x - 10), x2=(x + w), y1=(y - 35), y2=(y - 35), style=style).svg()
+        a += SVGtools.line(x1=(x - 5), x2=(x + w - 5 - grid), y1=(y - 35), y2=(y - 35), style=style).svg()
         # Text
         #a += SVGtools.text("start", "16px", x, (y - h + 26), "{}, total: {} mm".format(_title, _Sum)).svg()
         a += SVGtools.text("start", "16px", x, (y - h + 26), "{}, total: {} mm".format(_title, int(round(_sum)), 0)).svg()
@@ -952,8 +952,7 @@ class GraphPane:
         tz = timezone(p.config['timezone'])
         # Canvas
         style = "fill:{};stroke:{};stroke-width:{}px;".format(bgcolor, bgcolor, (0))
-        a += SVGtools.rect(x=(x - 10), y=(y - h + 10), width=(w + 10), height=(h - 45), style=style).svg()
-        
+        a += SVGtools.rect(x=(x - 5), y=(y - h + 10), width=(w + grid - 5), height=(h - 45), style=style).svg() 
         if basis == "hour" and title == "snow accumulation":
             # Graph
             th = 10.0 # threshold 
@@ -992,9 +991,9 @@ class GraphPane:
                     a += SVGtools.text("middle", "16px", _x, (base_y - _vol - 12), "{} mm".format(int(round(vol, 0)))).svg()
                     style2 = "fill:{};stroke:{};stroke-linecap:{};stroke-width:{}px;".format(axis_color, axis_color, stroke_linecap, "1")
                     a += SVGtools.line(_x, _x, (base_y - _vol), (base_y - _vol - 10), style2).svg()
-
+        # Baseline
         style = "fill:none;stroke:{};stroke-width:{}px;".format(axis_color, 1)
-        a += SVGtools.line(x1=(x - 10), x2=(x + w), y1=(y - 35), y2=(y - 35), style=style).svg()
+        a += SVGtools.line(x1=(x - 5), x2=(x + w - 5 - grid), y1=(y - 35), y2=(y - 35), style=style).svg()
         # Text processing
         a += SVGtools.text("start", "16px", x, (y - h + 26), "{}, total: {} mm".format(_title, int(round(_sum)), 0)).svg()
         a += '</g>'
@@ -1005,6 +1004,7 @@ class GraphPane:
         x, y = self.x, self.y
         canvas = p.config['graph_canvas']
         obj = self.obj
+        grid = canvas["grid"]
         basis, title = obj["basis"], obj["title"]
         w, h, bgcolor, axis = canvas["width"], canvas["height"], canvas["bgcolor"], canvas["axis"]
         kwargs = {  'w': w, 'h': h, 'bgcolor': bgcolor, 'axis': axis,
@@ -1017,7 +1017,7 @@ class GraphPane:
         # Canvas
         style = "fill:{};stroke:{};stroke-width:{}px;".format(bgcolor, bgcolor, (0))
         #a += SVGtools.rect(x=(x - 10), y=(y - h + 10), width=(w + 10), height=(h - 45), style=style).svg()
-        a += SVGtools.rect(x=(x-5), y=(y - h + 10), width=(w), height=(h - 45), style=style).svg()
+        a += SVGtools.rect(x=(x-5), y=(y - h + 10), width=(w + grid - 5), height=(h - 45), style=style).svg()
         def daily_weather(p, x, y, w, h, bgcolor, axis, axis_color, grid, grid_color, stroke, stroke_color, fill, stroke_linecap, \
                             title, end, step, basis, tz, sp_x, **kwargs):
             end = 6 if p.config['api'] == 'TomorrowIo' else end
@@ -1038,9 +1038,9 @@ class GraphPane:
                 s += SVGtools.circle((_x + half - 6), (_y - 10), 2, "black", 1, "none").svg()
                 s += SVGtools.text("end", "16px", (_x + half + 22), (_y ), "{}".format(round(weather['temp_max']))).svg()
                 s += SVGtools.circle((_x + half + 24), (_y - 10), 2, "black", 1, "none").svg()
-                if n < (end - 1):
-                    style = "fill:none;stroke:{};stroke-linecap:{};stroke-width:{}px;".format(grid_color, stroke_linecap, grid)
-                    i += SVGtools.line((_x + box_size_x), (_x + box_size_x), (_y - h + 55), (_y + 10), style).svg()
+                #if n < (end - 1):
+                style = "fill:none;stroke:{};stroke-linecap:{};stroke-width:{}px;".format(grid_color, stroke_linecap, grid)
+                i += SVGtools.line((_x + box_size_x), (_x + box_size_x), (_y - h + 55), (_y + 10), style).svg()
             return s,i
 
         def moon_phase(p, x, y, w, h, bgcolor, axis, axis_color, grid, grid_color, stroke, stroke_color, fill, stroke_linecap, \
@@ -1064,9 +1064,9 @@ class GraphPane:
                 _y = y - 45
                 r = 18 if end == 6 else 14
                 # grid
-                if n < (end - 1):
-                    style = "fill:none;stroke:{};stroke-linecap:{};stroke-width:{}px;".format(grid_color, stroke_linecap, grid)
-                    i += SVGtools.line((_x + box_size_x), (_x + box_size_x), (_y - h + 55), (_y + 10), style).svg()                 
+                #if n < (end - 1):
+                style = "fill:none;stroke:{};stroke-linecap:{};stroke-width:{}px;".format(grid_color, stroke_linecap, grid)
+                i += SVGtools.line((_x + box_size_x), (_x + box_size_x), (_y - h + 55), (_y + 10), style).svg()                 
                 # icon
                 style = "fill:{};stroke:{};stroke-width:{}px;".format(fill, stroke_color, 1)
                 i += SVGtools.circle((_x + box_size_x / 2), (_y - 53), (r + 2), stroke_color, stroke, "none").svg()

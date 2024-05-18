@@ -21,7 +21,7 @@
 						"stroke-linecap": "butt"},
 			"daily_snow_accumulation": {"title": "snow accumulation", "end": 8, "step": 1, "basis": "day",
 						"type": "rect", "stroke": 1, "stroke-color": "rgb(105,105,105)", "fill": "rgb(245,245,245)", 
-						"stroke-linecap": "butt", "width": 50},			
+						"stroke-linecap": "butt", "width": 40},			
 			"moon_phase": {"title": "moon phase", "end": 8, "step": 1, "basis": "day", "type": "tile",
 						"stroke": 4, "stroke-color": "rgb(0,0,0)", "fill": "rgb(0,0,0)", "stroke-linecap": "round"},
 			"daily_weather": {"title": "weather", "end": 8, "step": 1, "basis": "day", "type": "tile",
