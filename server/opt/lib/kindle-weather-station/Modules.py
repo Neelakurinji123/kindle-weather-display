@@ -513,8 +513,8 @@ class DailyWeatherPane:
             a += SVGtools.text("end", "35px", (x + 200), (y + 75), w).svg()
             a += add_temp_unit(x=tMin, y=(y + 75), text=int(tLow), unit=p.units['temp'])
             a += add_temp_unit(x=int(tMax - s_padding(tHigh)), y=(y + 75), text=int(tHigh), unit=p.units['temp'])
-            a += SVGtools.line(int(tMin + 40), int(tMax - 65), (y + 75 - 10), (y + 75 - 10), \
-                 "fill:none;stroke:black;stroke-linecap:round;stroke-width:10px;").svg()
+            style = "fill:none;stroke:black;stroke-linecap:round;stroke-width:10px;"
+            a += SVGtools.line(int(tMin + 40), int(tMax - 65), (y + 75 - 10), (y + 75 - 10), style).svg()
             y += pitch
         return a
 
@@ -1005,62 +1005,53 @@ class GraphPane:
         x, y = self.x, self.y
         canvas = p.config['graph_canvas']
         obj = self.obj
+        basis, title = obj["basis"], obj["title"]
         w, h, bgcolor, axis = canvas["width"], canvas["height"], canvas["bgcolor"], canvas["axis"]
-        x_sp = (600 - w) / 2
-        axis_color, grid, grid_color = canvas["axis_color"], canvas["grid"], canvas["grid_color"]
-        title = obj["title"]
-        end, step, basis = obj["end"], obj["step"], obj["basis"]
-        tz = timezone(p.config['timezone'])
+        kwargs = {  'w': w, 'h': h, 'bgcolor': bgcolor, 'axis': axis,
+                    'axis_color': canvas["axis_color"], 'grid': canvas["grid"], 'grid_color': canvas["grid_color"],
+                    'title': obj["title"], 'end': obj["end"], 'step': obj["step"], 'basis': obj["basis"], 'stroke': obj["stroke"],
+                    'stroke_color': obj["stroke-color"], 'fill': obj["fill"], 'stroke_linecap': obj["stroke-linecap"],
+                    'tz': timezone(p.config['timezone']), 'sp_x': (600 - w) / 2}
+        # Start
         a = '<g font-family="{}">\n'.format(p.config['font'])   
         # Canvas
         style = "fill:{};stroke:{};stroke-width:{}px;".format(bgcolor, bgcolor, (0))
-        a += SVGtools.rect(x=(x - 10), y=(y - h + 10), width=(w + 10), height=(h - 45), style=style).svg()
-        style = "fill:none;stroke:{};stroke-width:{}px;".format(axis_color, axis)
-
-        def daily_weather(p, x, y, canvas, obj):
-            w, h, bgcolor, axis = canvas["width"], canvas["height"], canvas["bgcolor"], canvas["axis"]
-            axis_color, grid_y, grid_y_color = canvas["axis_color"], canvas["grid"], canvas["grid_color"]
-            stroke, stroke_color, fill, stroke_linecap = obj["stroke"], obj["stroke-color"], obj["fill"], obj["stroke-linecap"]
-            title = obj["title"]
-            end, step, basis = obj["end"], obj["step"], obj["basis"]
+        #a += SVGtools.rect(x=(x - 10), y=(y - h + 10), width=(w + 10), height=(h - 45), style=style).svg()
+        a += SVGtools.rect(x=(x-5), y=(y - h + 10), width=(w), height=(h - 45), style=style).svg()
+        def daily_weather(p, x, y, w, h, bgcolor, axis, axis_color, grid, grid_color, stroke, stroke_color, fill, stroke_linecap, \
+                            title, end, step, basis, tz, sp_x, **kwargs):
             end = 6 if p.config['api'] == 'TomorrowIo' else end
-            box_size_x = (w - (end - 1) * grid_y) / (end - 1)
+            icon_sp = 20 if p.config['api'] == 'TomorrowIo' else 0
+            box_size_x = (w - (end -1) * grid) / end
+            half = int(box_size_x * 0.5)
             i18n = read_i18n(p, i18nfile)
-            i = str()
-            s = str()
+            i, s = str(), str()
             for n in range(0, end, step):
                 weather = p.DailyForecast(n)
                 jour = str.lower(datetime.fromtimestamp(weather['dt'], tz).strftime('%a'))
                 #jour = i18n["abbreviated_weekday"][jour] if not i18n == dict() else jour
-                _x = x + x_sp + int(w / end) * n
-                _y = y - 45          
-                i += SVGtools.transform("(1.0,0,0,1.0,{},{})".format((_x - 53), (_y - 105)), addIcon(weather['main'])).svg()
-                s += SVGtools.text("start", "16px", (_x - 32), (_y - 10), "hi:").svg()
-                s += SVGtools.text("end", "16px", (_x + 26), (_y - 10), "{} {}".format(round(weather['temp_max']), p.units['temp'])).svg()
-                s += SVGtools.circle((_x + 15), (_y - 21), 2, "black", 1, "none").svg()
-                s += SVGtools.text("start", "16px", (_x - 32), (_y + 7), "lo:").svg()
-                s += SVGtools.text("end", "16px", (_x + 26), (_y + 7), "{} {}".format(round(weather['temp_min']), p.units['temp'])).svg()
-                s += SVGtools.circle((_x + 15), (_y - 4), 2, "black", 1, "none").svg()
+                _x = int(sp_x + (box_size_x + grid) * n)
+                _y = y - 45
+                i += SVGtools.transform("(1.0,0,0,1.0,{},{})".format((_x + 12 - box_size_x / 2 + icon_sp), (_y - 100)), addIcon(weather['main'])).svg()
+                s += SVGtools.text("end", "16px", (_x + half), (_y ), "/").svg()
+                s += SVGtools.text("end", "16px", (_x + half - 8), (_y ), "{}".format(round(weather['temp_min']))).svg()
+                s += SVGtools.circle((_x + half - 6), (_y - 10), 2, "black", 1, "none").svg()
+                s += SVGtools.text("end", "16px", (_x + half + 22), (_y ), "{}".format(round(weather['temp_max']))).svg()
+                s += SVGtools.circle((_x + half + 24), (_y - 10), 2, "black", 1, "none").svg()
                 if n < (end - 1):
-                    style = "fill:none;stroke:{};stroke-linecap:{};stroke-width:{}px;".format(grid_y_color, stroke_linecap, grid_y)
-                    i += SVGtools.line((_x + 30), (_x + 30), (_y - h + 55), (_y + 10), style).svg()
+                    style = "fill:none;stroke:{};stroke-linecap:{};stroke-width:{}px;".format(grid_color, stroke_linecap, grid)
+                    i += SVGtools.line((_x + box_size_x), (_x + box_size_x), (_y - h + 55), (_y + 10), style).svg()
             return s,i
 
-        def moon_phase(p, x, y, canvas, obj):
-            from hijridate import Hijri, Gregorian
-            w, h, bgcolor, axis = canvas["width"], canvas["height"], canvas["bgcolor"], canvas["axis"]
-            sp_x = (600 - w) / 2
-            axis_color, grid_y, grid_y_color = canvas["axis_color"], canvas["grid"], canvas["grid_color"]
-            stroke, stroke_color, fill, stroke_linecap = obj["stroke"], obj["stroke-color"], obj["fill"], obj["stroke-linecap"]
-            title = obj["title"]
-            end, step, basis = obj["end"], obj["step"], obj["basis"]
+        def moon_phase(p, x, y, w, h, bgcolor, axis, axis_color, grid, grid_color, stroke, stroke_color, fill, stroke_linecap, \
+                            title, end, step, basis, tz, sp_x, **kwargs):
+            from hijridate import Hijri, Gregorian   
             end = 6 if p.config['api'] == 'TomorrowIo' else end
-            box_size_x = (w - (end -1) * grid_y) / end
+            box_size_x = (w - (end -1) * grid) / end
+            half = int(box_size_x * 0.5)
             i18n = read_i18n(p, i18nfile)
-            tz = timezone(p.config['timezone'])
             ramadhan = p.config['ramadhan']
-            i = str()
-            s = str()           
+            i, s = str(),str()          
             for n in range(0, end, step):
                 weather = p.DailyForecast(n)
                 jour = str.lower(datetime.fromtimestamp(weather['dt'], tz).strftime('%a'))
@@ -1069,12 +1060,12 @@ class GraphPane:
                 mon = int(datetime.fromtimestamp(weather['dt'], tz).strftime('%-m'))
                 yrs = int(datetime.fromtimestamp(weather['dt'], tz).strftime('%Y'))
                 lat = float(p.config['lat'])
-                _x = int(sp_x + (box_size_x + grid_y) * n) 
+                _x = int(sp_x + (box_size_x + grid) * n) 
                 _y = y - 45
                 r = 18 if end == 6 else 14
                 # grid
                 if n < (end - 1):
-                    style = "fill:none;stroke:{};stroke-linecap:{};stroke-width:{}px;".format(grid_y_color, stroke_linecap, grid_y)
+                    style = "fill:none;stroke:{};stroke-linecap:{};stroke-width:{}px;".format(grid_color, stroke_linecap, grid)
                     i += SVGtools.line((_x + box_size_x), (_x + box_size_x), (_y - h + 55), (_y + 10), style).svg()                 
                 # icon
                 style = "fill:{};stroke:{};stroke-width:{}px;".format(fill, stroke_color, 1)
@@ -1213,8 +1204,10 @@ class GraphPane:
                 #t_moonrise = str(daily[20])  # test
                 moonrise = "00:00" if weather['moonrise'] == 0 else str(datetime.fromtimestamp(weather['moonrise'], tz).strftime("%H:%M"))
                 moonset = "00:00" if weather['moonset'] == 0 else str(datetime.fromtimestamp(weather['moonset'], tz).strftime("%H:%M"))
-                s += SVGtools.text("middle", "16px", (_x + int(box_size_x * 0.5)), (_y - 10), "r: {}".format(moonrise)).svg()
-                s += SVGtools.text("middle", "16px", (_x + int(box_size_x * 0.5)), (_y + 7), "s: {}".format(moonset)).svg()
+                s += SVGtools.text("middle", "16px", (_x + int(box_size_x * 0.5)), (_y - 10), moonrise).svg()
+                s += SVGtools.text("middle", "16px", (_x + int(box_size_x * 0.5)), (_y + 8), moonset).svg()
+                style = "fill:none;stroke:black;stroke-width:1px;"
+                i += SVGtools.line((_x + half - 25), (_x  + half + 25), (_y - 6), (_y - 6), style).svg()
                 # moon phase and ramadhan 
                 s += SVGtools.text("start", "16px", (_x + 3), (_y - 68), "{}".format(ps)).svg()
                 s += SVGtools.text("end", "16px", (_x + box_size_x - 3), (_y - 68), "{}".format(ram)).svg()
@@ -1223,10 +1216,10 @@ class GraphPane:
         # Graph
         #points = str()
         if basis == "day" and title == "weather":
-            s,i = daily_weather(p, x, y, canvas, obj)
+            s,i = daily_weather(p, x, y, **kwargs)
             a += s + '</g>' + i
         elif basis == "day" and title == "moon phase":
-            s,i = moon_phase(p, x, y, canvas, obj)
+            s,i = moon_phase(p, x, y, **kwargs)
             a += s + '</g>' + i         
         return a
 
@@ -1320,7 +1313,3 @@ def addIcon(s):
     else:
         return None
 
-#    except Exception as e:
-#        shutil.copyfile(error_image, flatten_pngfile)
-#        print(e)
-#        exit(1)
