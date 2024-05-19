@@ -38,6 +38,7 @@ def readSettings(settings):
         a['cloudconvert'] = bool(eval(service['cloudconvert'])) if 'cloudconvert' in service else False
         a['converter'] = service['converter'] if 'converter' in service else None
         a['layout'] = service['layout']
+        a['landscape'] = bool(eval(service['landscape'])) if 'landscape' in service else False
         a['ramadhan'] = bool(eval(service['ramadhan'])) if 'ramadhan' in service else False
         a['twitter'] = service['twitter'] if 'twitter' in service else False
         if 'twitter_keywords' in service:

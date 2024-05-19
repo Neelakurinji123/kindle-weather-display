@@ -308,6 +308,17 @@ Available options are as follows:
   - "twitter\_keywords": {"include": "heavy,thunder,disaster", "exclude": "sakura,zakura"}
     - "include": If one of "include" keyword do match, display Twitter, otherwise, use "alternate" layout.
     - "exclude": If one of "exclude" keyword do match, use "alternate" layout. 
+
+## Landscape e-Paper layout(WIP)
+
+<kbd><img src="sample_screenshots/kindle_weather-display-landscape.jpg"  height="360"/></kbd>&nbsp;
+
+Available module options are as follows:
+
+- config: "graph\_objects"
+  - "daily\_temperature\_landscape": Daily Temperature
+  - "daily\_weather\_landscape": Daily Weather
+  - "moon\_phase\_landscape": Moon Phase
  
 ## Set up time schedule
 
