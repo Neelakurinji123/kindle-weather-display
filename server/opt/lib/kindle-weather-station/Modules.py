@@ -324,7 +324,7 @@ class CurrentWeatherPane(CurrentData):
     def text(self):
         p = self.p
         if p.config['landscape'] == True:
-            x, y = 270, -125
+            x, y = 270, -135
             prec = super(CurrentWeatherPane, self).precipitation()
             self.x, self.y = x, y+5
             temp = super(CurrentWeatherPane, self).temperature()
@@ -353,7 +353,7 @@ class CurrentWeatherPane(CurrentData):
             a = super(CurrentWeatherPane, self).icon()
             if int(weather['wind_speed']) != 0:
                 #self.x = 450
-                self.x, self.y = 475,  -75
+                self.x, self.y = 475,  -85
                 a += super(CurrentWeatherPane, self).wind_icon()
         else:
             a = super(CurrentWeatherPane, self).icon()
@@ -729,7 +729,7 @@ class GraphLabel:
         w, h, bgcolor, axis = canvas["width"], canvas["height"], canvas["bgcolor"], canvas["axis"]
         axis_color, grid, grid_color = canvas["axis_color"], canvas["grid"], canvas["grid_color"]
         start, end, step, basis, font_size = label["start"], label["end"], label["step"], label["basis"], label["font-size"]
-        sp_x = int((800 - w) / 2) if p.config['landscape'] == True else int((600 - w) / 2)
+        sp_x = int((800 - w) * 0.5) if p.config['landscape'] == True else int((600 - w) * 0.5)
         box_size_x = w / end
         a = '<g font-family="{}">\n'.format(p.config['font'])
         d = read_i18n(p, i18nfile)
@@ -755,8 +755,8 @@ class GraphLabel:
         axis_color, grid, grid_color = canvas["axis_color"], canvas["grid"], canvas["grid_color"]
         #stroke, stroke_color, fill, stroke_linecap = obj["stroke"], obj["stroke-color"], obj["fill"], obj["stroke-linecap"]
         start, end, step, basis, font_size = label["start"], label["end"], label["step"], label["basis"], label["font-size"]
-        end = 6 if p.config['api'] == 'TomorrowIo' else end
-        sp_x = int((800 - w) / 2) if p.config['landscape'] == True else int((600 - w) / 2)
+        end = 6 if p.config['api'] == 'TomorrowIo' and end == 8 else end
+        sp_x = int((800 - w) * 0.5) if p.config['landscape'] == True else int((600 - w) * 0.5)
         box_size_x = w / (end - start)
         a = '<g font-family="{}">\n'.format(p.config['font'])
         d = read_i18n(p, i18nfile)
@@ -797,7 +797,7 @@ class GraphPane:
         axis_color, grid, grid_color = canvas["axis_color"], canvas["grid"], canvas["grid_color"]
         stroke, stroke_color, fill, stroke_linecap = obj["stroke"], obj["stroke-color"], obj["fill"], obj["stroke-linecap"]
         start, end, step, basis, title = obj["start"], obj["end"], obj["step"], obj["basis"], obj["title"]
-        end = 6 if p.config['api'] == 'TomorrowIo' and basis == "day" else end
+        end = 6 if p.config['api'] == 'TomorrowIo' and basis == "day" and end == 8 else end
         sp_x = int((800 - w) / 2) if p.config['landscape'] == True else int((600 - w) / 2)
         box_size_x = w / end
         half = box_size_x * 0.5
@@ -877,7 +877,7 @@ class GraphPane:
         stroke, stroke_color, fill, stroke_linecap = obj["stroke"], obj["stroke-color"], obj["fill"], obj["stroke-linecap"]
         title = obj["title"]
         start, end, step, basis = obj["start"], obj["end"], obj["step"], obj["basis"]
-        end = 6 if p.config['api'] == 'TomorrowIo' and basis == "day" else end
+        end = 6 if p.config['api'] == 'TomorrowIo' and basis == "day" and end == 8 else end
         sp_x = int((800 - w) / 2) if p.config['landscape'] == True else int((600 - w) / 2)
         box_size_x = w / end
         a = '<g font-family="{}">\n'.format(p.config['font'])
@@ -947,7 +947,7 @@ class GraphPane:
         stroke, stroke_color, fill, stroke_linecap, width = obj["stroke"], obj["stroke-color"], obj["fill"], obj["stroke-linecap"], obj["width"]
         title = obj["title"]
         start, end, step, basis = obj["start"], obj["end"], obj["step"], obj["basis"]
-        end = 6 if p.config['api'] == 'TomorrowIo' and basis == "day" else end
+        end = 6 if p.config['api'] == 'TomorrowIo' and basis == "day" and end == 8 else end
         sp_x = int((800 - w) / 2) if p.config['landscape'] == True else int((600 - w) / 2)
         box_size_x = w / end
         a = '<g font-family="{}">\n'.format(p.config['font'])
@@ -1008,7 +1008,7 @@ class GraphPane:
         grid = canvas['grid']
         basis, title = obj['basis'], obj['title']
         w, h, bgcolor, axis = canvas['width'], canvas['height'], canvas['bgcolor'], canvas['axis']
-        sp_x = int((800 - w) / 2) if p.config['landscape'] == True else int((600 - w) / 2)
+        sp_x = int((800 - w) * 0.5) if p.config['landscape'] == True else int((600 - w) * 0.5)
         kwargs = {  'w': w, 'h': h, 'bgcolor': bgcolor, 'axis': axis,
                     'axis_color': canvas['axis_color'], 'grid': canvas["grid"], 'grid_color': canvas['grid_color'],
                     'grid_ext_upper': canvas['grid_ext_upper'], 'grid_ext_lower': canvas['grid_ext_lower'],
@@ -1021,11 +1021,14 @@ class GraphPane:
         # Canvas
         style = "fill:{};stroke:{};stroke-width:{}px;".format(bgcolor, bgcolor, 0)
         #a += SVGtools.rect(x=(x - 10), y=(y - h + 10), width=(w + 10), height=(h - 45), style=style).svg()
-        a += SVGtools.rect(x=(x-5), y=(y - h + 10), width=(w + grid - 5), height=(h - 45), style=style).svg()
+        if p.config['landscape'] == True:
+            a += SVGtools.rect(x=0, y=(y - h + 10), width=w, height=(h - 45), style=style).svg()
+        else:
+            a += SVGtools.rect(x=(x-5), y=(y - h + 10), width=(w + grid - 5), height=(h - 45), style=style).svg()
         def daily_weather(p, x, y, w, h, bgcolor, axis, axis_color, grid, grid_color, grid_ext_upper, grid_ext_lower, \
                             stroke, stroke_color, fill, stroke_linecap, \
                             title, start, end, step, basis, tz, sp_x, variant, **kwargs):
-            end = 6 if p.config['api'] == 'TomorrowIo' else end
+            end = 6 if p.config['api'] == 'TomorrowIo' and end == 8 else end
             icon_sp = 20 if p.config['api'] == 'TomorrowIo' else 0
             box_size_x = (w - (end - start - 1) * grid) / (end - start)
             half = int(box_size_x * 0.5)
@@ -1038,7 +1041,7 @@ class GraphPane:
                 _x = int(sp_x + (box_size_x + grid) * (n - start))
                 _y = y - 45
                 if p.config['landscape'] == True:
-                    i += SVGtools.transform("(1.8,0,0,1.8,{},{})".format((_x + 70 - box_size_x / 2 + icon_sp), (_y - 180)), addIcon(weather['main'])).svg()
+                    i += SVGtools.transform("(1.8,0,0,1.8,{},{})".format((_x + 70 - box_size_x * 0.5 + icon_sp), (_y - 180)), addIcon(weather['main'])).svg()
                     s += SVGtools.text("end", "30px", (_x + half), (_y + 5), "/").svg()
                     s += SVGtools.text("end", "30px", (_x + half - 20), (_y + 5), "{}".format(round(weather['temp_min']))).svg()
                     s += SVGtools.circle((_x + half - 18), (_y - 15), 3, "black", 2, "none").svg()
@@ -1048,7 +1051,7 @@ class GraphPane:
                         style = "fill:none;stroke:{};stroke-linecap:{};stroke-width:{}px;".format(grid_color, stroke_linecap, grid)
                         i += SVGtools.line((_x + box_size_x), (_x + box_size_x), (_y - h + 55 - grid_ext_upper), (_y + 10), style).svg()
                 else:
-                    i += SVGtools.transform("(1.0,0,0,1.0,{},{})".format((_x + 12 - box_size_x / 2 + icon_sp), (_y - 100)), addIcon(weather['main'])).svg()
+                    i += SVGtools.transform("(1.0,0,0,1.0,{},{})".format((_x + 12 - box_size_x * 0.5 + icon_sp), (_y - 100)), addIcon(weather['main'])).svg()
                     s += SVGtools.text("end", "16px", (_x + half), (_y ), "/").svg()
                     s += SVGtools.text("end", "16px", (_x + half - 8), (_y ), "{}".format(round(weather['temp_min']))).svg()
                     s += SVGtools.circle((_x + half - 6), (_y - 10), 2, "black", 1, "none").svg()
@@ -1062,7 +1065,7 @@ class GraphPane:
         def moon_phase(p, x, y, w, h, bgcolor, axis, axis_color, grid, grid_color, stroke, stroke_color, fill, stroke_linecap, \
                              grid_ext_upper, grid_ext_lower, title, start, end, step, basis, tz, sp_x, variant, **kwargs):
             from hijridate import Hijri, Gregorian   
-            end = 6 if p.config['api'] == 'TomorrowIo' else end
+            end = 6 if p.config['api'] == 'TomorrowIo' and end == 8 else end
             box_size_x = (w - (end -1) * grid) / end
             half = int(box_size_x * 0.5)
             i18n = read_i18n(p, i18nfile)
