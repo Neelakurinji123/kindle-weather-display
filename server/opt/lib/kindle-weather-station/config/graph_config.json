@@ -33,7 +33,7 @@
 			"daily_weather_landscape": {"title": "weather", "start": 1, "end": 6, "step": 1, "basis": "day", "type": "tile",
 						"stroke": 4, "stroke-color": "rgb(0,0,0)", "fill": "rgb(0,0,0)", "stroke-linecap": "round"},
 			"daily_temperature_landscape": {"title": "temperature", "start": 0, "end": 6, "step": 1, "basis": "day",
-						"type": "line", "stroke": 6, "stroke-color": "rgb(105,105,105)", "fill": "rgb(220,220,220)",
+						"type": "line", "stroke": 8, "stroke-color": "rgb(105,105,105)", "fill": "rgb(220,220,220)",
 						"stroke-linecap": "round"},
 			"moon_phase_landscape": {"title": "moon phase", "start": 0, "end": 6, "step": 1, "basis": "day", "type": "tile",
 						"stroke": 4, "stroke-color": "rgb(0,0,0)", "fill": "rgb(0,0,0)", "stroke-linecap": "round"}	
@@ -41,8 +41,8 @@
 		"labels": {
 			"hourly_xlabel": {"start": 0, "end": 25, "step": 1, "basis": "hour", "font-size": 20, "stroke-color": "rgb(105,105,105)"},
 			"daily_xlabel": {"start": 0, "end": 8, "step": 1, "basis": "day", "font-size": 20, "stroke-color": "rgb(105,105,105)"},
-			"daily_xlabel_landscape": {"start": 1, "end": 6, "step": 1, "basis": "day", "font-size": 35, "stroke-color": "rgb(105,105,105)"},
-			"daily_xlabel_landscape_start0": {"start": 0, "end": 6, "step": 1, "basis": "day", "font-size": 35, "stroke-color": "rgb(105,105,105)"}
+			"daily_xlabel_landscape": {"start": 1, "end": 6, "step": 1, "basis": "day", "font-size": 30, "stroke-color": "rgb(105,105,105)"},
+			"daily_xlabel_landscape_start0": {"start": 0, "end": 6, "step": 1, "basis": "day", "font-size": 30, "stroke-color": "rgb(105,105,105)"}
 		}
 	}
 }

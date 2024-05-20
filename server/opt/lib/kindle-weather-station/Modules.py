@@ -47,24 +47,25 @@ def read_i18n(p, file):
             a = dict()
     return a
     
-def split_text(wordwrap, text, max_row):
+def split_text(wordwrap, text, max_rows):
     s = list()
     d = dict()
     a = list()
-    row = 0
+    max_rows -= 1
+    rows = 0
     for w in text.split():
-        if len(''.join(s)) + len(w)  + len(s) > wordwrap and row < max_row:
-            d[row] = s
-            row += 1
+        if len(''.join(s)) + len(w)  + len(s) > wordwrap and rows < max_rows:
+            d[rows] = s
+            rows += 1
             s = [w]
-            d[row] = s
-        elif len(''.join(s)) + len(w)  + len(s) + 3 > wordwrap and row == max_row:
+            d[rows] = s
+        elif len(''.join(s)) + len(w)  + len(s) + 3 > wordwrap and rows == max_rows:
             s.append('...')
-            d[row] = s
+            d[rows] = s
             break
         else:
             s.append(w)
-            d[row] = s
+            d[rows] = s
     for n in d.values():
         a += [' '.join(n) + '\n']
     return a
@@ -87,7 +88,6 @@ class Maintenant:
 
     def text(self):
         p, x, y = self.p, self.x, self.y
-        variant = self.variant
         weather = p.CurrentWeather()
         tz = timezone(p.config['timezone'])
         now = p.now
@@ -113,7 +113,7 @@ class Maintenant:
             #d = read_i18n(p, i18nfile)
             #w[0] = d["abbreviated_weekday"][w[0][:-1]] + ',' if not d == dict() else w[0]
             #w[2] = d["abbreviated_month"][w[2]] if not d == dict() else w[2]
-            if variant == 1:
+            if p.config['landscape'] == True:
                 #a += SVGtools.text("start", "30px", (x + 200 + 20), (y + 40), ' '.join(w)).svg()
                 a += SVGtools.text("end", "30px", (x + 200 + 445), (y + 40), sunrise).svg()
                 a += SVGtools.text("end", "30px", (x + 200 + 580),(y + 40), sunset).svg()                
@@ -135,10 +135,9 @@ class Maintenant:
 
     def icon(self):
         p, x, y = self.p, self.x, self.y
-        variant = self.variant
         a = str()
         if p.config['sunrise_and_sunset'] == True:
-            if variant == 1:
+            if p.config['landscape'] == True:
                 a += SVGtools.transform("(1.1,0,0,1.1," + str(x + 200 + 328) + "," + str(y + 14) + ")", Icons.Sunrise()).svg() 
                 a += SVGtools.transform("(1.1,0,0,1.1," + str(x + 200 + 465) + "," + str(y + 14) + ")", Icons.Sunset()).svg()
             else:
@@ -163,11 +162,19 @@ class CurrentData:
                     a += SVGtools.text("end", "45px", (x + 200 - int(s_padding(r) * 0.64)), (y + 135), "").svg()
                     #a += SVGtools.text("end", "45px", (x + 200 - int(s_padding(r) * 0.64)), (y + 135), "n/a").svg()
                 else:
-                    if weather['main'] == sub_main:
-                        a += SVGtools.text("end", "45px", (x + 195 - int(s_padding(r) * 0.64)), (y + 135), \
+                    if p.config['landscape'] == True:
+                        if weather['main'] == sub_main:
+                            a += SVGtools.text("end", "45px", (x + 195 - int(s_padding(r) * 0.64)), (y + 160), \
+                                Decimal(float(r)).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP)).svg()
+                        else:
+                            a += SVGtools.text("end", "40px", (x + 162 - int(s_padding(r) * 0.64)), (y + 120), \
                             Decimal(float(r)).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP)).svg()
                     else:
-                        a += SVGtools.text("end", "40px", (x + 172 - int(s_padding(r) * 0.64)), (y + 120), \
+                        if weather['main'] == sub_main:
+                            a += SVGtools.text("end", "45px", (x + 195 - int(s_padding(r) * 0.64)), (y + 135), \
+                                Decimal(float(r)).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP)).svg()
+                        else:
+                            a += SVGtools.text("end", "40px", (x + 162 - int(s_padding(r) * 0.64)), (y + 120), \
                             Decimal(float(r)).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP)).svg()
         return a
 
@@ -206,7 +213,8 @@ class CurrentData:
     def pressure(self):
         p, x, y = self.p, self.x, self.y
         weather = p.CurrentWeather()
-        a = SVGtools.text("end", "30px", (x + 235 + self.offset),(y + 370), str(round(weather['pressure']))).svg()
+        _x = -5 if p.config['api'] == 'TomorrowIo' else 0
+        a = SVGtools.text("end", "30px", (x + _x + 235 + self.offset),(y + 370), str(round(weather['pressure']))).svg()
         a+= SVGtools.text("end", "23px", (x + 280 + self.offset),(y + 370), p.units['pressure']).svg()
         return a
 
@@ -229,8 +237,11 @@ class CurrentData:
         weather = p.CurrentWeather()
         wordwrap= self.wordwrap
         a = str()
-        disc = split_text(wordwrap=wordwrap, text=weather['description'], max_row=3)
-
+        if p.config['landscape'] == True:
+            #disc = split_text(wordwrap=wordwrap, text=weather['description'], max_rows=1)
+            disc = [weather['description']]
+        else:
+            disc = split_text(wordwrap=wordwrap, text=weather['description'], max_rows=2)
         for w in disc:
             a += SVGtools.text("end", "30px", (x + 280 + self.offset), (y + 410), w).svg()
             y += 35
@@ -244,7 +255,7 @@ class CurrentData:
             return SVGtools.transform("(4,0,0,4," + str(x - 30) + "," + str(y - 80) + ")", addIcon(weather['main'])).svg()
         else:
             a = str()
-            a += SVGtools.transform("(3.5,0,0,3.5," + str(x - 30) + "," + str(y - 70) + ")", addIcon(weather['main'])).svg()
+            a += SVGtools.transform("(3.5,0,0,3.5," + str(x - 40) + "," + str(y - 70) + ")", addIcon(weather['main'])).svg()
             a += SVGtools.transform("(1.6,0,0,1.6," + str(x + 200) + "," + str(y + 90) + ")", addIcon(sub_main)).svg()
             a += SVGtools.line((x + 200), (x + 260), (y + 200), (y + 110), "fill:none;stroke:black;stroke-width:2px;").svg()
             return a
@@ -311,18 +322,19 @@ class CurrentWeatherPane(CurrentData):
         self.sub_main = max(b.items(), key=lambda x: x[1])[0]
         
     def text(self):
-        if self.variant == 1:
-            x, y = 270, -150
+        p = self.p
+        if p.config['landscape'] == True:
+            x, y = 270, -125
             prec = super(CurrentWeatherPane, self).precipitation()
             self.x, self.y = x, y+5
             temp = super(CurrentWeatherPane, self).temperature()
-            self.x, self.y = x, y
+            self.x, self.y = x, y+10
             pres = super(CurrentWeatherPane, self).pressure()
-            self.x, self.y = x, y
+            self.x, self.y = x, y+10
             humi = super(CurrentWeatherPane, self).humidity()
-            self.x, self.y = x+195, y+40
+            self.x, self.y = x+195, y+50
             wind = super(CurrentWeatherPane, self).wind()
-            self.x, self.y = x, y+40
+            self.x, self.y = x, y+50
             disc = super(CurrentWeatherPane, self).description()
         else:
             prec = super(CurrentWeatherPane, self).precipitation()
@@ -336,12 +348,12 @@ class CurrentWeatherPane(CurrentData):
     def icon(self):
         p = self.p
         weather = p.CurrentWeather()
-        if self.variant == 1:
+        if p.config['landscape'] == True:
             self.x, self.y = -5, 65
             a = super(CurrentWeatherPane, self).icon()
             if int(weather['wind_speed']) != 0:
                 #self.x = 450
-                self.x, self.y = 475,  -110
+                self.x, self.y = 475,  -75
                 a += super(CurrentWeatherPane, self).wind_icon()
         else:
             a = super(CurrentWeatherPane, self).icon()
@@ -384,24 +396,15 @@ class HourlyWeatherPane:
         config = self.p.config
         offset, wordwrap = 0, 0
         hour, span, step, pitch = self.hour, self.span, self.step, self.pitch
-        variant = self.variant
         a = str() 
         # 3h forecast
         for i in range(hour, span, step):
             weather = p.HourlyForecast(i)
             if p.config['landscape'] == True:
                 hrs = {3: "3 hrs", 6: "6 hrs", 9: "9 hrs"}
-            else:
-                hrs = {3: "three hours", 6: "six hours", 9: "nine hours"}
-                d = read_i18n(p, i18nfile)
-                if not d == dict():
-                    for k in hrs.keys():
-                        hrs[k] = d["hours"][hrs[k]]
-
-            if variant == 1:
                 a += SVGtools.text("end", "30px", (x + 200), (y + 170), round(weather['temp'])).svg()
                 a += self.add_temp_unit(x=(x + 200), y=(y + 175), font_size=35)
-                a += SVGtools.text("start", "30px", (x + 70), (y + 170), hrs[i]).svg()
+                a += SVGtools.text("start", "30px", (x + 65), (y + 170), hrs[i]).svg()
                 # 'in_clouds' option
                 if not config['in_clouds'] == str():
                     #if weather['main'] in ['Rain', 'Drizzle', 'Snow', 'Sleet', 'Cloudy']:
@@ -412,6 +415,11 @@ class HourlyWeatherPane:
                         else:
                             a += SVGtools.text("end", "25px", int(x + 157 - s_padding(r) * 0.357), (y + 92), r).svg()
             else:
+                hrs = {3: "three hours", 6: "six hours", 9: "nine hours"}
+                d = read_i18n(p, i18nfile)
+                if not d == dict():
+                    for k in hrs.keys():
+                        hrs[k] = d["hours"][hrs[k]]
                 # Hourly weather document area (base_x=370 ,base_y=40)
                 a += SVGtools.text("end", "35px", (x + 30), (y + 96), round(weather['temp'])).svg()
                 #a += SVGtools.text("start", "25px", (x - 0), (y + 165), hrs[i]).svg()
@@ -432,11 +440,10 @@ class HourlyWeatherPane:
     def icon(self):
         p, x, y = self.p, self.x, self.y
         hour, span, step, pitch = self.hour, self.span, self.step, self.pitch
-        variant = self.variant
         a = str()
         for i in range(hour, span, step):
             weather = p.HourlyForecast(i)
-            if variant == 1:
+            if p.config['landscape'] == True:
                 a += SVGtools.transform("(2.3,0,0,2.3," + str(x + 28) + "," + str(y - 32) + ")", addIcon(weather['main'])).svg()
                 y += pitch
             else:
@@ -460,7 +467,6 @@ class DailyWeatherPane:
         self.y = 500
         self.pitch = 90
         self.span = 4
-        self.variant = variant
 
     def text(self):
         p, x, y = self.p, self.x, self.y
@@ -517,31 +523,22 @@ class TwitterPane:
         self.p = p
         self.x = x
         self.y = y
-        self.tw_config = p.config['twitter']
-
+        self.tw = p.config['twitter']
+        self.keywords = self.tw['keywords']
+        
     def text(self):
-        p, x, y = self.p, self.x, self.y
+        p, x, y, tw, keywords = self.p, self.x, self.y, self.tw, self.keywords
         _y = int(y)
-        tw_config = self.tw_config
         encoding = p.config['encoding']
-        now = p.now
-        timezone_offset = p.timezone_offset
+        #now, timezone_offset = p.now, p.timezone_offset
         a = str()
         #"twitter": {"screen_name": "tenkijp", "translate": "True", "translate_target": "en", "expiration": "1h", "alternate": "daily"}
         from twikit import Client
         from deep_translator import GoogleTranslator
-            
-        screen_name = tw_config['screen_name']
-        translate = tw_config['translate']
-        translate_target = tw_config['translate_target']
-        expiration = tw_config['expiration']
-        alternate = tw_config['alternate']
-        user = p.config['twitter_screen_name']
-        password = p.config['twitter_password']
-        caption = p.config['twitter']['caption']
-        alternate_url = tw_config['alternate_url']
-        include_keywords = p.config['twitter_include_keywords']
-        exclude_keywords = p.config['twitter_exclude_keywords']
+        screen_name, caption, translate, translate_target = tw['screen_name'], tw['caption'], tw['translate'], tw['translate_target']
+        expiration, alternate, alternate_url = tw['expiration'], tw['alternate'], tw['alternate_url']     
+        user, password = p.config['twitter_screen_name'], p.config['twitter_password']
+        include_keywords, exclude_keywords = keywords['include'], keywords['exclude']
         client = Client('en-US')
         client.login(auth_info_1=user, password=password)
         client.save_cookies('/tmp/cookies.json')
@@ -565,7 +562,6 @@ class TwitterPane:
             b = _b.encode(en, 'ignore').decode(en)
         else:
             b = full_text
-
         c = include_keywords.split(',')
         processing = False
         for n in c:
@@ -595,8 +591,8 @@ class TwitterPane:
         e = tweets_to_store[0]['created_at'].split()
         f = e[3].split(':')
         t_min, t_hour, t_day, t_month, t_year = int(f[1]), int(f[0]), int(e[2]), int(d[e[1]]), int(e[5])
-        epoch = datetime(t_year, t_month, t_day, t_hour, t_min, 0).timestamp() + timezone_offset # UTC + timezone_offset
-        #print('epoch', epoch, now, (now - epoch - timezone_offset))
+        epoch = datetime(t_year, t_month, t_day, t_hour, t_min, 0).timestamp() + p.timezone_offset # UTC + timezone_offset
+        #print('epoch', epoch, p.now, (p.now - epoch - p.timezone_offset))
         #print('timezone offset', p.timezone_offset)
         if re.match(r'[0-9.]+m', expiration):
             c = re.sub(r'([0-9.]+)m', r'\1',expiration)
@@ -605,16 +601,26 @@ class TwitterPane:
             c = re.sub(r'([0-9.]+)h', r'\1',expiration)
             c_time = float(c) * 60 * 60
 
-        if now - epoch <= c_time and processing == True:
+        if p.now - epoch <= c_time and processing == True:
             processing = True
-        elif now - epoch > c_time and processing == True:
+        elif p.now - epoch > c_time and processing == True:
             processing = False
 
         if processing == True:
-            disc = split_text(wordwrap=36, text=b, max_row=8)
-            for w in disc:
-                a += SVGtools.text("start", "20px", (x + 180), (y + 50), w).svg()
-                y += 25
+            if p.config['landscape'] == True:
+                if not caption == str() and not a == None:
+                    a += SVGtools.text("middle", "30px", (x + 95), (_y + 35), caption).svg()
+                disc = split_text(wordwrap=50, text=b, max_rows=6)
+                for w in disc:
+                    a += SVGtools.text("start", "25px", (x + 180), (y + 30), w).svg()
+                    y += 32
+            else:
+                if not caption == str() and not a == None:
+                    a += SVGtools.text("middle", "25px", (x + 95), (_y + 55), caption).svg()
+                disc = split_text(wordwrap=36, text=b, max_rows=8)
+                for w in disc:
+                    a += SVGtools.text("start", "20px", (x + 180), (y + 50), w).svg()
+                    y += 25
             if len(urls) > 0:
                 url = urls[0]
             else:
@@ -622,8 +628,7 @@ class TwitterPane:
         else:
             a, url = None, None
     
-        if not tw_config['caption'] == str() and not a == None:
-            a += SVGtools.text("middle", "25px", (x + 95), (_y + 55), tw_config['caption']).svg()           
+                 
         return a, url, processing
         
     def draw(self, url):
@@ -631,8 +636,7 @@ class TwitterPane:
         import qrcode
         import qrcode.image.svg
         #from qrcode.image.pure import PyPNGImage
-
-        tw_config = self.tw_config
+        p, tw = self.p, self.tw
         _y = 25
         multiple = 5       
         # define a method to choose which factory metho to use
@@ -662,10 +666,16 @@ class TwitterPane:
         a = re.sub(r'</svg>$', '', a)
         a = re.sub('([0-9]+)mm', r'\1', a)
         # Transformation
-        if not tw_config['caption'] == str():
-            offset_x, offset_y = 8, (560 + _y)
+        if p.config['landscape'] == True:
+            if not tw['caption'] == str():
+                offset_x, offset_y = 8, (390 + _y)
+            else:
+                offset_x, offset_y = 8, 390
         else:
-            offset_x, offset_y = 8, 560
+            if not tw['caption'] == str():
+                offset_x, offset_y = 8, (560 + _y)
+            else:
+                offset_x, offset_y = 8, 560
         def multi_x(match):
             d = int(match.group(1))
             d *= multiple

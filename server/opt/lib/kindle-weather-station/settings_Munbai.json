@@ -11,6 +11,7 @@
         "lat": "19.0821978",
         "lon": "72.7411",
         "units": "metric",
+		"in_clouds": "probability",
         "lang": "hi",
         "cloudconvert": "False",
         "converter": "gm",

@@ -10,15 +10,11 @@
         "lat": "-77.8400829",
         "lon": "166.6445298",
         "units": "metric",
+		"in_clouds": "probability",
         "lang": "en",
-        "exclude": "minutely",
         "cloudconvert": "False",
         "converter": "gm",
 		"layout": ["maintenant", "main", "daily"],
-		"twitter": {"caption": "alert", "screen_name": "tenkijp", "translate": "True", "translate_target": "en",
-				 "expiration": "3h", "alternate": ["graph", "daily_xlabel8", "graph"], "alternate_url": "https://tenki.jp/"},
-		"twitter_keywords": {"include": "heavy,thunder", "exclude": ""},
-		"graph_objects": ["daily_temperature8", "daily_precipitation8"],
 		"graph_canvas": "default"
     }
 }

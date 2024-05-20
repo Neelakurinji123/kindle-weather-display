@@ -38,14 +38,14 @@ def create_svg(p, svgfile):
     graph_objects = p.config['graph_objects']
     x, y = 0, 0
     # Landscape's paper layout
-    width, height, variant = (800, 600, 1) if p.config['landscape'] == True else (600, 800, False)
+    width, height, variant = (800, 600, 1) if p.config['landscape'] == True else (600, 800, None)
     header += '''<?xml version="1.0" encoding="{}"?>
 <svg xmlns="http://www.w3.org/2000/svg" height="{}" width="{}" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink">\n'''.format(p.config['encoding'], height, width)
     header += '<g font-family="{}">\n'.format(p.config['font'])
     #svg_header += '<g font-family="{}">\n'.format("Chalkboard")
     #svg_header += '<g font-family="{}">\n'.format("Arial")
  
-    def maintenant_pane(p, x, y, text, draw, variant):
+    def maintenant_pane(p, x, y, text, draw, variant=None):
         # Maintenant: y=40        
         a = Maintenant(p=p, x=x, y=y, variant=variant)
         text += a.text()
@@ -54,7 +54,7 @@ def create_svg(p, svgfile):
         y += 40
         return x, y, text, draw
         
-    def main_pane(p, x, y, text, draw, variant):
+    def main_pane(p, x, y, text, draw, variant=None):
         if variant == 1:
             # Current weather: size(x=365, y=480)
             offset, wordwrap = 35, 18
@@ -81,7 +81,7 @@ def create_svg(p, svgfile):
             y += 480
         return x, y, text, draw
 
-    def daily_pane(p, x, y, text, draw, variant):
+    def daily_pane(p, x, y, text, draw, variant=None):
         # Daily weather: size(y=280)
         _x, y, span, pitch = 0, y, 4, 90
         a = DailyWeatherPane(p=p, x=_x, y=y-20, span=span, pitch=pitch, variant=variant)
@@ -90,7 +90,7 @@ def create_svg(p, svgfile):
         y += 280
         return x, y, text, draw
 
-    def alternatePane(p, x, y, objects, text, draw, variant):
+    def alternatePane(p, x, y, objects, text, draw, variant=None):
         alternate = p.config['twitter']['alternate']
         for s in alternate:
             if s == 'daily':
@@ -98,16 +98,17 @@ def create_svg(p, svgfile):
             elif s == 'graph':
                 try:
                     obj = objects.pop()
-                    x, y, text, draw = graph_pane(p=p, x=x, y=y, obj=obj, text=text, draw=draw)
+                    x, y, draw = graph_pane(p=p, x=x, y=y, obj=obj, draw=draw)
                 except Exception as e:
                     print(e)
-            elif s == 'hourly_xlabel' or s == 'daily_xlabel':
-                x, y, text, draw = label_pane(p=p, x=x, y=y, s=s, text=text, draw=draw)
+            #elif s == 'hourly_xlabel' or s == 'daily_xlabel':
+            elif re.search('xlabel', s):
+                x, y, text = label_pane(p=p, x=x, y=y, s=s, text=text)
             elif re.match(r'(padding[\+\-0-9]*)', s):
                 y += int(re.sub('padding', '', s))
         return x, y, text, draw
         
-    def twitter_pane(p, x, y, objects, text, draw, variant):
+    def twitter_pane(p, x, y, objects, text, draw, variant=None):
         try:
             a = TwitterPane(p=p, x=x, y=y, variant=variant)
             _text, url, processing = a.text()
@@ -124,8 +125,8 @@ def create_svg(p, svgfile):
             
         return x, y, text, draw
  
-    def graph_pane(p, x, y, obj, draw, variant):
-        if variant == 1:
+    def graph_pane(p, x, y, obj, draw, variant=None):
+        if p.config['landscape'] == True:
             # pane size(y=120)
             #x, y = 40, 660
             a = GraphPane(p=p, x=x+40, y=y+100, obj=obj, variant=variant)
@@ -139,8 +140,8 @@ def create_svg(p, svgfile):
             y += 120
         return x, y, draw
         
-    def label_pane(p, x, y, s, text, variant):
-        if variant == 1:
+    def label_pane(p, x, y, s, text, variant=None):
+        if p.config['landscape'] == True:
             a = GraphLabel(p=p, x=x+40, y=y-20, s=s, variant=variant)
             text += a.text()
             y += 20
@@ -242,11 +243,7 @@ def img_processing(p, svgfile, pngfile, pngtmpfile):
         except Exception as e:
             print(e)
 
-    t.sleep(2)
-    #if p.config['landscape'] == True:
-    #    tForm = '-flatten  -rotate +90' 
-   # else:
-    #    tForm = '-flatten'    
+    t.sleep(2)   
     if p.config['darkmode'] == 'True':
         if p.config['landscape'] == True:
             out = Popen(['convert', '-rotate', '+90', '-flatten', pngfile, flatten_pngfile])

@@ -12,6 +12,7 @@
         "lon": "139.5268",
         "units": "metric",
         "lang": "en",
+		"in_clouds": "probability",
         "cloudconvert": "False",
         "converter": "gm",
         "ramadhan": "True",

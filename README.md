@@ -311,7 +311,8 @@ Available options are as follows:
 
 ## Landscape e-Paper layout(WIP)
 
-<kbd><img src="sample_screenshots/kindle_weather-display-landscape.jpg"  height="360"/></kbd>&nbsp;
+<kbd><img src="sample_screenshots/kindle_weather-display-landscape.jpg"  height="360"/></kbd>&nbsp;&nbsp;
+<kbd><img src="sample_screenshots/KindleStation_flatten_daily_temperature_landscape.png"  height="360"/></kbd>&nbsp;
 
 Available module options are as follows:
 
@@ -319,7 +320,9 @@ Available module options are as follows:
   - "daily\_temperature\_landscape": Daily Temperature
   - "daily\_weather\_landscape": Daily Weather
   - "moon\_phase\_landscape": Moon Phase
- 
+- config: "layout"
+  - ["twitter"] : X (former Twitter)
+  
 ## Set up time schedule
 
 Edit the server's crontab and restart cron.

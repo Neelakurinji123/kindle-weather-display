@@ -7,18 +7,17 @@
         "font": "Droid Sans",
         "sunrise_and_sunset": "True",
         "darkmode": "False",
-        "service": "onecall",
+		"api": "TomorrowIo",
         "lat": "35.7853",
         "lon": "139.5268",
         "units": "metric",
         "lang": "en",
-        "exclude": "minutely",
-		"version": "2.5",
+		"in_clouds": "probability",
         "cloudconvert": "False",
         "converter": "gm",
         "ramadhan": "True",
-		"layout": ["maintenant", "main", "padding-10", "graph", "hourly_xlabel", "graph", "daily_xlabel"],
-		"graph_objects": ["hourly_temperature", "daily_temperature"],
+		"layout": ["maintenant", "main", "graph", "daily_xlabel", "graph"],
+		"graph_objects": ["daily_weather", "moon_phase"],
 		"graph_canvas": "default"
     }
 }

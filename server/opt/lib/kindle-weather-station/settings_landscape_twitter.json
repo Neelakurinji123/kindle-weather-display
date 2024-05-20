@@ -17,9 +17,10 @@
 		"converter": "gm",
 		"layout": ["maintenant", "main", "twitter"],
 		"twitter": {"caption": "ALERT", "screen_name": "tenkijp", "translate": "True", "translate_target": "en",
-				 	"expiration": "3h", "alternate": ["graph", "daily_xlabel", "graph"], "alternate_url": "https://tenki.jp/",
+				 	"expiration": "3h", "alternate": ["padding-30", "daily_xlabel_landscape_start0", "padding+50", "graph"], "alternate_url": "https://tenki.jp/",
 				 	"keywords": {"include": "heavy,thunder,disaster", "exclude": "sakura,zakura,observe,space"}},
-		"graph_objects": ["daily_temperature", "moon_phase"],
-		"graph_canvas": "default"
+		"graph_objects": ["daily_temperature_landscape"],
+		"graph_canvas": "default_landscape",
+		"landscape": "True"
 	}
 }

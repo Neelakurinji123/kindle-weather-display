@@ -12,6 +12,7 @@
         "lon": "-21.9426",
         "units": "metric",
         "lang": "us",
+		"in_clouds": "probability",
         "cloudconvert": "False",
         "converter": "gm",
 		"layout": ["maintenant", "main", "daily"]

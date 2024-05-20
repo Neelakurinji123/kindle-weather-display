@@ -41,11 +41,11 @@ def readSettings(settings):
         a['landscape'] = bool(eval(service['landscape'])) if 'landscape' in service else False
         a['ramadhan'] = bool(eval(service['ramadhan'])) if 'ramadhan' in service else False
         a['twitter'] = service['twitter'] if 'twitter' in service else False
-        if 'twitter_keywords' in service:
-            a['twitter_include_keywords'] = service['twitter_keywords']['include'] if 'include' in service['twitter_keywords'] else str()
-            a['twitter_exclude_keywords'] = service['twitter_keywords']['exclude'] if 'exclude' in service['twitter_keywords'] else str()
-        else:
-             a['twitter_keywords'] = False
+        #if 'twitter_keywords' in service:
+        #    a['twitter_include_keywords'] = service['twitter_keywords']['include'] if 'include' in service['twitter_keywords'] else str()
+        #    a['twitter_exclude_keywords'] = service['twitter_keywords']['exclude'] if 'exclude' in service['twitter_keywords'] else str()
+        #else:
+        #     a['twitter_keywords'] = False
         c = service['graph_canvas'] if 'graph_canvas' in service else 'default'
         # Add timezone offset
         tz = timezone(a['timezone'])
@@ -128,7 +128,7 @@ class TomorrowIo:
         if self.config['units'] == 'metric':
             self.units = {'pressure': 'hPa', 'wind_speed': 'm/s', 'temp': 'C'}
         elif self.config['units'] == 'imperial':
-            self.units = {'pressure': 'hPa', 'wind_speed': 'mph', 'temp': 'F'}
+            self.units = {'pressure': 'inHg', 'wind_speed': 'mph', 'temp': 'F'}
         else:
             self.units = {'pressure': 'hPa', 'wind_speed': 'm/s', 'temp': 'K'}
 
