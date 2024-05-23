@@ -1,0 +1,29 @@
+usbcore
+usb-net
+
+
+root@OpenWrt:~# ip link | sed '/link/d'
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode 
+DEFAULT group default qlen 1000
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq master br-lan 
+state UP mode DEFAULT group default qlen 1000
+3: sit0@NONE: <NOARP> mtu 1480 qdisc noop state DOWN mode DEFAULT group 
+default qlen 1000
+4: ip6tnl0@NONE: <NOARP> mtu 1452 qdisc noop state DOWN mode DEFAULT group 
+default qlen 1000
+5: usb0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT 
+group default qlen 1000
+6: br-lan: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state 
+UP mode DEFAULT group default qlen 1000
+
+
+python3:
+opkg install python3
+opkg install python3-pip
+opkg install python3-setuptools
+
+
+pip:
+
+
+

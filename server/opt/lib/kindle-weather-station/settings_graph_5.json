@@ -1,23 +1,23 @@
 {
     "station": {
-        "city": "Kiyose,Tokyo",
-        "timezone": "Asia/Tokyo",
+        "city": "South Pole Station",
+        "timezone": "UTC",
         "encoding": "iso-8859-1",
         "locale": "en_US.UTF-8",
         "font": "Droid Sans",
         "sunrise_and_sunset": "True",
         "darkmode": "False",
-        "api": "OpenWeather",
-        "lat": "35.7853",
-        "lon": "139.5268",
+		"api": "OpenWeather",
+        "lat": "-90",
+        "lon": "0",
         "units": "metric",
         "lang": "en",
 		"in_clouds": "probability",
         "cloudconvert": "False",
         "converter": "rsvg-convert",
         "ramadhan": "True",
-		"layout": ["maintenant", "main", "graph", "daily_xlabel", "graph"],
-		"graph_objects": ["daily_temperature", "moon_phase"],
+		"layout": ["maintenant", "main", "graph","hourly_xlabel", "graph"],
+		"graph_objects": ["daily_weather", "daily_snow_accumulation"],
 		"graph_canvas": "default"
     }
 }

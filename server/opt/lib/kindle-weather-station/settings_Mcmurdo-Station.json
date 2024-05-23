@@ -6,14 +6,14 @@
         "locale": "en_US.UTF-8",
         "font": "Droid Sans",
         "sunrise_and_sunset": "True",
-		"api": "OpenWeatherMap",
+		"api": "OpenWeather",
         "lat": "-77.8400829",
         "lon": "166.6445298",
         "units": "metric",
 		"in_clouds": "probability",
         "lang": "en",
         "cloudconvert": "False",
-        "converter": "gm",
+        "converter": "rsvg-convert",
 		"layout": ["maintenant", "main", "daily"],
 		"graph_canvas": "default"
     }

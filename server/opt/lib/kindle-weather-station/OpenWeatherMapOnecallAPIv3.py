@@ -39,45 +39,35 @@ def readSettings(settings):
         a['landscape'] = bool(eval(service['landscape'])) if 'landscape' in service else False
         a['ramadhan'] = bool(eval(service['ramadhan'])) if 'ramadhan' in service else False
         a['twitter'] = service['twitter'] if 'twitter' in service else False
-        #if 'twitter_keywords' in service:
-        #    a['twitter_include_keywords'] = service['twitter_keywords']['include'] if 'include' in service['twitter_keywords'] else str()
-        #    a['twitter_exclude_keywords'] = service['twitter_keywords']['exclude'] if 'exclude' in service['twitter_keywords'] else str()
-        #else:
-        #     a['twitter_keywords'] = False
-        c = service['graph_canvas'] if 'graph_canvas' in service else 'default'
         # Add timezone offset
         tz = timezone(a['timezone'])
-        _tz = tz.utcoffset(datetime.now(), is_dst = True)
+        try:
+            _tz = tz.utcoffset(datetime.now(), is_dst = True)
+        except:
+            _tz = tz.utcoffset(datetime.now())
         offset = _tz.seconds if _tz.days == 0 else -_tz.seconds
         a['timezone_offset'] = offset
         
-    try:
-        b = list(reversed(service['graph_objects'])) if 'graph_objects' in service else None
+    b = list(reversed(service['graph_objects'])) if 'graph_objects' in service else None
+    
+    with open(graph_config, 'r') as f:
+        graph = json.load(f)['graph']
+        a['graph_lines'] = graph['lines']
+        a['graph_labels'] = graph['labels']
         if not b == None:
-            with open(graph_config, 'r') as f:
-                graph = json.load(f)['graph']
-                a['graph_canvas'] = graph['canvas'][service['graph_canvas']]
-                a['graph_objects'] = list()
-                a['graph_labels'] = graph['labels']
-                for n in b:
-                    a['graph_objects'].append(graph['objects'][n])
+            a['graph_canvas'] = graph['canvas'][service['graph_canvas']]
+            a['graph_objects'] = list()
+            for n in b:
+                a['graph_objects'].append(graph['objects'][n])
         else:
             a['graph_canvas'] = dict()
-            a['graph_objects'] = list()
-            a['graph_labels'] = dict()             
-    except Exception as e:
-        a['graph_canvas'] = dict()
-        a['graph_objects'] = list()
-        a['graph_labels'] = dict()
+            a['graph_objects'] = list() 
 
-    try:
+    if not a['twitter'] == False:
         with open(twitter_config, 'r') as f:
-            t = json.load(f)['twitter']
-            a['twitter_screen_name'] =  t["user_screen_name"]
-            a['twitter_password'] =  t["password"]
-    except Exception as e:
-        a['twitter_screen_name'] = None
-        a['twitter_password'] = None
+            tw = json.load(f)['twitter']
+            a['twitter_screen_name'] =  tw["user_screen_name"]
+            a['twitter_password'] =  tw["password"]
     
     with open(OWM_config, 'r') as f:
         owm = json.load(f)['OWM']
@@ -112,7 +102,7 @@ class OpenWeatherMap:
         config = self.config
         s += 'lat=' + config['lat'] + '&lon=' + config['lon']
         s += '&units=' + config['units'] if 'units' in config and not config['units'] == None else ''
-        s += '&lang=' + config['lang'] if 'lang' in config and not config['lang'] == None else ''
+        s += '&lang=' + config['lang']
         s += ('&exclude=' + config['exclude'] if 'exclude' in config and not config['exclude'] == None else '')
         s += '&appid=' + config['api_key']
         url = 'https://api.openweathermap.org/data/' + config['api_version'] + '/onecall?' + s
@@ -128,9 +118,9 @@ class OpenWeatherMap:
         c = self.api_data['current']
         h = self.api_data['hourly'][0]
         if not 'sunrise' in c:
-            c['sunrise'] = None
+            c['sunrise'] = 0
         if not 'sunset' in c:
-            c['sunset'] = None
+            c['sunset'] = 0
         # Add hourly precipitation of rain or snow
         if 'rain' in h:
             c['rainAccumulation'] = float(h['rain']['1h'])

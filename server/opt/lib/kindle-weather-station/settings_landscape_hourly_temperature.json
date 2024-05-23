@@ -15,9 +15,9 @@
 		"in_clouds": "probability",
 		"cloudconvert": "False",
 		"converter": "rsvg-convert",
-		"layout": ["maintenant", "main", "daily_xlabel_landscape", "padding+20", "graph"],
+		"layout": ["maintenant", "main", "padding+20", "graph", "padding+20", "hourly_xlabel_landscape_start0"],
 		"landscape": "True",
-		"graph_objects": ["daily_weather_landscape"],
-		"graph_canvas": "default_landscape"		
+		"graph_objects": ["hourly_temperature_landscape"],
+		"graph_canvas": "default_landscape_noGrid_sp20"		
 	}
 }

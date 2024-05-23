@@ -7,14 +7,14 @@
         "font": "Droid Sans",
         "sunrise_and_sunset": "False",
         "darkmode": "False",
-		"api": "OpenWeatherMap",
+		"api": "OpenWeather",
         "lat": "59.9392259",
         "lon": "29.5342917",
         "units": "metric",
         "lang": "ru",
 		"in_clouds": "probability",
         "cloudconvert": "False",
-        "converter": "gm",
+        "converter": "rsvg-convert",
 		"layout": ["maintenant", "main", "daily"]
     }
 }

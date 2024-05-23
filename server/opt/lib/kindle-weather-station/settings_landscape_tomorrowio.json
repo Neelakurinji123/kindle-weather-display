@@ -7,7 +7,7 @@
 		"font": "Droid Sans",
 		"sunrise_and_sunset": "True",
 		"darkmode": "False",
-		"api": "OpenWeather",
+		"api": "Tomorrow.io",
 		"lat": "35.7853",
 		"lon": "139.5268",
 		"units": "metric",

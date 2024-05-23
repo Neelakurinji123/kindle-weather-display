@@ -37,6 +37,7 @@ Subscribe to a v3.0 API.
 ## Create API key on CloudConvert (optional)
 
 Create API key with the following options:
+
 - user.read: View your user data 
 - user.write: Update your user data 
 - task.read: View your task and job data 
@@ -51,18 +52,17 @@ kindle requires special PNG format. Converting process is as follows:
                                                [The server sends a PNG file to Kindle and displays it]
  SVG image ------------> PNG image ----------> flattened PNG image --> Kindle Dispaly
            converter:              converter:
-           a)convert               a)convert	
+           a)convert               a)convert
            b)gm
-           c)CloudConvert(online)
+           c)rsvg-convert
+           d)CloudConvert(online)
 ```
 note:
 
-`convert` is converter of ImageMagick.
-
-`gm` is converter of graphicsMagick.
-
-Both ImageMagick and graphicsMagick for Openwrt are lack of capabilities to manipulate SVG format.
-
+`convert` is converter of ImageMagick.&nbsp;
+`gm` is converter of graphicsMagick.&nbsp;
+`rsvg-convert` is a commandline tool to render SVG documents to PNG images.&nbsp;
+Both ImageMagick and graphicsMagick for Openwrt are lack of capabilities to manipulate SVG format.&nbsp;
 Use CloudConvert.
 
 ## Set up server
@@ -96,7 +96,7 @@ Default config is `settings.json`.
 - qrcode (optional, for twitter module)
 - hijridate (optional, for moon\_phase module)
 
-e.g.)
+e.g.) Openwrt
 ```
 opkg update
 opkg install python3 python3-pytz python3-requests python3-setuptools python3-pip
@@ -128,7 +128,8 @@ Take a look at `/etc/KindleStation_flatten.png`.
 
 ### 7. Install USB network
 
-e.g.)
+e.g.) Openwrt
+
 ```
 opkg install kmod-usb-net kmod-usb-net-rndis kmod-usb-net-cdc-ether usbutils
 ```
@@ -159,13 +160,14 @@ When usbnet setup is finished, access to Kindle. (no password)
 ssh root@192.168.2.2
 ```
 
-### 2. Set up dropbear's Auth key
+### 2. Set up ssh Auth key
 
 - Create the server's pubkey.
 - Set up the server's ssh client environment.
 - Copy the server's ssh pubkey to Kindle.
 
-e.g) 
+e.g) dropbear
+
 ```
 cd /etc/dropbear
 dropbearkey -y -f dropbear_rsa_host_key | grep "^ssh-rsa " > dropbear_rsa_host_key.pub

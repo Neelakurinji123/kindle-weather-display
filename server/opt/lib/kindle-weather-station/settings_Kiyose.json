@@ -7,14 +7,14 @@
         "font": "Hiragino Sans",
         "sunrise_and_sunset": "False",
         "darkmode": "False",
-		"api": "OpenWeatherMap",
+		"api": "OpenWeather",
 		"lat": "35.7853",
 		"lon": "139.5268",
         "units": "metric",
         "lang": "ja",
 		"in_clouds": "probability",
         "cloudconvert": "True",
-        "converter": "convert",
+        "converter": "rsvg-convert",
 		"layout": ["maintenant", "main", "daily"],
 		"graph_canvas": "default"
     }
