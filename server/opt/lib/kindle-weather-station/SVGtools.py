@@ -4,17 +4,21 @@
 
 # Reguler font
 class text:
-    def __init__(self, anchor, fontsize, x, y, v):
+    def __init__(self, anchor, fontsize, x, y, v, stroke=None):
         self.anchor = anchor
         self.fontsize = fontsize
         self.x = x
         self.y = y
         self.v = v
+        self.stroke = stroke
 
     def svg(self):
-        return '<text style="text-anchor:{};" font-size="{}" x="{}" y="{}">{}</text>\n'.\
-               format(self.anchor, self.fontsize, self.x, self.y, self.v)
-
+        if not self.stroke == None:
+            return '<text style="text-anchor:{};" font-size="{}" x="{}" y="{}" stroke="{}" fill="{}">{}</text>\n'.\
+                   format(self.anchor, self.fontsize, self.x, self.y, self.stroke, self.stroke, self.v)
+        else:
+            return '<text style="text-anchor:{};" font-size="{}" x="{}" y="{}">{}</text>\n'.\
+                   format(self.anchor, self.fontsize, self.x, self.y, self.v)
 
 # Bold font
 class text2:

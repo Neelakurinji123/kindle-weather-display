@@ -131,14 +131,14 @@ class OpenWeatherMap:
         else:
             c['snowAccumulation'] = 0
         # Add 'in_clouds'
-        c['cloudCover'] = c['clouds']
+        c['cloudCover'] = c['clouds'] if 'clouds' in c else 0
         #c['pop'] = round(c['cloudCover'] / 100,1)
         if config['in_clouds'] == 'cloudCover':
-            c['in_clouds'] = round(h['cloudCover'] / 100,1)
+            c['in_clouds'] = round(c['cloudCover'] / 100,1)
         elif config['in_clouds'] == 'probability':
             c['in_clouds'] = round(h['pop'],1) if 'pop' in h else 0
         else:
-            c['in_clouds'] = 0   
+            c['in_clouds'] = 0 
         # Add cardinal direction
         c['cardinal'] = self.cardinal(c['wind_deg'])
         # Get simplicity

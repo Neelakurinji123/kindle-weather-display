@@ -36,15 +36,15 @@ def svg_processing(p, text=str(), draw=str(), y=0):
     # Landscape's paper layout
     variant = 1 if p.config['landscape'] == True else None
     for s in layout:
-        if s == 'maintenant':      
+        if s == 'maintenant':    
             a = Maintenant(p=p, y=y, variant=None)
             text += a.text()
             draw += a.icon()
             y += 50
-            #y += 40            
+            #y += 40           
         elif s == 'main':      
             if p.config['landscape'] == True:
-                wordwrap = 18 
+                wordwrap = 18
                 a = CurrentWeatherPane(p=p, y=y, wordwrap=wordwrap, variant=None)
                 text += a.text()
                 draw += a.icon()
@@ -52,9 +52,7 @@ def svg_processing(p, text=str(), draw=str(), y=0):
                 a = HourlyWeatherPane(p=p, y=y, hour=start_hour, span=span, step=step, pitch=pitch, variant=None)
                 text += a.text()
                 draw += a.icon()
-                #y += 340
-                y += 330
-                #y += 370
+                y += 340
             else:
                 # Current weather: size(x=365, y=480)
                 wordwrap = 18
@@ -66,7 +64,6 @@ def svg_processing(p, text=str(), draw=str(), y=0):
                 a = HourlyWeatherPane(p=p, y=y, hour=start_hour, span=span, step=step, pitch=pitch)        
                 text += a.text()
                 draw += a.icon()
-                #y += 480
                 y += 490
         elif s == 'daily':
             # Daily weather: size(y=280)
@@ -140,7 +137,9 @@ def create_svg(p, svgfile, text, draw):
     #svg_header += '<g font-family="{}">\n'.format("Arial")
     
     #d = {'Tomorrow.io': 'Tomorrow.io API', 'OpenWeather': 'OpenWeather API'}
-    s = p.config['api']
+    s1 = p.config['city'] + ' - ' if p.config['sunrise_and_sunset'] == True else str()
+    s2 = p.config['api']
+    s = s1 + s2
     if p.config['landscape'] == True:
         a = '<g font-family="{}">\n'.format(p.config['font'])
         a += SVGtools.text('end', '16px', (800 - 5), (600 - 5), (s + ' API')).svg()
@@ -251,11 +250,14 @@ def img_processing(p, svgfile, pngfile, pngtmpfile):
     #t.sleep(3)
 
 if __name__ == "__main__":
+    flag_dump, flag_config = False, False
     if 'dump' in sys.argv:
-        dump = True
+        flag_dump = True
         sys.argv.remove('dump')
-    else:
-        dump = False
+    elif 'config' in sys.argv:
+        flag_config = True
+        sys.argv.remove('config')
+
     # Use custom settings    
     if len(sys.argv) > 1:
         settings = sys.argv[1]
@@ -267,7 +269,7 @@ if __name__ == "__main__":
         if api == 'OpenWeather':
             from OpenWeatherMapOnecallAPIv3 import OpenWeatherMap
             api_data = OpenWeatherMap(settings).ApiCall()
-            if not dump == True:   
+            if not flag_dump == True:   
                 p = OpenWeatherMap(settings=settings, api_data=api_data)
         elif api == 'Tomorrow.io':
             from TomorrowIoAPI import TomorrowIo
@@ -275,13 +277,18 @@ if __name__ == "__main__":
             #with open('TomorrowIoAPI_output.json', 'r') as f:
             #    api_data = json.load(f)             
             api_data = TomorrowIo(settings).ApiCall()
-            if not dump == True:
+            if not flag_dump == True:
                 p = TomorrowIo(settings=settings, api_data=api_data)     
         ## test: API data dump ##
-        if dump == True:
+        if flag_dump == True:
             output = api + 'API' + '_output.json'
             with open(output, 'w', encoding='utf-8') as f:
                 json.dump(api_data, f, ensure_ascii=False, indent=4)
+                exit(0)
+        elif flag_config == True:
+            output = settings + '_' + api + '_output.json'
+            with open(output, 'w', encoding='utf-8') as f:
+                json.dump(p.config, f, ensure_ascii=False, indent=4)
                 exit(0)
         
         # Locale

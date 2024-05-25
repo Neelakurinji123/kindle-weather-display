@@ -74,7 +74,8 @@ def readSettings(settings):
         c = json.load(f)['tomorrow.io']
         a['api_key'] = c['api_key']
         a['api_version'] = c['version']
-        a['service'] = c['service']        
+        a['service'] = c['service']
+        #a['timezone'] = c['timezone']       
         #a['service_timesteps'] = ['1m', '1h', '1d']
         a['service_timesteps'] = ['1h', '1d']
         a['service_1m_rows'] = 6
@@ -147,6 +148,7 @@ class TomorrowIo:
                     'units': config['units'],
                     'timesteps': n,
                     'apikey': config['api_key'],
+                    'timezone': config['timezone'],
                     'endtime': endtime}
             else:
                 querystring = {
@@ -154,6 +156,7 @@ class TomorrowIo:
                     "fields":fields[n],
                     "units":config['units'],
                     "timesteps":n,
+                    'timezone': config['timezone'],
                     "apikey":config['api_key']}
                     
             r = requests.request("GET", url, params=querystring)
