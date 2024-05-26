@@ -40,7 +40,7 @@ def svg_processing(p, text=str(), draw=str(), y=0):
             text += a.text()
             draw += a.icon()
             y += 50
-            #y += 40           
+            #y += 40
         elif s == 'main':      
             if p.config['landscape'] == True:
                 wordwrap = 18
@@ -300,18 +300,18 @@ def img_processing(p, svgfile, pngfile, pngtmpfile=None, svg=None):
             #out = Popen(['convert', '-negate', pngtmpfile, flatten_pngfile])
     else:
         if landscape == True:
-            with Image(filename=pngfile) as img:
-                with img.clone() as i:
-                    i.rotate(90)
-                    i.alpha_channel_types = 'flatten'
-                    i.save(filename=flatten_pngfile)
-            #out = Popen(['convert', '-rotate', '+90', '-flatten', pngfile, flatten_pngfile])
+            #with Image(filename=pngfile) as img:
+            #    with img.clone() as i:
+            #        i.rotate(90)
+            #        i.alpha_channel_types = 'flatten'
+            #        i.save(filename=flatten_pngfile)
+            out = Popen(['convert', '-rotate', '+90', '-flatten', pngfile, flatten_pngfile])
         else:
-            with Image(filename=pngfile) as img:
-                with img.clone() as i:
-                    i.alpha_channel_types = 'flatten'
-                    i.save(filename=flatten_pngfile)
-            #out = Popen(['convert', '-flatten', pngfile, pngtmpfile])
+            #with Image(filename=pngfile) as img:
+            #    with img.clone() as i:
+            #        i.alpha_channel_types = 'flatten'
+            #        i.save(filename=flatten_pngfile)
+            out = Popen(['convert', '-flatten', pngfile, pngtmpfile])
 
 if __name__ == "__main__":
     flag_dump, flag_config = False, False
@@ -338,9 +338,9 @@ if __name__ == "__main__":
         elif api == 'Tomorrow.io':
             from TomorrowIoAPI import TomorrowIo
             #test
-            #with open('TomorrowIoAPI_output.json', 'r') as f:
-            #    api_data = json.load(f)             
-            api_data = TomorrowIo(settings).ApiCall()
+            with open('Tomorrow.ioAPI_output.json', 'r') as f:
+                api_data = json.load(f)             
+            #api_data = TomorrowIo(settings).ApiCall()
             if not flag_dump == True:
                 p = TomorrowIo(settings=settings, api_data=api_data)     
         ## test: API data dump ##
