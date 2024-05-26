@@ -55,7 +55,8 @@ kindle requires special PNG format. Converting process is as follows:
            a)convert               a)convert
            b)gm
            c)rsvg-convert
-           d)CloudConvert(online)
+           d)cairosvg
+           e)CloudConvert(online)
 ```
 note:
 
@@ -84,30 +85,59 @@ Default config is `settings.json`.
 
 ### 4. Install Graphics converters, Python3 and modules.
 
+#### Applications
+
+- imageMagick
+- graphicmagick (optional)
+- rsvg-convert (optional)
+- cairo and cairosvg (optional)
+
+
 #### Python3(v3.11 or newer) and module Requirements
 
 - pytz
 - requests
 - setuptools
 - pip
+- Wand
 - cloudconvert (optional)
 - twikit (optional, for twitter module)
 - deep_translator (optional, for twitter module)
 - qrcode (optional, for twitter module)
 - hijridate (optional, for moon\_phase module)
 
+
 e.g.) Openwrt
 ```
 opkg update
 opkg install python3 python3-pytz python3-requests python3-setuptools python3-pip
-opkg install graphicsmagick
 opkg install imagemagick
+opkg install cairo
 pip3 install twikit
 pip3 install deep_translator
 pip3 install qrcode
 pip3 install cloudconvert
 pip3 install hijridate
+pip3 install Wand
+pip3 install cairosvg
+
 ```
+#### Advanced Installation for Openwrt: To use Cairo on Openwrt.
+
+Install cairo and Python cairosvg module.
+
+1. Download SDK from Openwrt site.
+2. Compile `cairo` with SDK and install the build package or use the pre-build package in this repository. (armv8 only)
+3. Install `cairosvg` via pip.
+4. Install a TTF font (e.g. `Sans_Regular.ttf` in this repository) to server's /root/.fonts: 
+5. Run `fc-cache -f`
+
+e.g.)
+```
+opkg install cairo_1.16.0-2_aarch64_generic.ipk
+opkg install fontconfig
+pip3 install cairosvg
+````
 
 ### 5. Network Time Synchronization
 

@@ -7,14 +7,13 @@
 
 
 import time as t
-import sys
-import re
+import sys, re, json, io
 from pytz import timezone
-#import pytz
 import locale
-import json
 import shutil
 from subprocess import Popen
+from wand.image import Image
+from wand.display import display
 from Modules import Maintenant, CurrentWeatherPane, HourlyWeatherPane, DailyWeatherPane, TwitterPane, GraphPane, GraphLabel, GraphLine
 import SVGtools
 
@@ -126,61 +125,85 @@ def svg_processing(p, text=str(), draw=str(), y=0):
     #f_svg.close()
     return text, draw
 
-def create_svg(p, svgfile, text, draw):
-    header = str()
+def create_svg(p, text, draw, svgfile=None):
     width, height = (800, 600) if p.config['landscape'] == True else (600, 800)
-    f_svg = open(svgfile,"w", encoding=p.config['encoding'])
-    header += '''<?xml version="1.0" encoding="{}"?>
+    header = '''<?xml version="1.0" encoding="{}"?>
 <svg xmlns="http://www.w3.org/2000/svg" height="{}" width="{}" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink">\n'''.format(p.config['encoding'], height, width)
     header += '<g font-family="{}">\n'.format(p.config['font'])
     #svg_header += '<g font-family="{}">\n'.format("Chalkboard")
     #svg_header += '<g font-family="{}">\n'.format("Arial")
     
-    #d = {'Tomorrow.io': 'Tomorrow.io API', 'OpenWeather': 'OpenWeather API'}
     s1 = p.config['city'] + ' - ' if p.config['sunrise_and_sunset'] == True else str()
     s2 = p.config['api']
     s = s1 + s2
-    if p.config['landscape'] == True:
-        a = '<g font-family="{}">\n'.format(p.config['font'])
-        a += SVGtools.text('end', '16px', (800 - 5), (600 - 5), (s + ' API')).svg()
-        #a += SVGtools.text2('end',  'bold', '16px', (800 - 5), (600 - 5), s).svg()
-    else:
-        a = '<g font-family="{}">\n'.format(p.config['font'])
-        a += SVGtools.text('end', '16px', (600 - 5), (800 - 5), (s + ' API')).svg()
-        #a += SVGtools.text2('end', 'bold', '16px', (600 - 5), (800 - 5), s).svg()
-    #text +=  a + '</g>'
+    a = '<g font-family="{}">\n'.format(p.config['font'])
+    a += SVGtools.text('end', '16px', (width - 5), (height - 5), (s + ' API')).svg()
+    #a += SVGtools.text2('end',  'bold', '16px', (800 - 5), (600 - 5), s).svg()
     text +=  a  + '</g>\n'
-    
     footer = '</svg>'
-    f_svg.write(header + text + draw + footer)
-    f_svg.close()
+    converter = p.config['converter']
+    if converter == 'cairosvg':
+        return header + text + draw + footer
+    else:
+        f_svg = open(svgfile,"w", encoding=p.config['encoding'])
+        f_svg.write(header + text + draw + footer)
+        f_svg.close()
 
 # image processing
-def img_processing(p, svgfile, pngfile, pngtmpfile):
+def img_processing(p, svgfile, pngfile, pngtmpfile=None, svg=None):
     now = p.now
     converter = p.config['converter']
-
+    landscape = p.config['landscape']
+    darkmode = p.config['darkmode']
+    cloudconvert = p.config['cloudconvert']
+    encoding = p.config['encoding']
+    state = CurrentWeatherPane(p=p).state
     try:
-        #if p.config['cloudconvert'] == False and (p.config['encoding'] == 'iso-8859-1' or p.config['encoding'] == 'iso-8859-5'):
-        if p.config['cloudconvert'] == False:
-            if converter == 'convert':
-                a = ['convert', '-size', '600x800', '-background', 'white', '-depth', '8', svgfile, pngfile]
+        #if cloudconvert == False and (encoding == 'iso-8859-1' or encoding == 'iso-8859-5'):
+        if cloudconvert == False:
+            if converter == 'convert' and landscape == True:
+                with Image(filename=svgfile) as img:
+                    img.background_color = 'white'
+                    img.depth = 8
+                    img.width = 800
+                    img.height = 600
+                    img.save(filename=pngfile)
+            elif converter == 'convert':
+                with Image(filename=svgfile) as img:
+                    img.background_color = 'white'
+                    img.depth = 8
+                    img.width = 600
+                    img.height = 800
+                    img.save(filename=pngfile)
+            elif converter == 'gm' and landscape == True:
+                #a = ['gm', 'convert', '-size', '600x800', '-background', 'white', '-depth', '8', '-font', 'Droid Sans', \
+                a = ['gm', 'convert', '-size', '600x800', '-background', 'white', '-depth', '8', \
+                     '-resize', '800x600', '-colorspace', 'gray', '-type', 'palette', '-geometry', '600x800', svgfile, pngfile]
                 out = Popen(a)
             elif converter == 'gm':
-                #a = ['gm', 'convert', '-size', '600x800', '-background', 'white', '-depth', '8', '-font', 'Droid Sans', \
                 a = ['gm', 'convert', '-size', '600x800', '-background', 'white', '-depth', '8', \
                      '-resize', '600x800', '-colorspace', 'gray', '-type', 'palette', '-geometry', '600x800', svgfile, pngfile]
                 out = Popen(a)
-            elif converter == 'rsvg-convert' and p.config['landscape'] == True:
+            elif converter == 'rsvg-convert' and landscape == True:
                 a = ['rsvg-convert', '-w', '800', '-h', '600', '-b', 'white', '-f', 'png', svgfile, '-o', pngfile]
                 out = Popen(a)
             elif converter == 'rsvg-convert':
                 a = ['rsvg-convert', '-w', '600', '-h', '800', '-b', 'white', '-f', 'png', svgfile, '-o', pngfile]
                 out = Popen(a)
+            elif converter == 'cairosvg' and landscape == True:
+                from cairosvg import svg2png
+                svg2png(bytestring=svg, write_to=pngfile, background_color="white", parent_width=800, parent_height=600)
+            elif converter == 'cairosvg':
+                from cairosvg import svg2png
+                #png = io.BytesIO()
+                svg2png(bytestring=svg, write_to=pngfile, background_color="white", parent_width=600, parent_height=800)
+                # test
+                #with open(pngfile, 'wb', buffering=0) as f:
+                #    f.write(png.getbuffer())
             else:
                 print('Create a SVG file only.')
                 exit(0)
-        elif p.config['cloudconvert'] == True:
+        elif cloudconvert == True:
             # Use cloudconvert API
             import cloudconvert
             with open('./config/cloudconvert.json') as f:
@@ -223,31 +246,72 @@ def img_processing(p, svgfile, pngfile, pngtmpfile):
     except Exception as e:
         print(e)
 
-    t.sleep(2)   
-    if p.config['darkmode'] == 'True':
-        if p.config['landscape'] == True:
+    t.sleep(2)
+    if darkmode == 'True':
+        if landscape == True:
+            #with Image(filename=pngfile) as img:
+            #    with img.clone() as i:
+            #        i.rotate(90)
+            #        i.alpha_channel = False
+            #        i.negate(True,"all_channels")
+            #        i.save(filename=flatten_pngfile)
             out = Popen(['convert', '-rotate', '+90', '-flatten', pngfile, flatten_pngfile])
         else:
+            #with Image(filename=pngfile) as img:
+            #    with img.clone() as i:
+            #        i.alpha_channel = False
+            #        i.negate(True,"all_channels")
+            #        i.save(filename=flatten_pngfile)
             out = Popen(['convert', '-flatten', pngfile, pngtmpfile])
         t.sleep(3)
         out = Popen(['convert', '-negate', pngtmpfile, flatten_pngfile])
-    elif p.config['darkmode'] == 'Auto':
-        if a['sunrise'] > now or a['sunset'] < now:
-            if p.config['landscape'] == True:
+    elif darkmode == 'Auto':
+        if state == 'day' or  state == 'midnight_sun':
+            if landscape == True:
+                #with Image(filename=pngfile) as img:
+                #    with img.clone() as i:
+                #        i.rotate(90)
+                #        i.alpha_channel = False
+                #        i.save(filename=flatten_pngfile)
                 out = Popen(['convert', '-rotate', '+90', '-flatten', pngfile, flatten_pngfile])
             else:
+                #with Image(filename=pngfile) as img:
+                #    with img.clone() as i:
+                #        i.alpha_channel = False
+                #        i.save(filename=flatten_pngfile)
+                out = Popen(['convert', '-flatten', pngfile, pngtmpfile])
+        else:
+            if landscape == True:
+                #with Image(filename=pngfile) as img:
+                #    with img.clone() as i:
+                #        i.rotate(90)
+                #        i.alpha_channel = False
+                #       i.negate(True,"all_channels")
+                #        i.save(filename=flatten_pngfile)
+                out = Popen(['convert', '-rotate', '+90', '-flatten', pngfile, flatten_pngfile])
+            else:
+                #with Image(filename=pngfile) as img:
+                #    with img.clone() as i:
+                #        i.alpha_channel = False
+                #        i.negate(True,"all_channels")
+                #        i.save(filename=flatten_pngfile)
                 out = Popen(['convert', '-flatten', pngfile, pngtmpfile])
             t.sleep(3)
             out = Popen(['convert', '-negate', pngtmpfile, flatten_pngfile])
-        else:
-            out = Popen(['convert', '-flatten', pngfile, flatten_pngfile])
     else:
-        if p.config['landscape'] == True:
+        if landscape == True:
+            #with Image(filename=pngfile) as img:
+            #    with img.clone() as i:
+            #        i.rotate(90)
+            #        i.alpha_channel = False
+            #        i.save(filename=flatten_pngfile)
             out = Popen(['convert', '-rotate', '+90', '-flatten', pngfile, flatten_pngfile])
         else:
-            out = Popen(['convert', '-flatten', pngfile, flatten_pngfile])
-        
-    #t.sleep(3)
+            #with Image(filename=pngfile) as img:
+            #    with img.clone() as i:
+            #        i.alpha_channel = False
+            #        i.save(filename=flatten_pngfile)
+            out = Popen(['convert', '-flatten', pngfile, pngtmpfile])
 
 if __name__ == "__main__":
     flag_dump, flag_config = False, False
@@ -294,10 +358,15 @@ if __name__ == "__main__":
         # Locale
         #locale.setlocale(locale.LC_TIME, p.config['locale'])
         text, draw = svg_processing(p=p)
-        create_svg(p=p, svgfile=svgfile, text=text, draw=draw)
-        #create_svg(p, svgfile, svg)
-        t.sleep(1)
-        img_processing(p=p, svgfile=svgfile, pngfile=pngfile, pngtmpfile=pngtmpfile)
+        converter = p.config['converter']
+        if converter == 'cairosvg':
+            svg = create_svg(p=p, text=text, draw=draw)
+            img_processing(p=p, svgfile=svgfile, pngfile=pngfile, svg=svg)
+        else:
+            create_svg(p=p, svgfile=svgfile, text=text, draw=draw)
+            #create_svg(p, svgfile, svg)
+            t.sleep(1)
+            img_processing(p=p, svgfile=svgfile, pngfile=pngfile, pngtmpfile=pngtmpfile)
 
     except Exception as e:
         print(e)

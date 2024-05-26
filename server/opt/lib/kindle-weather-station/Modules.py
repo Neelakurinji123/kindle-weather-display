@@ -227,7 +227,7 @@ class CurrentData:
         # Temperature
         tempEntier = math.floor(weather['temp'])
         tempDecimale = 10 * (weather['temp'] - tempEntier)
-        a += SVGtools.text('end', '100px', (x_temp), (y_temp), int(tempEntier)).svg()
+        a += SVGtools.text('end', '100px', (x_temp - 10), (y_temp), int(tempEntier)).svg()
         a += SVGtools.text('start', '50px', (x_temp - 5), (y_temp - 5), '.' + str(int(tempDecimale))).svg()
         a += self.add_unit_temp(x=x_temp, y=y_temp, font_size=50)
         # Max temp
@@ -340,7 +340,7 @@ class CurrentData:
             return SVGtools.transform('(1.6,0,0,1.6,' + str(_x) + ',' + str(y_text + 326) + ')', addIcon(weather['cardinal'])).svg()
 
 class CurrentWeatherPane(CurrentData):
-    def __init__(self, p, y, wordwrap, variant=None):
+    def __init__(self, p, y=int(), wordwrap=int(), variant=None):
         self.p = p
         self.x = 0
         self.y = y
@@ -359,6 +359,7 @@ class CurrentWeatherPane(CurrentData):
         sunset = weather['sunset']
         now = p.now
         state = daytime(p=p, dt=now, sunrise=sunrise, sunset=sunset)
+        self.state = state
         b = dict()       
         for n in range(24):          
             weather = p.HourlyForecast(n)
@@ -748,7 +749,7 @@ class TwitterPane:
         # Transformation
         if p.config['landscape'] == True:
             if not tw['caption'] == str():
-                offset_x, offset_y = 8, (390 + 25)
+                offset_x, offset_y = 8, (390 + 25 + 10)
             else:
                 offset_x, offset_y = 8, 390
         else:
