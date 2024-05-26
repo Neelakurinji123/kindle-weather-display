@@ -249,69 +249,69 @@ def img_processing(p, svgfile, pngfile, pngtmpfile=None, svg=None):
     t.sleep(2)
     if darkmode == 'True':
         if landscape == True:
-            #with Image(filename=pngfile) as img:
-            #    with img.clone() as i:
-            #        i.rotate(90)
-            #        i.alpha_channel = False
-            #        i.negate(True,"all_channels")
-            #        i.save(filename=flatten_pngfile)
-            out = Popen(['convert', '-rotate', '+90', '-flatten', pngfile, flatten_pngfile])
+            with Image(filename=pngfile) as img:
+                with img.clone() as i:
+                    i.rotate(90)
+                    i.alpha_channel_types = 'flatten'
+                    i.negate(True,"all_channels")
+                    i.save(filename=flatten_pngfile)
+            #out = Popen(['convert', '-rotate', '+90', '-flatten', pngfile, flatten_pngfile])
         else:
-            #with Image(filename=pngfile) as img:
-            #    with img.clone() as i:
-            #        i.alpha_channel = False
-            #        i.negate(True,"all_channels")
-            #        i.save(filename=flatten_pngfile)
-            out = Popen(['convert', '-flatten', pngfile, pngtmpfile])
-        t.sleep(3)
-        out = Popen(['convert', '-negate', pngtmpfile, flatten_pngfile])
+            with Image(filename=pngfile) as img:
+                with img.clone() as i:
+                    i.alpha_channel_types = 'flatten'
+                    i.negate(True,"all_channels")
+                    i.save(filename=flatten_pngfile)
+            #out = Popen(['convert', '-flatten', pngfile, pngtmpfile])
+        #t.sleep(3)
+        #out = Popen(['convert', '-negate', pngtmpfile, flatten_pngfile])
     elif darkmode == 'Auto':
         if state == 'day' or  state == 'midnight_sun':
             if landscape == True:
-                #with Image(filename=pngfile) as img:
-                #    with img.clone() as i:
-                #        i.rotate(90)
-                #        i.alpha_channel = False
-                #        i.save(filename=flatten_pngfile)
-                out = Popen(['convert', '-rotate', '+90', '-flatten', pngfile, flatten_pngfile])
+                with Image(filename=pngfile) as img:
+                    with img.clone() as i:
+                        i.rotate(90)
+                        i.alpha_channel_types = 'flatten'
+                        i.save(filename=flatten_pngfile)
+                #out = Popen(['convert', '-rotate', '+90', '-flatten', pngfile, flatten_pngfile])
             else:
-                #with Image(filename=pngfile) as img:
-                #    with img.clone() as i:
-                #        i.alpha_channel = False
-                #        i.save(filename=flatten_pngfile)
-                out = Popen(['convert', '-flatten', pngfile, pngtmpfile])
+                with Image(filename=pngfile) as img:
+                    with img.clone() as i:
+                        i.alpha_channel_types = 'flatten'
+                        i.save(filename=flatten_pngfile)
+                #out = Popen(['convert', '-flatten', pngfile, pngtmpfile])
         else:
             if landscape == True:
-                #with Image(filename=pngfile) as img:
-                #    with img.clone() as i:
-                #        i.rotate(90)
-                #        i.alpha_channel = False
-                #       i.negate(True,"all_channels")
-                #        i.save(filename=flatten_pngfile)
-                out = Popen(['convert', '-rotate', '+90', '-flatten', pngfile, flatten_pngfile])
+                with Image(filename=pngfile) as img:
+                    with img.clone() as i:
+                        i.rotate(90)
+                        i.alpha_channel_types = 'flatten'
+                        i.negate(True,"all_channels")
+                        i.save(filename=flatten_pngfile)
+                #out = Popen(['convert', '-rotate', '+90', '-flatten', pngfile, flatten_pngfile])
             else:
-                #with Image(filename=pngfile) as img:
-                #    with img.clone() as i:
-                #        i.alpha_channel = False
-                #        i.negate(True,"all_channels")
-                #        i.save(filename=flatten_pngfile)
-                out = Popen(['convert', '-flatten', pngfile, pngtmpfile])
-            t.sleep(3)
-            out = Popen(['convert', '-negate', pngtmpfile, flatten_pngfile])
+                with Image(filename=pngfile) as img:
+                    with img.clone() as i:
+                        i.alpha_channel_types = 'flatten'
+                        i.negate(True,"all_channels")
+                        i.save(filename=flatten_pngfile)
+                #out = Popen(['convert', '-flatten', pngfile, pngtmpfile])
+            #t.sleep(3)
+            #out = Popen(['convert', '-negate', pngtmpfile, flatten_pngfile])
     else:
         if landscape == True:
-            #with Image(filename=pngfile) as img:
-            #    with img.clone() as i:
-            #        i.rotate(90)
-            #        i.alpha_channel = False
-            #        i.save(filename=flatten_pngfile)
-            out = Popen(['convert', '-rotate', '+90', '-flatten', pngfile, flatten_pngfile])
+            with Image(filename=pngfile) as img:
+                with img.clone() as i:
+                    i.rotate(90)
+                    i.alpha_channel_types = 'flatten'
+                    i.save(filename=flatten_pngfile)
+            #out = Popen(['convert', '-rotate', '+90', '-flatten', pngfile, flatten_pngfile])
         else:
-            #with Image(filename=pngfile) as img:
-            #    with img.clone() as i:
-            #        i.alpha_channel = False
-            #        i.save(filename=flatten_pngfile)
-            out = Popen(['convert', '-flatten', pngfile, pngtmpfile])
+            with Image(filename=pngfile) as img:
+                with img.clone() as i:
+                    i.alpha_channel_types = 'flatten'
+                    i.save(filename=flatten_pngfile)
+            #out = Popen(['convert', '-flatten', pngfile, pngtmpfile])
 
 if __name__ == "__main__":
     flag_dump, flag_config = False, False

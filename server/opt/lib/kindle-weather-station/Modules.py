@@ -1227,7 +1227,10 @@ class GraphPane:
 
                 # moon phase:  360d = 2pi(rad)
                 #lat = -1  # test
-                pi = math.pi
+                if p.config['converter'] == 'cairosvg':
+                    pi = -math.pi
+                else:
+                    pi = math.pi
                 #rad = weather['moon_phase'] * pi * 2  
                 # One call API: 0 or 1:new moon, 0.25:first qurater moon, 0.5:full moon, 0.75:third quarter moon 
                 m = moonphase(day, mon, yr)
