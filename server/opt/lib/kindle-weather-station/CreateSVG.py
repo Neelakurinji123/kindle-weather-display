@@ -150,7 +150,7 @@ def create_svg(p, text, draw, svgfile=None):
         f_svg.close()
 
 # image processing
-def img_processing(p, svgfile, pngfile, pngtmpfile=None, svg=None):
+def img_processing(p, pngfile, svgfile=None, pngtmpfile=None, svg=None):
     now = p.now
     converter = p.config['converter']
     landscape = p.config['landscape']
@@ -338,9 +338,9 @@ if __name__ == "__main__":
         elif api == 'Tomorrow.io':
             from TomorrowIoAPI import TomorrowIo
             #test
-            with open('Tomorrow.ioAPI_output.json', 'r') as f:
-                api_data = json.load(f)             
-            #api_data = TomorrowIo(settings).ApiCall()
+            #with open('Tomorrow.ioAPI_output.json', 'r') as f:
+            #    api_data = json.load(f)             
+            api_data = TomorrowIo(settings).ApiCall()
             if not flag_dump == True:
                 p = TomorrowIo(settings=settings, api_data=api_data)     
         ## test: API data dump ##
@@ -361,7 +361,7 @@ if __name__ == "__main__":
         converter = p.config['converter']
         if converter == 'cairosvg':
             svg = create_svg(p=p, text=text, draw=draw)
-            img_processing(p=p, svgfile=svgfile, pngfile=pngfile, svg=svg)
+            img_processing(p=p, pngfile=pngfile, svg=svg)
         else:
             create_svg(p=p, svgfile=svgfile, text=text, draw=draw)
             #create_svg(p, svgfile, svg)

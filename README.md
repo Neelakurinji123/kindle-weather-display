@@ -88,7 +88,7 @@ Default config is `settings.json`.
 #### Applications
 
 - imageMagick
-- graphicmagick (optional)
+- graphicsmagick (optional)
 - rsvg-convert (optional)
 - cairo and cairosvg (optional)
 
@@ -124,7 +124,8 @@ pip3 install cairosvg
 ```
 #### Advanced Installation for Openwrt: To use Cairo on Openwrt.
 
-Install cairo and Python cairosvg module.
+Install cairo and Python cairosvg module.&nbsp;
+Note: Converting QR code still has an issue.&nbsp;
 
 1. Download SDK from Openwrt site.
 2. Compile `cairo` with SDK and install the build package or use the pre-build package in this repository. (armv8 only)
