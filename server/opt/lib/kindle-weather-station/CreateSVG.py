@@ -79,17 +79,14 @@ def svg_processing(p, text=str(), draw=str(), y=0):
                     text += _text
                     draw += a.draw(url)
                 else:
-                    #layout = p.config['layout']
+                    # Alternate layout
                     p.config['layout'] = p.config['twitter']['alternate']
                     text, draw = svg_processing(p=p, text=text, draw=draw, y=y)
-                    # Alternate layout
-                    #y, text, draw = alternatePane(p=p, y=y, objects=graph_objects, text=text, draw=draw)
             except Exception as e:
                 # Alternate layout
                 print(e)
-                #p.config['layout'] = p.config['twitter']['alternate']
-               # text, draw = svg_processing(p=p, text=text, draw=draw, y=y)
-                ##y, text, draw = alternatePane(p=p, y=y, objects=graph_objects, text=text, draw=draw)
+                p.config['layout'] = p.config['twitter']['alternate']
+                text, draw = svg_processing(p=p, text=text, draw=draw, y=y)
         elif s == 'graph':
             obj = graph_objects.pop()
             if p.config['landscape'] == True:
@@ -118,11 +115,6 @@ def svg_processing(p, text=str(), draw=str(), y=0):
             a = GraphLine(p=p, y=y, obj=p.config['graph_lines'][s], variant=None)
             draw += a.draw()
                        
-    #text += '</g>\n'
-    
-   
-    #f_svg.write(header + text + draw + footer)
-    #f_svg.close()
     return text, draw
 
 def create_svg(p, text, draw, svgfile=None):
