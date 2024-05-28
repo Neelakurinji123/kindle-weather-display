@@ -319,7 +319,8 @@ class CurrentData:
             if p.config['landscape'] == True:
                 i = str()
                 i += SVGtools.transform('(3.5,0,0,3.5,' + str(x_main - 30) + ',' + str(y_main + 40) + ')', addIcon(weather['main'])).svg()
-                i += SVGtools.transform('(1.6,0,0,1.6,' + str(x_sub_main + 180) + ',' + str(y_sub_main + 230) + ')', addIcon(sub_main)).svg()
+                #i += SVGtools.transform('(1.6,0,0,1.6,' + str(x_sub_main + 180) + ',' + str(y_sub_main + 230) + ')', addIcon(sub_main)).svg()
+                i += SVGtools.transform('(1.6,0,0,1.6,' + str(x_sub_main + 180) + ',' + str(y_sub_main + 215) + ')', addIcon(sub_main)).svg()
                 i += SVGtools.line((x_main + 275), (x_main + 215), (y_main + 220), (y_main + 310), 'stroke:black;stroke-width:2px;').svg()
             else:
                 i = str()
