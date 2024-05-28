@@ -133,15 +133,23 @@ def create_svg(p, text, draw, svgfile=None):
     #a += SVGtools.text2('end',  'bold', '16px', (800 - 5), (600 - 5), s).svg()
     text +=  a  + '</g>\n'
     footer = '</svg>'
-    converter = p.config['converter']
-    if converter == 'cairosvg':
-        return header + text + draw + footer
-    else:
-        f_svg = open(svgfile,"w", encoding=p.config['encoding'])
-        f_svg.write(header + text + draw + footer)
-        f_svg.close()
+    svg = header + text + draw + footer
+    return svg
+    
+    
+    
+    #converter = p.config['converter']
+    #
+    #if converter == 'cairosvg':
+    #    svg = header + text + draw + footer
+    #    return svg
+    #else:
+    #    f_svg = open(svgfile,"w", encoding=p.config['encoding'])
+    #    f_svg.write(header + text + draw + footer)
+    #    f_svg.close()
 
 # image processing
+#def img_processing(p, pngfile, svgfile=None, pngtmpfile=None, svg=None):
 def img_processing(p, pngfile, svgfile=None, pngtmpfile=None, svg=None):
     now = p.now
     converter = p.config['converter']
@@ -306,13 +314,16 @@ def img_processing(p, pngfile, svgfile=None, pngtmpfile=None, svg=None):
             out = Popen(['convert', '-flatten', pngfile, pngtmpfile])
 
 if __name__ == "__main__":
-    flag_dump, flag_config = False, False
+    flag_dump, flag_config, flag_svg = False, False, False
     if 'dump' in sys.argv:
         flag_dump = True
         sys.argv.remove('dump')
     elif 'config' in sys.argv:
         flag_config = True
         sys.argv.remove('config')
+    elif 'svg' in sys.argv:
+        flag_svg = True
+        sys.argv.remove('svg')
 
     # Use custom settings    
     if len(sys.argv) > 1:
@@ -350,15 +361,26 @@ if __name__ == "__main__":
         # Locale
         #locale.setlocale(locale.LC_TIME, p.config['locale'])
         text, draw = svg_processing(p=p)
+        svg = create_svg(p=p, text=text, draw=draw)
         converter = p.config['converter']
-        if converter == 'cairosvg':
+        cloudconvert = p.config['cloudconvert']
+        if converter == 'cairosvg' and cloudconvert == False:
             svg = create_svg(p=p, text=text, draw=draw)
-            img_processing(p=p, pngfile=pngfile, svg=svg)
+            if flag_svg == True:
+                output = svgfile
+                with open(output, 'w', encoding='utf-8') as f:
+                    f.write(svg)
+                f.close()    
+                exit(0)
+            else:
+                img_processing(p=p, pngfile=pngfile, svg=svg)
         else:
             create_svg(p=p, svgfile=svgfile, text=text, draw=draw)
-            #create_svg(p, svgfile, svg)
-            t.sleep(1)
-            img_processing(p=p, svgfile=svgfile, pngfile=pngfile, pngtmpfile=pngtmpfile)
+            if flag_svg == True:
+                exit(0)
+            else:
+                t.sleep(1)
+                img_processing(p=p, svgfile=svgfile, pngfile=pngfile, pngtmpfile=pngtmpfile)
 
     except Exception as e:
         print(e)

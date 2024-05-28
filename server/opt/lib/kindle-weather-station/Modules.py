@@ -206,7 +206,7 @@ class CurrentData:
                             a += SVGtools.text('end', '45px', (x_main + 225 - int(s_padding(r) * 0.64)), (y_main + 220), \
                                 Decimal(float(r)).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP)).svg()
                         else:
-                            a += SVGtools.text('end', '40px', (x_main + 167 - int(s_padding(r) * 0.64)), (y_main + 200), \
+                            a += SVGtools.text('end', '40px', (x_main + 167 - int(s_padding(r) * 0.64)), (y_main + 230), \
                             Decimal(float(r)).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP)).svg()
                     else:
                         if weather['main'] == sub_main:
@@ -454,12 +454,12 @@ class HourlyWeatherPane:
                 weather = p.HourlyForecast(i)
                 #hrs = {3: '3 hrs', 6: '6 hrs', 9: '9 hrs'}
                 hrs = {3: 'three hours', 6: 'six hours', 9: 'nine hours'}
-                a += SVGtools.text('end', '30px', (x + 200), (y + 90), round(weather['temp'])).svg()
-                a += self.add_unit_temp(x=(x + 200), y=(y + 95), font_size=35)
+                a += SVGtools.text('end', '35px', (x + 200), (y + 90), round(weather['temp'])).svg()
+                a += self.add_unit_temp(x=(x + 200), y=(y + 90), font_size=35)
                 a += SVGtools.text('start', '30px', (x + 55), (y + 160), hrs[i]).svg()
-                #a += SVGtools.text('end', '30px', (x + 200), (y + 160), round(weather['temp'])).svg()
-                #a += self.add_unit_temp(x=(x + 200), y=(y + 165), font_size=35)
-                #a += SVGtools.text('start', '30px', (x + 65), (y + 160), hrs[i]).svg()
+                #a += SVGtools.text('end', '30px', (x + 200), (y + 90), round(weather['temp'])).svg()
+                #a += self.add_unit_temp(x=(x + 200), y=(y + 95), font_size=35)
+                #a += SVGtools.text('start', '30px', (x + 55), (y + 160), hrs[i]).svg()
                 # 'in_clouds' option
                 if not config['in_clouds'] == str():
                     #if weather['main'] in ['Rain', 'Drizzle', 'Snow', 'Sleet', 'Cloudy']:
