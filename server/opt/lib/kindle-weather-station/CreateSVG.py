@@ -117,7 +117,7 @@ def svg_processing(p, text=str(), draw=str(), y=0):
                        
     return text, draw
 
-def create_svg(p, text, draw, svgfile=None):
+def create_svg(p, text, draw):
     width, height = (800, 600) if p.config['landscape'] == True else (600, 800)
     header = '''<?xml version="1.0" encoding="{}"?>
 <svg xmlns="http://www.w3.org/2000/svg" height="{}" width="{}" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink">\n'''.format(p.config['encoding'], height, width)
@@ -135,18 +135,6 @@ def create_svg(p, text, draw, svgfile=None):
     footer = '</svg>'
     svg = header + text + draw + footer
     return svg
-    
-    
-    
-    #converter = p.config['converter']
-    #
-    #if converter == 'cairosvg':
-    #    svg = header + text + draw + footer
-    #    return svg
-    #else:
-    #    f_svg = open(svgfile,"w", encoding=p.config['encoding'])
-    #    f_svg.write(header + text + draw + footer)
-    #    f_svg.close()
 
 # image processing
 #def img_processing(p, pngfile, svgfile=None, pngtmpfile=None, svg=None):
@@ -375,7 +363,10 @@ if __name__ == "__main__":
             else:
                 img_processing(p=p, pngfile=pngfile, svg=svg)
         else:
-            create_svg(p=p, svgfile=svgfile, text=text, draw=draw)
+            svg = create_svg(p=p, text=text, draw=draw)
+            f = open(svgfile,"w", encoding=p.config['encoding'])
+            f.write(svg)
+            f.close()
             if flag_svg == True:
                 exit(0)
             else:
