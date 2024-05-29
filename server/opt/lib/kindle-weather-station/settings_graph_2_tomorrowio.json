@@ -14,7 +14,7 @@
         "lang": "en",
 		"in_clouds": "probability",
         "cloudconvert": "False",
-        "converter": "rsvg-convert",
+        "converter": "cairosvg",
         "ramadhan": "True",
 		"layout": ["maintenant", "main", "graph", "daily_xlabel_6cols", "graph"],
 		"graph_objects": ["daily_temperature_6cols", "daily_rain_precipitation_6cols"],

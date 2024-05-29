@@ -14,6 +14,7 @@ import shutil
 from subprocess import Popen
 from wand.image import Image
 from wand.display import display
+from cairosvg import svg2png
 from Modules import Maintenant, CurrentWeatherPane, HourlyWeatherPane, DailyWeatherPane, TwitterPane, GraphPane, GraphLabel, GraphLine
 import SVGtools
 
@@ -138,7 +139,7 @@ def create_svg(p, text, draw):
 
 # image processing
 #def img_processing(p, pngfile, svgfile=None, pngtmpfile=None, svg=None):
-def img_processing(p, pngfile, svgfile=None, pngtmpfile=None, svg=None):
+def img_processing(p, pngfile, svg):
     now = p.now
     converter = p.config['converter']
     landscape = p.config['landscape']
@@ -149,45 +150,10 @@ def img_processing(p, pngfile, svgfile=None, pngtmpfile=None, svg=None):
     try:
         #if cloudconvert == False and (encoding == 'iso-8859-1' or encoding == 'iso-8859-5'):
         if cloudconvert == False:
-            if converter == 'convert' and landscape == True:
-                with Image(filename=svgfile) as img:
-                    img.background_color = 'white'
-                    img.depth = 8
-                    img.width = 800
-                    img.height = 600
-                    img.save(filename=pngfile)
-            elif converter == 'convert':
-                with Image(filename=svgfile) as img:
-                    img.background_color = 'white'
-                    img.depth = 8
-                    img.width = 600
-                    img.height = 800
-                    img.save(filename=pngfile)
-            elif converter == 'gm' and landscape == True:
-                #a = ['gm', 'convert', '-size', '600x800', '-background', 'white', '-depth', '8', '-font', 'Droid Sans', \
-                a = ['gm', 'convert', '-size', '600x800', '-background', 'white', '-depth', '8', \
-                     '-resize', '800x600', '-colorspace', 'gray', '-type', 'palette', '-geometry', '600x800', svgfile, pngfile]
-                out = Popen(a)
-            elif converter == 'gm':
-                a = ['gm', 'convert', '-size', '600x800', '-background', 'white', '-depth', '8', \
-                     '-resize', '600x800', '-colorspace', 'gray', '-type', 'palette', '-geometry', '600x800', svgfile, pngfile]
-                out = Popen(a)
-            elif converter == 'rsvg-convert' and landscape == True:
-                a = ['rsvg-convert', '-w', '800', '-h', '600', '-b', 'white', '-f', 'png', svgfile, '-o', pngfile]
-                out = Popen(a)
-            elif converter == 'rsvg-convert':
-                a = ['rsvg-convert', '-w', '600', '-h', '800', '-b', 'white', '-f', 'png', svgfile, '-o', pngfile]
-                out = Popen(a)
-            elif converter == 'cairosvg' and landscape == True:
-                from cairosvg import svg2png
+            if converter == 'cairosvg' and landscape == True:
                 svg2png(bytestring=svg, write_to=pngfile, background_color="white", parent_width=800, parent_height=600)
             elif converter == 'cairosvg':
-                from cairosvg import svg2png
-                #png = io.BytesIO()
                 svg2png(bytestring=svg, write_to=pngfile, background_color="white", parent_width=600, parent_height=800)
-                # test
-                #with open(pngfile, 'wb', buffering=0) as f:
-                #    f.write(png.getbuffer())
             else:
                 print('Create a SVG file only.')
                 exit(0)
@@ -352,26 +318,15 @@ if __name__ == "__main__":
         svg = create_svg(p=p, text=text, draw=draw)
         converter = p.config['converter']
         cloudconvert = p.config['cloudconvert']
-        if converter == 'cairosvg' and cloudconvert == False:
-            svg = create_svg(p=p, text=text, draw=draw)
-            if flag_svg == True:
-                output = svgfile
-                with open(output, 'w', encoding='utf-8') as f:
-                    f.write(svg)
-                f.close()    
-                exit(0)
-            else:
-                img_processing(p=p, pngfile=pngfile, svg=svg)
+        svg = create_svg(p=p, text=text, draw=draw)
+        if flag_svg == True:
+            output = svgfile
+            with open(output, 'w', encoding='utf-8') as f:
+                f.write(svg)
+            f.close()    
+            exit(0)
         else:
-            svg = create_svg(p=p, text=text, draw=draw)
-            f = open(svgfile,"w", encoding=p.config['encoding'])
-            f.write(svg)
-            f.close()
-            if flag_svg == True:
-                exit(0)
-            else:
-                t.sleep(1)
-                img_processing(p=p, svgfile=svgfile, pngfile=pngfile, pngtmpfile=pngtmpfile)
+            img_processing(p=p, pngfile=pngfile, svg=svg)
 
     except Exception as e:
         print(e)

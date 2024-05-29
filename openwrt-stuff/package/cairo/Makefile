@@ -1,22 +1,19 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=cairo
-PKG_VERSION:=1.16.0
-PKG_RELEASE:=2
+PKG_VERSION:=1.18.0
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=https://www.cairographics.org/releases/
-PKG_HASH:=5e7b29b3f113ef870d1e3ecf8adf21f923396401604bda16d44be45e66052331
+PKG_HASH:=243a0736b978a33dee29f9cca7521733b78a65b5418206fef7bd1c3d4cf10b64
 
-PKG_MAINTAINER:=Mathew McBride <matt@traverse.com.au>
+PKG_MAINTAINER:=krishna <krishna@hottunalabs.net>
 
-PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk
-
-#TARGET_LDFLAGS+= \
-#	-Wl,-rpath-link=$(STAGING_DIR)/usr/lib
+include $(INCLUDE_DIR)/meson.mk
 
 define Package/cairo
   SECTION:=xorg-libraries
@@ -31,42 +28,28 @@ define Package/cairo/description
  Drawing library
 endef
 
-CONFIGURE_ARGS += \
-	--enable-trace=no \
-	--enable-interpreter=no \
-	--disable-directfb \
-	--enable-ft \
-	--enable-gobject \
-	--enable-lzo \
-	--disable-glesv2 \
-	--disable-vg \
-	--disable-xlib \
-	--disable-xcb \
-	--without-x \
-	--disable-xlib-xrender \
-	--disable-ps \
-	--disable-pdf \
-	--enable-png \
-	--disable-script \
-	--enable-svg \
-	--disable-tee \
-	--disable-xml
-
-CONFIGURE_VARS += \
-	CXX="$(TARGET_CC)"
+MESON_OPTIONS += \
+	-Dfontconfig=enabled \
+	-Dfreetype=enabled \
+	-Dpng=enabled \
+	-Dglib=enabled \
+	-Dxcb=disabled \
+	-Dxlib=disabled \
+	-Dzlib=enabled \
+	-Dglib=enabled
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include $(1)/usr/lib $(1)/usr/lib/pkgconfig
 	$(CP) $(PKG_INSTALL_DIR)/usr/include/cairo $(1)/usr/include/
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libcairo.{a,la,so*} $(1)/usr/lib
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libcairo-gobject.{a,la,so*} $(1)/usr/lib
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libcairo.so* $(1)/usr/lib
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libcairo-gobject.so* $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/pkgconfig $(1)/usr/lib/
 endef
 
 define Package/cairo/install
 	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libcairo.{a,la,so*} $(1)/usr/lib
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libcairo-gobject.{a,la,so*} $(1)/usr/lib
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libcairo.so* $(1)/usr/lib
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libcairo-gobject.so* $(1)/usr/lib
 endef
 
 $(eval $(call BuildPackage,cairo))

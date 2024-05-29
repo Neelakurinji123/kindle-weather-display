@@ -14,7 +14,7 @@
         "lang": "ru",
 		"in_clouds": "probability",
         "cloudconvert": "False",
-        "converter": "rsvg-convert",
+        "converter": "cairosvg",
 		"layout": ["maintenant", "main", "daily"]
     }
 }

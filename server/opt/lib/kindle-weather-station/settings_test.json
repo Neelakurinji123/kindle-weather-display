@@ -6,8 +6,8 @@
 		"locale": "en_US.UTF-8",
 		"font": "Droid Sans",
 		"sunrise_and_sunset": "True",
-		"darkmode": "True",
-		"api": "OpenWeather",
+		"darkmode": "False",
+		"api": "Tomorrow.io",
 		"lat": "35.7853",
 		"lon": "139.5268",
 		"units": "metric",
@@ -15,7 +15,9 @@
 		"in_clouds": "probability",
 		"cloudconvert": "False",
 		"converter": "cairosvg",
-		"layout": ["maintenant", "main", "daily"],
-		""
+		"layout": ["maintenant", "main", "daily_xlabel_landscape_start0", "padding+10", "graph"],
+		"landscape": "True",
+		"graph_objects": ["moon_phase_landscape"],
+		"graph_canvas": "default_landscape"		
 	}
 }

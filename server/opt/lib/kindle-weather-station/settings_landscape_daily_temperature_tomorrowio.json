@@ -14,7 +14,7 @@
 		"lang": "en",
 		"in_clouds": "probability",
 		"cloudconvert": "False",
-		"converter": "rsvg-convert",
+		"converter": "cairosvg",
 		"layout": ["maintenant", "main", "daily_xlabel_landscape_start0","padding+10", "graph"],
 		"landscape": "True",
 		"graph_objects": ["daily_temperature_landscape"],

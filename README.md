@@ -52,19 +52,9 @@ kindle requires special PNG format. Converting process is as follows:
                                                [The server sends a PNG file to Kindle and displays it]
  SVG image ------------> PNG image ----------> flattened PNG image --> Kindle Dispaly
            converter:              converter:
-           a)convert               a)convert
-           b)gm
-           c)rsvg-convert
-           d)cairosvg
-           e)CloudConvert(online)
+            a)cairosvg              a)convert
+            e)CloudConvert(online)
 ```
-note:
-
-`convert` is converter of ImageMagick.&nbsp;
-`gm` is converter of graphicsMagick.&nbsp;
-`rsvg-convert` is a commandline tool to render SVG documents to PNG images.&nbsp;
-Both ImageMagick and graphicsMagick for Openwrt are lack of capabilities to manipulate SVG format.&nbsp;
-Use CloudConvert.
 
 ## Set up server
 
@@ -88,10 +78,7 @@ Default config is `settings.json`.
 #### Applications
 
 - imageMagick
-- graphicsmagick (optional)
-- rsvg-convert (optional)
-- cairo and cairosvg (optional)
-
+- cairo and cairosvg
 
 #### Python3(v3.11 or newer) and module Requirements
 
@@ -138,7 +125,7 @@ e.g.)
 opkg install cairo_1.16.0-2_aarch64_generic.ipk
 opkg install fontconfig
 pip3 install cairosvg
-````
+```
 
 ### 5. Network Time Synchronization
 
@@ -212,8 +199,6 @@ cat /tmp/dropbear_rsa_host_key.pub >> /mnt/us/usbnet/etc/authorized_keys
 exit
 ssh root@192.168.2.2  # test passwordless login
 ```
-
-
 
 ### 3. Test run
 

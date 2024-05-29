@@ -14,11 +14,11 @@
 		"lang": "en",
 		"in_clouds": "probability",
 		"cloudconvert": "False",
-		"converter": "rsvg-convert",
+		"converter": "cairosvg",
 		"layout": ["maintenant", "main", "twitter"],
 		"twitter": {"caption": "ALERT", "screen_name": "tenkijp", "translate": "True", "translate_target": "en",
 				 	"expiration": "3h", "alternate": ["daily_xlabel_landscape_start0", "padding+10", "graph"], "alternate_url": "https://tenki.jp/",
-				 	"keywords": {"include": "heavy,thunder,disaster", "exclude": "sakura,zakura,observe,space"}},
+				 	"keywords": {"include": "warn,typhoon,heavy,thunder,disaster", "exclude": "sakura,zakura,observe,space"}},
 		"graph_objects": ["daily_temperature_landscape"],
 		"graph_canvas": "default_landscape",
 		"landscape": "True"
