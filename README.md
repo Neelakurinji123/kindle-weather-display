@@ -27,7 +27,7 @@ Subscribe to a v3.0 API.
 
 - Jailbroken Kindle 3: https://wiki.mobileread.com/wiki/Kindle_Hacks_Information
 - Server: Minimum 256M/100M OpenWrt router or SBC (e.g. OrangePi zero)
-- Server OS: Openwrt, Ubuntu and Debian, etc which work with Python v3.11 or newer.
+- Server OS: Openwrt, Ubuntu and Debian, etc which works with Python v3.11 or newer.
 - Server's devices: USB port x1, LAN port x1
 - WeatherAPI key
 - API key on CloudConvert for online image converter (optional)

@@ -203,10 +203,10 @@ class CurrentData:
                 else:
                     if p.config['landscape'] == True:
                         if weather['main'] == sub_main:
-                            a += SVGtools.text('end', '45px', (x_main + 225 - int(s_padding(r) * 0.64)), (y_main + 220), \
+                            a += SVGtools.text('end', '45px', (x_main + 225 - int(s_padding(r) * 0.64)), (y_main + 220 + 27), \
                                 Decimal(float(r)).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP)).svg()
                         else:
-                            a += SVGtools.text('end', '40px', (x_main + 167 - int(s_padding(r) * 0.64)), (y_main + 230), \
+                            a += SVGtools.text('end', '40px', (x_main + 167 - int(s_padding(r) * 0.64)), (y_main + 230 + 2), \
                             Decimal(float(r)).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP)).svg()
                     else:
                         if weather['main'] == sub_main:
@@ -314,7 +314,10 @@ class CurrentData:
         x_sub_main = self.x_sub_main
         y_sub_main = self.y_sub_main
         if weather['main'] == sub_main:
-            return SVGtools.transform('(4,0,0,4,' + str(x_main) + ',' + str(y_main) + ')', addIcon(weather['main'])).svg()
+            if p.config['landscape'] == True:
+                return SVGtools.transform('(4,0,0,4,' + str(x_main) + ',' + str(y_main + 25) + ')', addIcon(weather['main'])).svg()
+            else:
+                return SVGtools.transform('(4,0,0,4,' + str(x_main) + ',' + str(y_main) + ')', addIcon(weather['main'])).svg()
         else:
             if p.config['landscape'] == True:
                 i = str()
