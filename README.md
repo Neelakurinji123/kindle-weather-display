@@ -122,7 +122,7 @@ Note: Converting QR code still has an issue.&nbsp;
 
 e.g.)
 ```
-opkg install cairo_1.16.0-2_aarch64_generic.ipk
+opkg install cairo_1.18.0-1_aarch64_generic.ipk
 opkg install fontconfig
 pip3 install cairosvg
 ```
@@ -141,7 +141,7 @@ or one of config files:
 
 `./CreateSVG.py settings_######.json`
 
-Take a look at `/etc/KindleStation_flatten.png`.
+Take a look at `/tmp/KindleStation_flatten.png`.
 
 
 ### 7. Install USB network
@@ -184,7 +184,7 @@ ssh root@192.168.2.2
 - Set up the server's ssh client environment.
 - Copy the server's ssh pubkey to Kindle.
 
-e.g) dropbear
+e.g.) dropbear (openwrt)
 
 ```
 cd /etc/dropbear
@@ -196,6 +196,20 @@ cd -
 scp dropbear_rsa_host_key.pub root@192.168.2.2:/tmp
 ssh root@192.168.2.2  # access to Kindle
 cat /tmp/dropbear_rsa_host_key.pub >> /mnt/us/usbnet/etc/authorized_keys
+exit
+ssh root@192.168.2.2  # test passwordless login
+```
+
+e.g.) openssh (openwrt)
+
+```
+cd /root/.ssh
+opkg update
+opkg install openssh-client openssh-keygen openssh-sftp-client
+ssh-keygen -t ecdsa
+scp id_ecdsa.pub root@192.168.2.2:/tmp
+ssh root@192.168.2.2  # access to Kindle
+cat /tmp/id_ecdsa.pub >> /mnt/us/usbnet/etc/authorized_keys
 exit
 ssh root@192.168.2.2  # test passwordless login
 ```
