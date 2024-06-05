@@ -1,0 +1,19 @@
+{
+    "station": {
+        "city": "Reykjavík",
+        "timezone": "Atlantic/Reykjavik",
+        "encoding": "utf-8",
+        "locale": "en_US.UTF-8",
+        "font": "Droid Sans",
+        "sunrise_and_sunset": "False",
+        "darkmode": "False",
+		"api": "OpenWeather",
+        "lat": "64.1466",
+        "lon": "-21.9426",
+        "units": "metric",
+        "lang": "us",
+		"in_clouds": "probability",
+        "cloudconvert": "False",
+		"layout": ["maintenant", "main", "daily"]
+    }
+}

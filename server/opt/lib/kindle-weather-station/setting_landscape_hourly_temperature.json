@@ -1,0 +1,22 @@
+{
+	"station": {
+		"city": "Kiyose,Tokyo",
+		"timezone": "Asia/Tokyo",
+		"encoding": "iso-8859-1",
+		"locale": "en_US.UTF-8",
+		"font": "Droid Sans",
+		"sunrise_and_sunset": "True",
+		"darkmode": "False",
+		"api": "OpenWeather",
+		"lat": "35.7853",
+		"lon": "139.5268",
+		"units": "metric",
+		"lang": "en",
+		"in_clouds": "probability",
+		"cloudconvert": "False",
+		"layout": ["maintenant", "main",  "padding+10", "graph", "padding+20", "hourly_xlabel_landscape_start0"],
+		"landscape": "True",
+		"graph_objects": ["hourly_temperature_landscape"],
+		"graph_canvas": "default_landscape_noGrid_sp20"		
+	}
+}

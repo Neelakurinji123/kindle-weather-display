@@ -14,10 +14,10 @@ class text:
 
     def svg(self):
         if not self.stroke == None:
-            return '<text style="text-anchor:{};" font-size="{}" x="{}" y="{}" stroke="{}" fill="{}">{}</text>\n'.\
+            return '<text style="text-anchor:{};" font-size="{}px" x="{}" y="{}" stroke="{}" fill="{}">{}</text>\n'.\
                    format(self.anchor, self.fontsize, self.x, self.y, self.stroke, self.stroke, self.v)
         else:
-            return '<text style="text-anchor:{};" font-size="{}" x="{}" y="{}">{}</text>\n'.\
+            return '<text style="text-anchor:{};" font-size="{}px" x="{}" y="{}">{}</text>\n'.\
                    format(self.anchor, self.fontsize, self.x, self.y, self.v)
 
 # Bold font
@@ -31,7 +31,7 @@ class text2:
         self.v = v
 
     def svg(self):
-        return '<text style="text-anchor:{};" font-weight="{}" font-size="{}" x="{}" y="{}">{}</text>\n'.\
+        return '<text style="text-anchor:{};" font-weight="{}" font-size="{}px" x="{}" y="{}">{}</text>\n'.\
                format(self.anchor, self.fontweight, self.fontsize, self.x, self.y, self.v)
 
 

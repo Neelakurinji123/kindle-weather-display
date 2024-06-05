@@ -1,0 +1,22 @@
+{
+    "station": {
+        "city": "South Pole Station",
+        "timezone": "UTC",
+        "encoding": "iso-8859-1",
+        "locale": "en_US.UTF-8",
+        "font": "Droid Sans",
+        "sunrise_and_sunset": "False",
+        "darkmode": "False",
+		"api": "Tomorrow.io",
+        "lat": "-90",
+        "lon": "0",
+        "units": "metric",
+        "lang": "en",
+		"in_clouds": "probability",
+        "cloudconvert": "False",
+        "ramadhan": "True",
+		"layout": ["maintenant", "main", "padding-10", "graph", "padding-5", "hourly_xlabel", "padding-5", "graph", "padding-5", "daily_xlabel_6cols"],
+		"graph_objects": ["hourly_snow_accumulation", "daily_snow_accumulation_6cols"],
+		"graph_canvas": "default"
+    }
+}

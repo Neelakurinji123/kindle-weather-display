@@ -9,106 +9,113 @@ import time as t
 import json
 import re
 import requests
-from pytz import timezone
+#from pytz import timezone
+import zoneinfo
 from datetime import datetime,timedelta
 #from datetime import datetime, timedelta, date, timezone
 
 wether_codes_config = './config/tomorrow_codes.json'
     
-def readSettings(settings):
+def readSettings(setting):
     tomorrow_io_config = './config/tomorrow_io_API_KEY.json'
     graph_config = './config/graph_config.json'
     twitter_config = './config/twitter_ID.json'
-    a = dict()
-    with open(settings, 'r') as f:
+    i18n_file = './config/i18n.json'
+    
+    with open(setting, 'r') as f:
         service = json.load(f)['station']
-        a['city'] = service['city'] if 'city' in service else None
-        a['timezone'] = service['timezone'] if 'timezone' in service else None
-        a['locale'] = service['locale'] if 'locale' in service else 'en_US.UTF-8'
-        a['encoding'] = service['encoding'] if 'encoding' in service else 'iso-8859-1'
-        a['font'] = service['font'] if 'font' in service else 'Droid Sans'
-        a['sunrise_and_sunset'] = bool(eval(service['sunrise_and_sunset'])) if 'sunrise_and_sunset' in service else True
-        a['darkmode'] = service['darkmode'] if 'darkmode' in service else 'False'
-        a['api'] = service['api']
-        a['lat'] = service['lat']
-        a['lon'] = service['lon']
-        a['units'] = service['units'] if 'units' in service else 'metric'
-        a['lang'] = service['lang'] if 'lang' in service else 'en'
-        a['in_clouds'] = service['in_clouds'] if 'in_clouds' in service else str()  # Options: "cloudCover", "probability"
-        a['cloudconvert'] = bool(eval(service['cloudconvert'])) if 'cloudconvert' in service else False
-        a['converter'] = service['converter'] if 'converter' in service else None
-        a['layout'] = service['layout']
-        a['landscape'] = bool(eval(service['landscape'])) if 'landscape' in service else False
-        a['ramadhan'] = bool(eval(service['ramadhan'])) if 'ramadhan' in service else False
-        a['twitter'] = service['twitter'] if 'twitter' in service else False
-        # Add timezone offset
-        tz = timezone(a['timezone'])
-        try:
-            _tz = tz.utcoffset(datetime.now(), is_dst = True)
-        except:
-            _tz = tz.utcoffset(datetime.now())
-        offset = _tz.seconds if _tz.days == 0 else -_tz.seconds
-        a['timezone_offset'] = offset
-
-    b = list(reversed(service['graph_objects'])) if 'graph_objects' in service else None
+    f.close()
+    
+    a = dict()
+    a['city'] = service['city'] if 'city' in service else None
+    a['timezone'] = service['timezone'] if 'timezone' in service else None
+    a['locale'] = service['locale'] if 'locale' in service else 'en_US.UTF-8'
+    a['encoding'] = service['encoding'] if 'encoding' in service else 'iso-8859-1'
+    a['font'] = service['font'] if 'font' in service else 'Droid Sans'
+    a['sunrise_and_sunset'] = bool(eval(service['sunrise_and_sunset'])) if 'sunrise_and_sunset' in service else True
+    a['darkmode'] = service['darkmode'] if 'darkmode' in service else 'False'
+    a['api'] = service['api']
+    a['lat'] = service['lat']
+    a['lon'] = service['lon']
+    a['units'] = service['units'] if 'units' in service else 'metric'
+    a['lang'] = service['lang'] if 'lang' in service else 'en'
+    a['in_clouds'] = service['in_clouds'] if 'in_clouds' in service else str()  # Options: "cloudCover", "probability"
+    a['cloudconvert'] = bool(eval(service['cloudconvert'])) if 'cloudconvert' in service else False
+    a['converter'] = service['converter'] if 'converter' in service else None
+    a['layout'] = service['layout']
+    a['landscape'] = bool(eval(service['landscape'])) if 'landscape' in service else False
+    a['ramadhan'] = bool(eval(service['ramadhan'])) if 'ramadhan' in service else False
+    a['twitter'] = service['twitter'] if 'twitter' in service else False
+    tz = zoneinfo.ZoneInfo(a['timezone'])
+    _tz = tz.utcoffset(datetime.now())
+    offset = _tz.seconds if _tz.days == 0 else -_tz.seconds
+    a['timezone_offset'] = offset
+    a['tz'] = tz
+    a['UTC'] = zoneinfo.ZoneInfo('UTC')
+    a['i18n_file'] = i18n_file
+    
     with open(graph_config, 'r') as f:
         graph = json.load(f)['graph']
-        a['graph_lines'] = graph['lines']
-        a['graph_labels'] = graph['labels']
-        if not b == None:
-            a['graph_canvas'] = graph['canvas'][service['graph_canvas']]
-            a['graph_objects'] = list()
-            for n in b:
-                a['graph_objects'].append(graph['objects'][n])           
-        else:
-            a['graph_canvas'] = dict()
-            a['graph_objects'] = list()
+    f.close()
+    
+    a['graph_lines'] = graph['lines']
+    a['graph_labels'] = graph['labels']
+    b = list(reversed(service['graph_objects'])) if 'graph_objects' in service else None
+    if not b == None:
+        a['graph_canvas'] = graph['canvas'][service['graph_canvas']]
+        a['graph_objects'] = list()
+        for n in b:
+            a['graph_objects'].append(graph['objects'][n])           
+    else:
+        a['graph_canvas'] = dict()
+        a['graph_objects'] = list()
 
     if not a['twitter'] == False:
         with open(twitter_config, 'r') as f:
             tw = json.load(f)['twitter']
-            a['twitter_screen_name'] =  tw["user_screen_name"]
-            a['twitter_password'] =  tw["password"]
+        f.close()
+        a['twitter_screen_name'] =  tw["user_screen_name"]
+        a['twitter_password'] =  tw["password"]
     
     with open(tomorrow_io_config, 'r') as f:
         c = json.load(f)['tomorrow.io']
-        a['api_key'] = c['api_key']
-        a['api_version'] = c['version']
-        a['service'] = c['service']
-        #a['timezone'] = c['timezone']       
-        #a['service_timesteps'] = ['1m', '1h', '1d']
-        a['service_timesteps'] = ['1h', '1d']
-        a['service_1m_rows'] = 6
-        a['service_fields'] = { '1h': ['temperature', 'humidity', 'windSpeed', 'windDirection','pressureSeaLevel', \
-                                        'weatherCode','precipitationProbability','cloudCover', 'rainAccumulation', 'snowAccumulation', \
-                                        ],
-                                '1d': ['temperature', 'humidity', 'windSpeed', 'windDirection','pressureSeaLevel', \
-                                        'sunriseTime','sunsetTime','weatherCodeFullDay','weatherCode','precipitationProbability', \
-                                        'cloudCover', 'moonriseTime', 'moonsetTime', 'temperatureMax', 'temperatureMin', \
-                                        'rainAccumulation', 'snowAccumulation']
-                                }
-        #a['service_fields'] = {'1m': ['temperature', 'humidity', 'windSpeed', 'windDirection','pressureSeaLevel', \
-        #                                'weatherCode','precipitationProbability','cloudCover'],
-        #                        '1h': ['temperature', 'humidity', 'windSpeed', 'windDirection','pressureSeaLevel', \
-        #                                'weatherCode','precipitationProbability','cloudCover', 'rainAccumulation', 'snowAccumulation'],
-        #                        '1d': ['temperature', 'humidity', 'windSpeed', 'windDirection','pressureSeaLevel', \
-        #                                'sunriseTime','sunsetTime','weatherCodeFullDay','weatherCode','precipitationProbability', \
-        #                                'cloudCover', 'moonriseTime', 'moonsetTime', 'temperatureMax', 'temperatureMin', \
-        #                                'rainAccumulation', 'snowAccumulation']
-        #                        }
+    f.close()
+    
+    a['api_key'] = c['api_key']
+    a['api_version'] = c['version']
+    a['service'] = c['service']      
+    #a['service_timesteps'] = ['1m', '1h', '1d']
+    a['service_timesteps'] = ['1h', '1d']
+    a['service_1m_rows'] = 6
+    a['service_fields'] = { '1h': ['temperature', 'humidity', 'windSpeed', 'windDirection','pressureSeaLevel', \
+                                    'weatherCode','precipitationProbability','cloudCover', 'rainAccumulation', 'snowAccumulation', \
+                                    ],
+                            '1d': ['temperature', 'humidity', 'windSpeed', 'windDirection','pressureSeaLevel', \
+                                    'sunriseTime','sunsetTime','weatherCodeFullDay','weatherCode','precipitationProbability', \
+                                    'cloudCover', 'moonriseTime', 'moonsetTime', 'temperatureMax', 'temperatureMin', \
+                                    'rainAccumulation', 'snowAccumulation']
+                            }
+    #a['service_fields'] = {'1m': ['temperature', 'humidity', 'windSpeed', 'windDirection','pressureSeaLevel', \
+    #                                'weatherCode','precipitationProbability','cloudCover'],
+    #                        '1h': ['temperature', 'humidity', 'windSpeed', 'windDirection','pressureSeaLevel', \
+    #                                'weatherCode','precipitationProbability','cloudCover', 'rainAccumulation', 'snowAccumulation'],
+    #                        '1d': ['temperature', 'humidity', 'windSpeed', 'windDirection','pressureSeaLevel', \
+    #                                'sunriseTime','sunsetTime','weatherCodeFullDay','weatherCode','precipitationProbability', \
+    #                                'cloudCover', 'moonriseTime', 'moonsetTime', 'temperatureMax', 'temperatureMin', \
+    #                                'rainAccumulation', 'snowAccumulation']
+    #                        }
     return a
-        
 
 class TomorrowIo:
     icon = str()
     units = dict()
     direction = str()
 
-    def __init__(self, settings, api_data=None):
+    def __init__(self, setting, api_data=None):
         s = str()
         now = int(t.time())
         self.now = now
-        self.config = readSettings(settings)
+        self.config = readSettings(setting)
         self.api_data = api_data
         config = self.config
         self.timezone_offset = config['timezone_offset']
@@ -137,9 +144,9 @@ class TomorrowIo:
         api_data = dict()
         for n in config['service_timesteps']:
             if n == '1m':
-                tz = timezone('utc')
-                #a = datetime.fromtimestamp(now, timezone.utc)
-                a = datetime.fromtimestamp(now, tz)
+                utc = config['UTC']
+                #tz = timezone('utc')
+                a = datetime.fromtimestamp(now, utc)
                 yrs, mons, days, hrs, mins, _, _, _, _ = a.timetuple()
                 endtime = str(yrs) + '-' + str(mons) + '-' + str(days) + 'T' + str(hrs) + ':' + str(int(mins) + int(config['service_1m_rows'])) + ':00Z'
                 querystring = {
@@ -288,7 +295,7 @@ class TomorrowIo:
         else:
             d['in_clouds'] = 0
         # Main weather
-        code_day = str(d['weatherCode']) # int() to str() data
+        code_day = str(d['weatherCode']) # int() to str()
         code_day = self.fix_weather(daytime=d['daytime'], code=code_day) 
         w = tomorrow_codes["weatherCode"][code_day]    
         d['main'] = self.fix_kindle_weather(w)
@@ -309,7 +316,7 @@ class TomorrowIo:
 
     def daytime(self, dt, sunrise, sunset):
         config = self.config
-        tz = timezone(config['timezone'])
+        tz = config['tz']
         d = datetime.fromtimestamp(dt, tz)
         yrs, mons, days, hrs, mins, _, _, _, _ = d.timetuple()
         _dt = hrs * 60 + mins
@@ -378,7 +385,7 @@ class TomorrowIo:
 #dumpAPI = 'output.json'
 #with open(dumpAPI, 'r', encoding='utf-8') as f:
 #    api_data = json.load(f)
-#print('config',TomorrowIo(settings='settings.json', api_data=api_data).config, '\n')
-#print('current',TomorrowIo(settings='settings.json', api_data=api_data).CurrentWeather(), '\n')
-#print('hourly', TomorrowIo(settings='settings.json', api_data=api_data).HourlyForecast(0), '\n')
-#print('daily', TomorrowIo(settings='settings.json', api_data=api_data).DailyForecast(1), '\n')
+#print('config',TomorrowIo(setting='setting.json', api_data=api_data).config, '\n')
+#print('current',TomorrowIo(setting='setting.json', api_data=api_data).CurrentWeather(), '\n')
+#print('hourly', TomorrowIo(setting='setting.json', api_data=api_data).HourlyForecast(0), '\n')
+#print('daily', TomorrowIo(setting='setting.json', api_data=api_data).DailyForecast(1), '\n')

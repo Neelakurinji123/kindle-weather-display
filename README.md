@@ -68,9 +68,9 @@ In config directory, edit `OWM_API_KEY.json` or `tomorrow_io_API_KEY.json`, `clo
 
 ### 3. Edit config files
 
-Tempalate's names are `settings_*.json`.
+Tempalate's names are `setting_*.json`.
 
-Default config is `settings.json`.
+Default config is `setting.json`.
 
 
 ### 4. Install Graphics converters, Python3 and modules.
@@ -82,7 +82,7 @@ Default config is `settings.json`.
 
 #### Python3(v3.11 or newer) and module Requirements
 
-- pytz
+- tzdata
 - requests
 - setuptools
 - pip
@@ -135,11 +135,11 @@ To retrieve data correctly, setup NTP server.
 
 All set up finished, then try it.
 
-`./CreateSVG.py` # use default config
+`./kindle-weather.py png` # use default config
 
 or one of config files:
 
-`./CreateSVG.py settings_######.json`
+`./kindle-weather.py setting_######.json png`
 
 Take a look at `/tmp/KindleStation_flatten.png`.
 
@@ -218,7 +218,7 @@ ssh root@192.168.2.2  # test passwordless login
 
 ```
 cd /opt/lib/kindle-weather-station
-./kindle-weather.sh [config.json]
+./kindle-weather.py [config.json]
 ```
 
 ## Layout
@@ -364,8 +364,8 @@ e.g.)
 `crontab -e`
 
 ```
-0 */2 * * * sh -c "/opt/lib/kindle-weather-station/kindle-weather.sh 2>>/tmp/kindle-weather-station.err"
-0 1-23/2 * * * sh -c "/opt/lib/kindle-weather-station/kindle-weather.sh /opt/lib/kindle-weather-station/settings_twitter.json 2>>/tmp/kindle-weather-station.err"
+0 */2 * * * sh -c "/opt/lib/kindle-weather-station/kindle-weather.py 2>>/tmp/kindle-weather-station.err"
+0 1-23/2 * * * sh -c "/opt/lib/kindle-weather-station/kindle-weather.py /opt/lib/kindle-weather-station/setting_twitter.json 2>>/tmp/kindle-weather-station.err"
 ```
 
 ```
