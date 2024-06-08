@@ -9,10 +9,8 @@ import time as t
 import json
 import re
 import requests
-#from pytz import timezone
 import zoneinfo
 from datetime import datetime,timedelta
-#from datetime import datetime, timedelta, date, timezone
 
 wether_codes_config = './config/tomorrow_codes.json'
     
