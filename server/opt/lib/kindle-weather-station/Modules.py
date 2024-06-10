@@ -1158,26 +1158,26 @@ class GraphPane:
         return a
 
     def tile(self):
-        p, y, obj, variant = self.p, self.y, self.obj, self.variant
-        canvas, w, h, bgcolor, axis = self.canvas, self.w, self.h, self.bgcolor, self.axis
-        axis_color, grid, grid_color = self.axis_color, self.grid, self.grid_color
-        start, end, step, basis, title = self.start, self.end, self.step, self.basis, self.title
-        stroke, stroke_color, fill, stroke_linecap = self.stroke, self.stroke_color, self.fill, self.stroke_linecap
-        grid_ext_upper, grid_ext_lower = self.grid_ext_upper, self.grid_ext_lower
-        tz = p.config['tz']
-        sp_x = int((800 - w) * 0.5) if p.config['landscape'] == True else int((600 - w) * 0.5)
-        kwargs = {  'p': p, 'y': y, 'w': w, 'h': h, 'bgcolor': bgcolor, 'axis': axis, 
-                    'axis_color': axis_color, 'grid': grid, 'grid_color': grid_color, 
-                    'grid_ext_upper': grid_ext_upper, 'grid_ext_lower': grid_ext_lower, 
-                    'title': title, 'start': start, 'step': step, 'end': end, 
-                    'basis': basis, 'stroke': stroke, 
-                    'stroke_color': stroke_color, 'fill': fill, 'stroke_linecap': stroke_linecap, 
-                    'tz': tz, 'sp_x': sp_x, 'variant': variant}
+        #p, y, obj, variant = self.p, self.y, self.obj, self.variant
+        #canvas, w, h, bgcolor, axis = self.canvas, self.w, self.h, self.bgcolor, self.axis
+        #axis_color, grid, grid_color = self.axis_color, self.grid, self.grid_color
+        #start, end, step, basis, title = self.start, self.end, self.step, self.basis, self.title
+        #stroke, stroke_color, fill, stroke_linecap = self.stroke, self.stroke_color, self.fill, self.stroke_linecap
+        #grid_ext_upper, grid_ext_lower = self.grid_ext_upper, self.grid_ext_lower
+        tz = self.p.config['tz']
+        sp_x = int((800 - self.w) * 0.5) if self.p.config['landscape'] == True else int((600 - self.w) * 0.5)
+        kwargs = {  'p': self.p, 'y': self.y, 'w': self.w, 'h': self.h, 'bgcolor': self.bgcolor, 'axis': self.axis, 
+                    'axis_color': self.axis_color, 'grid': self.grid, 'grid_color': self.grid_color, 
+                    'grid_ext_upper': self.grid_ext_upper, 'grid_ext_lower': self.grid_ext_lower, 
+                    'title': self.title, 'start': self.start, 'step': self.step, 'end': self.end, 
+                    'basis': self.basis, 'stroke': self.stroke, 
+                    'stroke_color': self.stroke_color, 'fill': self.fill, 'stroke_linecap': self.stroke_linecap, 
+                    'tz': tz, 'sp_x': sp_x, 'variant': self.variant}
         # Start
         a = self.font
         # Canvas
-        style = f'fill:{bgcolor};stroke:{bgcolor};stroke-width:{0}px;' 
-        a += SVGtools.rect(x=sp_x, y=(y - h + 140), width=w, height=(h - 45), style=style).svg()
+        style = f'fill:{self.bgcolor};stroke:{self.bgcolor};stroke-width:0px;' 
+        a += SVGtools.rect(x=sp_x, y=(self.y - self.h + 140), width=self.w, height=(self.h - 45), style=style).svg()
 
         def daily_weather(p, y, w, h, bgcolor, axis, axis_color, grid, grid_color, grid_ext_upper, grid_ext_lower, \
                             stroke, stroke_color, fill, stroke_linecap, \
@@ -1233,7 +1233,7 @@ class GraphPane:
             i18n = read_i18n(p)
             ramadhan = p.config['ramadhan']
             i, s = str(),str()
-            
+
             def calc_moonphase(day, mon, yr, half, x, y, r, lat, ramadhan, **kwargsPlus):
 
                 def phase(rad):
@@ -1428,16 +1428,15 @@ class GraphPane:
                     s += SVGtools.text('end', '16', (_x + box_size_x - 3), (_y - 8), f'{ram}').svg()      
             return s,i
         # Graph
-        if basis == 'day' and title == 'weather':
+        if self.basis == 'day' and self.title == 'weather':
             s,i = daily_weather(**kwargs)
             a += s + '</g>' + i
-        elif basis == 'day' and title == 'moon phase':
-            s,i = moon_phase(**kwargs)
-            if p.config['landscape'] == True:
+        elif self.basis == 'day' and self.title == 'moon phase':
+            s,i = moon_phase(**kwargs)        
+            if self.p.config['landscape'] == True:
                 s += SVGtools.text('start', '16', 10, (600 - 5), 'moon phase').svg()
             a += s + '</g>' + i         
         return a
-
 
 def addIcon(s):
     if s == 'ClearDay':
