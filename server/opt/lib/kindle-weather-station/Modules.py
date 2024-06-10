@@ -132,7 +132,10 @@ class Maintenant:
                 except Exception as e:
                     sunset = '--:--'
             # localtime
-            maintenant = (str.lower(datetime.fromtimestamp(now, tz).strftime('%a, %d %b %H:%M')))
+            if p.config['landscape'] == True:
+                maintenant = (str.lower(datetime.fromtimestamp(now, tz).strftime('%A, %d %B %H:%M')))
+            else:
+                maintenant = (str.lower(datetime.fromtimestamp(now, tz).strftime('%a, %d %b %H:%M')))
             w = maintenant.split()
             #d = read_i18n(p)
             #w[0] = d["abbreviated_weekday"][w[0][:-1]] + ',' if not d == dict() else w[0]
@@ -298,10 +301,10 @@ class CurrentData:
         a = str()
         if p.config['landscape'] == True:
             wordwrap = 22
-            disc = split_text(wordwrap=wordwrap, text=weather['description'], max_rows=2)
+            disc = split_text(wordwrap=wordwrap, text=weather['description'].lower(), max_rows=2)
             #disc = [weather['description']]
         else:
-            disc = split_text(wordwrap=wordwrap, text=weather['description'], max_rows=2)
+            disc = split_text(wordwrap=wordwrap, text=weather['description'].lower(), max_rows=2)
         for w in disc:
             a += SVGtools.text('end', '30', (x_text + 320), (y_text + 400), w).svg()
             y_text += 35
