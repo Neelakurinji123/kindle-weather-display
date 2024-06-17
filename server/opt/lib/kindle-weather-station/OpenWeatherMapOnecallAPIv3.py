@@ -36,8 +36,8 @@ def readSettings(setting):
     a['units'] = service['units'] if 'units' in service else 'metric'
     a['lang'] = service['lang'] if 'lang' in service else 'en'
     a['in_clouds'] = service['in_clouds'] if 'in_clouds' in service else str()  # Options: "cloudCover", "probability"
+    a['wind_icon'] = bool(eval(service['wind_icon'])) if 'wind_icon' in service else False
     a['cloudconvert'] = bool(eval(service['cloudconvert'])) if 'cloudconvert' in service else False
-    a['converter'] = service['converter'] if 'converter' in service else None
     a['layout'] = service['layout']
     a['landscape'] = bool(eval(service['landscape'])) if 'landscape' in service else False
     a['ramadhan'] = bool(eval(service['ramadhan'])) if 'ramadhan' in service else False

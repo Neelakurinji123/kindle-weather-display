@@ -12,6 +12,7 @@
         "units": "metric",
 		"in_clouds": "probability",
         "lang": "en",
+		"wind_icon": "False",
         "cloudconvert": "False",
 		"layout": ["maintenant", "main", "daily"],
 		"graph_canvas": "default"

@@ -13,6 +13,7 @@
 		"units": "metric",
 		"lang": "en",
 		"in_clouds": "probability",
+		"wind_icon": "False",
 		"cloudconvert": "False",
 		"layout": ["maintenant", "main", "twitter"],
 		"twitter": {"caption": "ALERT", "screen_name": "tenkijp", "translate": "True", "translate_target": "en",

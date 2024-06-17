@@ -13,6 +13,7 @@
 		"units": "metric",
 		"lang": "en",
 		"in_clouds": "probability",
+		"wind_icon": "False",
 		"cloudconvert": "False",
 		"layout": ["maintenant", "main", "daily_xlabel_landscape_start0","padding+10", "graph"],
 		"landscape": "True",

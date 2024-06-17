@@ -38,8 +38,8 @@ def readSettings(setting):
     a['units'] = service['units'] if 'units' in service else 'metric'
     a['lang'] = service['lang'] if 'lang' in service else 'en'
     a['in_clouds'] = service['in_clouds'] if 'in_clouds' in service else str()  # Options: "cloudCover", "probability"
+    a['wind_icon'] = bool(eval(service['wind_icon'])) if 'wind_icon' in service else False
     a['cloudconvert'] = bool(eval(service['cloudconvert'])) if 'cloudconvert' in service else False
-    a['converter'] = service['converter'] if 'converter' in service else None
     a['layout'] = service['layout']
     a['landscape'] = bool(eval(service['landscape'])) if 'landscape' in service else False
     a['ramadhan'] = bool(eval(service['ramadhan'])) if 'ramadhan' in service else False
@@ -145,8 +145,10 @@ class TomorrowIo:
                 utc = config['UTC']
                 #tz = timezone('utc')
                 a = datetime.fromtimestamp(now, utc)
-                yrs, mons, days, hrs, mins, _, _, _, _ = a.timetuple()
-                endtime = str(yrs) + '-' + str(mons) + '-' + str(days) + 'T' + str(hrs) + ':' + str(int(mins) + int(config['service_1m_rows'])) + ':00Z'
+                yr, mon, day, hr, mi, _, _, _, _ = a.timetuple()
+                b1 = int(mi)
+                b2 = int(config['service_1m_rows'])
+                endtime = f'{yr}-{mon}-{day}T{hr}:{b1}{b2}:00Z'
                 querystring = {
                     'location': location,
                     'fields': fields[n],
@@ -316,14 +318,14 @@ class TomorrowIo:
         config = self.config
         tz = config['tz']
         d = datetime.fromtimestamp(dt, tz)
-        yrs, mons, days, hrs, mins, _, _, _, _ = d.timetuple()
-        _dt = hrs * 60 + mins
+        yr, mon, day, hr, mi, _, _, _, _ = d.timetuple()
+        _dt = hr * 60 + mi
         d = datetime.fromtimestamp(sunrise, tz)
-        yrs, mons, days, hrs, mins, _, _, _, _ = d.timetuple()
-        _sunrise = hrs * 60 + mins
+        yr, mon, day, hr, mi, _, _, _, _ = d.timetuple()
+        _sunrise = hr * 60 + mi
         d = datetime.fromtimestamp(sunset, tz)
-        yrs, mons, days, hrs, mins, _, _, _, _ = d.timetuple()
-        _sunset = hrs * 60 + mins
+        yr, mon, day, hr, mi, _, _, _, _ = d.timetuple()
+        _sunset = hr * 60 + mi
         if _dt > _sunrise and _dt < _sunset:
             return True
         else:

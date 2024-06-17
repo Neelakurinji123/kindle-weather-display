@@ -13,6 +13,7 @@
         "units": "metric",
         "lang": "en",
 		"in_clouds": "probability",
+		"wind_icon": "False",
         "cloudconvert": "False",
         "ramadhan": "True",
 		"layout": ["maintenant", "main", "graph", "daily_xlabel", "graph"],
