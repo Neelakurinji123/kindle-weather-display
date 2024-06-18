@@ -195,7 +195,7 @@ class CurrentData:
                             a += SVGtools.text('end', '45', (self.x_main + 225 - padding), (self.y_main + 247), \
                                 Decimal(float(r)).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP)).svg()
                         else:
-                            a += SVGtools.text('end', '40', (self.x_main + 167 - padding), (self.y_main + 232), \
+                            a += SVGtools.text('end', '40', (self.x_main + 185 - padding), (self.y_main + 232), \
                             Decimal(float(r)).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP)).svg()
                     else:
                         if weather['main'] == self.sub_main:
@@ -1160,7 +1160,7 @@ class GraphPane:
             def calc_moonphase(day, mon, yr, half, x, y, r, lat, ramadhan, **kwargsPlus):
 
                 def phase(rad):
-                    one_day_step = 2 * pi / 56
+                    one_day_step = abs(2 * pi / 56)  # cairo fix
                     if one_day_step > rad >= 0 or one_day_step > (pi * 2 - rad) >= 0:
                         a = 'n'
                     elif one_day_step > abs(rad - pi * 0.5) >= 0:
@@ -1222,7 +1222,7 @@ class GraphPane:
                         py1 = math.sin(pi * 0.5 - m) * rp + ry
                         px2 = math.cos(pi * 0.5 - m) * rp + rx
                         py2 = -math.sin(pi * 0.5 - m) * rp + ry
-                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {(ra2+1.5)} {(ra3+1.5)} 0 0 1 {px1} {py1}z'
+                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 1 {px1} {py1}z'
                         ps = phase(rad)
                         ram = calc_ramadhan(day, mon, yr) if ramadhan == True else str()
                     elif pi > rad >= pi * 0.5:  # first quarter to full moon
@@ -1230,7 +1230,7 @@ class GraphPane:
                         py1 = math.sin(pi * 0.5 + m) * rp + ry
                         px2 = math.cos(pi * 0.5 + m) * rp + rx
                         py2 = -math.sin(pi * 0.5 + m) * rp + ry
-                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {(ra2+2)} {(ra3+2)} 0 0 0 {px1} {py1}z'
+                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 0 {px1} {py1}z'
                         ps = phase(rad)
                         ram = calc_ramadhan(day, mon, yr) if ramadhan == True else str()
                     elif pi * 1.5 > rad >= pi:  # full moon to third quarter
@@ -1246,7 +1246,7 @@ class GraphPane:
                         py1 = math.sin(pi * 1.5 - m) * rp + ry
                         px2 = math.cos(pi * 1.5 - m) * rp + rx
                         py2 = -math.sin(pi * 1.5 - m) * rp + ry
-                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {(ra3+1.75)} 0 0 1 {px1} {py1}z'
+                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 1 {px1} {py1}z'
                         ps = phase(rad)
                         ram = calc_ramadhan(day, mon, yr) if ramadhan == True else str()
                 else:
@@ -1322,11 +1322,11 @@ class GraphPane:
                     ps = d[ps] if ps in d else str()
                     ram = 'ram' if ram == 'r' else str()
                     if not ps == str() and not ram == str():
-                        s += SVGtools.text2('middle', 'bold', '18', (_x + half), (_y - 30), f'{ps},{ram}').svg()
+                        s += SVGtools.text2('middle', 'bold', '18', (_x + half), (_y + 55), f'{ps},{ram}').svg()
                     elif ps == str() and not ram == str():
-                        s += SVGtools.text2('middle', 'bold', '18', (_x + half), (_y - 30), f'{ram}').svg()
+                        s += SVGtools.text2('middle', 'bold', '18', (_x + half), (_y + 55), f'{ram}').svg()
                     else:
-                        s += SVGtools.text2('middle', 'bold', '18', (_x + half), (_y - 30), f'{ps}').svg()
+                        s += SVGtools.text2('middle', 'bold', '18', (_x + half), (_y + 55), f'{ps}').svg()
                 else:
                     _x = int(sp_x + (box_size_x + grid) * (n - start)) 
                     _y = y + 25  
