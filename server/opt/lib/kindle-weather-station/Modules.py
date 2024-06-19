@@ -973,12 +973,12 @@ class GraphPane:
         a = self.font
         d = read_i18n(self.p)
         tz = self.p.config['tz']       
-        # Canvas
+        # draw canvas
         style = f'fill:{self.bgcolor};stroke:{self.bgcolor};stroke-width:0px;'
         a += SVGtools.rect(x=sp_x, y=(y - self.h + 140), width=self.w, height=(self.h - 45), style=style).svg()
-        # Graph
+        # draw graph
         points = str()
-        # Hourly temp graph
+        # get hourly temp graph data
         if self.basis == 'hour':
             tMin = min([self.p.HourlyForecast(n)['temp'] for n in range(self.start, self.end, self.step)])
             tMax = max([self.p.HourlyForecast(n)['temp'] for n in range(self.start, self.end, self.step)])
@@ -990,15 +990,15 @@ class GraphPane:
                 lst = list()
                 for n in range(self.start, self.end, self.step):
                     weather = self.p.HourlyForecast(n)
-                    #heure = datetime.fromtimestamp(h_weather['dt'], tz).strftime('%H')
                     x = int(sp_x + box_size_x * n + half_box)
                     _y = y - (weather['temp'] - tMin) * tStep + 75
                     lst.append((x, _y))
+                    # add temp every 3 steps
                     if c % 3 == 0:    
                         a += SVGtools.text('middle', '25', x, (_y - 14), int(round(weather['temp']))).svg()
                         a += SVGtools.circle((x + 17), (_y - 29), 3, 'black', 2, 'none').svg()  
                     c += 1
-        # daily temp graph
+        # get daily temp graph data
         elif self.basis == 'day':
             tMin = min([self.p.DailyForecast(n)['temp_day'] for n in range(self.start, self.end, self.step)])
             tMax = max([self.p.DailyForecast(n)['temp_day'] for n in range(self.start, self.end, self.step)])
@@ -1014,14 +1014,8 @@ class GraphPane:
                     x = int(sp_x + box_size_x * n + half_box)
                     _y = y - (weather['temp_day'] - tMin) * tStep + 75
                     lst.append((x, _y))
-                    #points += f'{x},{_y} '
-                    #points2 = points + f'{x},{y + 95} {int(sp_x + half)},{y + 95}'
                     a += SVGtools.text('middle', '25', x, (_y - 14), int(weather['temp_day'])).svg()
                     a += SVGtools.circle((x + 17), (_y - 29), 3, 'black', 2, 'none').svg()              
-        #style2 = f'fill:{self.fill};stroke:{self.fill};stroke-width:0px;stroke-linecap:{self.stroke_linecap};'
-        #a += SVGtools.polyline(points2, style2).svg()
-        #style = f'fill:none;stroke:{self.stroke_color};stroke-width:{self.stroke}px;stroke-linecap:{self.stroke_linecap};'
-        #a += SVGtools.polyline(points, style).svg()
         # filled graph
         a += SVGtools.spline(lst=lst, _x=lst[0][0], _y=(y + 95), stroke=self.fill, stroke_width=0, fill=self.fill).svg()
         # spline graph
