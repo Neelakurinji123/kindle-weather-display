@@ -17,7 +17,7 @@
 		"cloudconvert": "False",
 		"layout": ["maintenant", "main", "daily_xlabel_landscape_start0","padding+10", "graph"],
 		"landscape": "True",
-		"graph_objects": ["daily_temperature_landscape"],
+		"graph_objects": ["daily_temperature_spline_landscape"],
 		"graph_canvas": "default_landscape"		
 	}
 }

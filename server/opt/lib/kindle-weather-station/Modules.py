@@ -286,36 +286,31 @@ class CurrentData:
 
     def icon(self):
         weather = self.p.CurrentWeather()
-        sub_main = self.sub_main
-        x_main = self.x_main
-        y_main = self.y_main
-        x_sub_main = self.x_sub_main
-        y_sub_main = self.y_sub_main
-        if weather['main'] == sub_main:
+        if weather['main'] == self.sub_main:
             if self.p.config['landscape'] == True:
-                y_main += 25
-                return SVGtools.transform(f'(4,0,0,4,{x_main},{y_main})', addIcon(weather['main'])).svg()
+                self.y_main += 25
+                return SVGtools.transform(f'(4,0,0,4,{self.x_main},{self.y_main})', addIcon(weather['main'])).svg()
             else:
-                return SVGtools.transform(f'(4,0,0,4,{x_main},{y_main})', addIcon(weather['main'])).svg()
+                return SVGtools.transform(f'(4,0,0,4,{self.x_main},{self.y_main})', addIcon(weather['main'])).svg()
         else:
             if self.p.config['landscape'] == True:
                 i = str()
-                x_main += -5
-                y_main += 40
-                i += SVGtools.transform(f'(3.5,0,0,3.5,{x_main},{y_main})', addIcon(weather['main'])).svg()
-                x_sub_main += 180
-                y_sub_main += 215
-                i += SVGtools.transform(f'(1.6,0,0,1.6,{x_sub_main},{y_sub_main})', addIcon(sub_main)).svg()
-                i += SVGtools.line((x_main + 295), (x_main + 235), (y_main + 180), (y_main + 270), 'stroke:black;stroke-width:2px;').svg()
+                self.x_main += -5
+                self.y_main += 40
+                i += SVGtools.transform(f'(3.5,0,0,3.5,{self.x_main},{self.y_main})', addIcon(weather['main'])).svg()
+                self.x_sub_main += 180
+                self.y_sub_main += 215
+                i += SVGtools.transform(f'(1.6,0,0,1.6,{self.x_sub_main},{self.y_sub_main})', addIcon(self.sub_main)).svg()
+                i += SVGtools.line((self.x_main + 295), (self.x_main + 235), (self.y_main + 180), (self.y_main + 270), 'stroke:black;stroke-width:2px;').svg()
             else:
                 i = str()
-                x_main += 10
-                y_main += 10
-                i += SVGtools.transform(f'(3.5,0,0,3.5,{x_main},{y_main})', addIcon(weather['main'])).svg()
-                x_sub_main += 205
-                y_sub_main += 190
-                i += SVGtools.transform(f'(1.6,0,0,1.6,{x_sub_main},{y_sub_main})', addIcon(sub_main)).svg()
-                i += SVGtools.line((x_main + 285), (x_main + 225), (y_main + 190), (y_main + 280), 'stroke:black;stroke-width:2px;').svg()
+                self.x_main += 10
+                self.y_main += 10
+                i += SVGtools.transform(f'(3.5,0,0,3.5,{self.x_main},{self.y_main})', addIcon(weather['main'])).svg()
+                self.x_sub_main += 205
+                self.y_sub_main += 190
+                i += SVGtools.transform(f'(1.6,0,0,1.6,{self.x_sub_main},{self.y_sub_main})', addIcon(self.sub_main)).svg()
+                i += SVGtools.line((self.x_main + 285), (self.x_main + 225), (self.y_main + 190), (self.y_main + 280), 'stroke:black;stroke-width:2px;').svg()
             return i
             
     def wind_icon(self):
@@ -871,6 +866,8 @@ class GraphPane:
     def draw(self):
         if self.type == 'line':
             a = self.line()
+        elif self.type == 'spline':
+            a = self.spline()
         elif self.type == 'bar':
             a = self.bar()
         elif self.type == 'rect':
@@ -967,6 +964,70 @@ class GraphPane:
         a += SVGtools.polyline(points, style).svg()
         a += '</g>'
         return a
+        
+    def spline(self):
+        y = self.y
+        sp_x = int((800 - self.w) * 0.5) if self.p.config['landscape'] == True else int((600 - self.w) * 0.5)
+        box_size_x = self.w / self.end
+        half_box = box_size_x * 0.5
+        a = self.font
+        d = read_i18n(self.p)
+        tz = self.p.config['tz']       
+        # Canvas
+        style = f'fill:{self.bgcolor};stroke:{self.bgcolor};stroke-width:0px;'
+        a += SVGtools.rect(x=sp_x, y=(y - self.h + 140), width=self.w, height=(self.h - 45), style=style).svg()
+        # Graph
+        points = str()
+        # Hourly temp graph
+        if self.basis == 'hour':
+            tMin = min([self.p.HourlyForecast(n)['temp'] for n in range(self.start, self.end, self.step)])
+            tMax = max([self.p.HourlyForecast(n)['temp'] for n in range(self.start, self.end, self.step)])
+            if self.p.config['landscape'] == True:
+                tStep = 80 / (tMax - tMin) if (tMax - tMin) != 0 else 1
+                title = self.title + ', 24 hours'
+                a += SVGtools.text('start', '16', 5, (600 - 5), title).svg()
+                c = 0
+                lst = list()
+                for n in range(self.start, self.end, self.step):
+                    weather = self.p.HourlyForecast(n)
+                    #heure = datetime.fromtimestamp(h_weather['dt'], tz).strftime('%H')
+                    x = int(sp_x + box_size_x * n + half_box)
+                    _y = y - (weather['temp'] - tMin) * tStep + 75
+                    lst.append((x, _y))
+                    if c % 3 == 0:    
+                        a += SVGtools.text('middle', '25', x, (_y - 14), int(round(weather['temp']))).svg()
+                        a += SVGtools.circle((x + 17), (_y - 29), 3, 'black', 2, 'none').svg()  
+                    c += 1
+        # daily temp graph
+        elif self.basis == 'day':
+            tMin = min([self.p.DailyForecast(n)['temp_day'] for n in range(self.start, self.end, self.step)])
+            tMax = max([self.p.DailyForecast(n)['temp_day'] for n in range(self.start, self.end, self.step)])
+            if self.p.config['landscape'] == True:
+                tStep = 80 / (tMax - tMin) if (tMax - tMin) != 0 else 1
+                title = f'{self.title}, {self.end} days'
+                a += SVGtools.text('start', '16', 5, (600 - 5), title).svg()
+                lst = list()
+                for n in range(self.start, self.end, self.step):
+                    weather = self.p.DailyForecast(n)
+                    jour = str.lower(datetime.fromtimestamp(weather['dt'], tz).strftime('%a'))
+                    jour = d['abbreviated_weekday'][jour] if not d == dict() else jour
+                    x = int(sp_x + box_size_x * n + half_box)
+                    _y = y - (weather['temp_day'] - tMin) * tStep + 75
+                    lst.append((x, _y))
+                    #points += f'{x},{_y} '
+                    #points2 = points + f'{x},{y + 95} {int(sp_x + half)},{y + 95}'
+                    a += SVGtools.text('middle', '25', x, (_y - 14), int(weather['temp_day'])).svg()
+                    a += SVGtools.circle((x + 17), (_y - 29), 3, 'black', 2, 'none').svg()              
+        #style2 = f'fill:{self.fill};stroke:{self.fill};stroke-width:0px;stroke-linecap:{self.stroke_linecap};'
+        #a += SVGtools.polyline(points2, style2).svg()
+        #style = f'fill:none;stroke:{self.stroke_color};stroke-width:{self.stroke}px;stroke-linecap:{self.stroke_linecap};'
+        #a += SVGtools.polyline(points, style).svg()
+        # filled graph
+        a += SVGtools.spline(lst=lst, _x=lst[0][0], _y=(y + 95), stroke=self.fill, stroke_width=0, fill=self.fill).svg()
+        # spline graph
+        a += SVGtools.spline(lst=lst, stroke=self.stroke_color, stroke_width=self.stroke).svg()
+        a += '</g>'
+        return a
 
     def bar(self):
         y = self.y
@@ -1026,10 +1087,6 @@ class GraphPane:
 
     def rect(self):
         y = self.y
-        canvas, w, h, bgcolor, axis = self.canvas, self.w, self.h, self.bgcolor, self.axis
-        axis_color, grid, grid_color = self.axis_color, self.grid, self.grid_color
-        start, end, step, basis, title = self.start, self.end, self.step, self.basis, self.title
-        stroke, stroke_color, fill, stroke_linecap, width = self.stroke, self.stroke_color, self.fill, self.stroke_linecap, self.width
         sp_x = int((800 - self.w) * 0.5) if self.p.config['landscape'] == True else int((600 - self.w) * 0.5)
         box_size_x = self.w / self.end
         a = self.font
@@ -1125,7 +1182,6 @@ class GraphPane:
                 _x = int(sp_x + (box_size_x + grid) * (n - start))
                 _y = y + 90
                 if p.config['landscape'] == True:
-                    
                     i += SVGtools.transform(f'(1.8,0,0,1.8,{(_x - 10)},{(_y - 180)})', addIcon(weather['main'])).svg()
                     s += SVGtools.text(anchor='end', fontsize='30', x=(_x + half - 20), y=_y, v=round(weather['temp_min']), stroke='rgb(128,128,128)').svg()
                     s += SVGtools.circle((_x + half - 14), (_y - 20), 3, 'rgb(128,128,128)', 2, 'none').svg()

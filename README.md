@@ -21,7 +21,7 @@ Subscribe to a v3.0 API.
 
 <img src="sample_screenshots/kindle_weather-display.jpg" height="360" alt="Kindle 3 Screenshot" />&nbsp;
 
-<kbd><img src="sample_screenshots/KindleStation_flatten_graph_1.png" height="360" alt="Kindle 3 Screenshot" /></kbd>&nbsp;
+<kbd><img src="sample_screenshots/KindleStation.png" height="360" alt="Kindle 3 Screenshot" /></kbd>&nbsp;
 
 ## Requirements
 
@@ -304,6 +304,14 @@ Available options are as follows:
   - "graph\_objects": ["daily\_temperature", "moon\_phase"]
   - "ramadhan": "True"
 
+##### 3.1.1 spline graph - landscape layout only (Optional)
+
+<kbd><img src="sample_screenshots/readme_imgs/KindleStation_spline.png" /></kbd>&nbsp;
+
+- config
+  - "graph\_objects": ["daily\_temperature\_spline\_landscape"]
+
+    
 #### 3.2 graph 2: Daily Temperature and Daily Precipitation. (settings\_graph\_2.json)
 
 <kbd><img src="sample_screenshots/readme_imgs/graph_2.png" /></kbd>&nbsp;
@@ -325,6 +333,11 @@ Available options are as follows:
 
 - config
   - "graph\_objects": ["hourly\_temperature", "hourly\_precipitation"]
+
+##### 3.4.1 spline graph - landscape layout only (Optional)
+
+- config
+  - "graph\_objects": ["hourly\_temperature\_spline\_landscape"]
 
 ### 4. Twitter (WIP)
 
@@ -379,3 +392,4 @@ e.g.)
 - [Tomorrow.io](https://www.tomorrow.io/) , Weather API
 - [CloudConvert](https://cloudconvert.com/) An online file converter
 - [X (Twitter)](https://twitter.com/home?lang=en) Twitter, Inc. is an American social media company.
+- [Bézier curves formula](https://www.particleincell.com/2012/bezier-splines/)
