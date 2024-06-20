@@ -97,16 +97,18 @@ Default config is `setting.json`.
 e.g.) Openwrt
 ```
 opkg update
-opkg install python3 python3-pytz python3-requests python3-setuptools python3-pip
+opkg install python3 python3-requests python3-setuptools python3-pip
 opkg install imagemagick
 opkg install cairo
-pip3 install twikit
-pip3 install deep_translator
-pip3 install qrcode
-pip3 install cloudconvert
-pip3 install hijridate
 pip3 install Wand
 pip3 install cairosvg
+pip3 install tzdata
+pip3 install twikit (optional)
+pip3 install deep_translator (optional)
+pip3 install qrcode (optional)
+pip3 install cloudconvert (optional)
+pip3 install hijridate (optional)
+
 
 ```
 #### Advanced Installation for Openwrt: To use Cairo on Openwrt.
