@@ -61,6 +61,7 @@ def split_text(wordwrap, text, max_rows):
     return a
 
 def python_encoding(encoding):
+    # convert Unix encoding to python encoding
     encoding_list={'us-ascii': 'ascii', 'iso-8859-1': 'latin_1', 'iso8859-1': 'latin_1', 'cp819': 'latin_1', \
                         'iso-8859-2': 'iso8859_2', 'iso-8859-4': 'iso8859_4', 'iso-8859-5': 'iso8859_5', \
                         'iso-8859-6': 'iso8859_6', 'iso-8859-7': 'iso8859_7', 'iso-8859-8': 'iso8859_8', \
@@ -70,6 +71,7 @@ def python_encoding(encoding):
     return encoding_list[encoding]
 
 def daytime(p, dt, sunrise, sunset):
+    # calculate daytime
     this_month = int(datetime.fromtimestamp(p.now, p.config['tz']).strftime("%m"))
     if not sunrise == 0:
         d = datetime.fromtimestamp(dt, p.config['tz'])
@@ -181,7 +183,7 @@ class CurrentData:
     def precipitation(self):
         weather = self.p.CurrentWeather()
         a = str()           
-        # 'in_clouds' option
+        # 'in_clouds' option: cloudCover, probability
         if not self.p.config['in_clouds'] == str():
             #if weather['main'] in ['Rain', 'Drizzle', 'Snow', 'Sleet', 'Cloudy']:
             if weather['main'] in ['Cloudy']:
@@ -255,6 +257,7 @@ class CurrentData:
 
     def wind(self):
         weather = self.p.CurrentWeather()
+        weather['cardinal'] = str() if int(weather['wind_speed']) == 0 else weather['cardinal']
         if self.p.config['landscape'] == True and self.p.config['wind_icon'] == True:
             a = SVGtools.text('end', '30', (self.x_text + 174),(self.y_text + 320), str(int(weather['wind_speed']))).svg()
             a += SVGtools.text('end', '23', (self.x_text + 217),(self.y_text + 320), self.p.units['wind_speed']).svg()
@@ -344,7 +347,8 @@ class CurrentWeatherPane(CurrentData):
         sunrise = weather['sunrise']
         sunset = weather['sunset']
         self.state = daytime(p=p, dt=p.now, sunrise=sunrise, sunset=sunset)
-        b = dict()       
+        b = dict()
+        # fix icons     
         for n in range(24):          
             weather = p.HourlyForecast(n)
             prob = 0.98
@@ -366,6 +370,7 @@ class CurrentWeatherPane(CurrentData):
         self.sub_main = max(b.items(), key=lambda z: z[1])[0]
         
     def text(self):
+        # genarate main info pane
         if self.p.config['landscape'] == True:
             self.x_text = 260
             self.y_text = -125
@@ -430,7 +435,7 @@ class HourlyWeatherPane:
         a = f'<g font-family="{font}">\n'
         hrs = {3: 'three hours', 6: 'six hours', 9: 'nine hours'}
         d = read_i18n(self.p)
-        # 3h forecast
+        # 3hr forecast
         if self.p.config['landscape'] == True:
             x = 550
             for i in range(self.hour, self.span, self.step):
@@ -438,7 +443,7 @@ class HourlyWeatherPane:
                 a += SVGtools.text('end', '35', (x + 200), (y + 90), round(weather['temp'])).svg()
                 a += self.add_unit_temp(x=(x + 200), y=(y + 90), font_size=35)
                 a += SVGtools.text('start', '30', (x + 55), (y + 160), hrs[i]).svg()
-                # 'in_clouds' option
+                # 'in_clouds' option: cloudCover, probability
                 if not self.p.config['in_clouds'] == str():
                     #if weather['main'] in ['Rain', 'Drizzle', 'Snow', 'Sleet', 'Cloudy']:
                     if weather['main'] in ['Cloudy']:
@@ -455,11 +460,10 @@ class HourlyWeatherPane:
                 if not d == dict():
                     for k in hrs.keys():
                         hrs[k] = d['hours'][hrs[k]]
-                # Hourly weather document area (base_x=370 ,base_y=40)
                 a += SVGtools.text('end', '35', (x + 30), (y + 86), round(weather['temp'])).svg()
                 a += SVGtools.text('end', '25', (x + 180), (y + 155), hrs[i]).svg()
                 a += self.add_unit_temp(x=(x + 30), y=(y + 86), font_size=35)
-                # 'in_clouds' option
+                # 'in_clouds' option: cloudCover, probability
                 if not self.p.config['in_clouds'] == str():
                     #if weather['main'] in ['Rain', 'Drizzle', 'Snow', 'Sleet', 'Cloudy']:
                     if weather['main'] in ['Cloudy']:
@@ -527,11 +531,12 @@ class DailyWeatherPane:
         tz = self.p.config['tz']
         font = self.p.config['font']
         a = f'<g font-family="{font}">\n'
+        # get max and min temp
         minTemp = math.floor(min([day1['temp_min'], day2['temp_min'], day3['temp_min']]))
         maxTemp = math.ceil(max([day1['temp_max'], day2['temp_max'] , day3['temp_max']]))
         pasTemp = 120 / (maxTemp-minTemp)
         d = read_i18n(self.p)
-        # Drawing temp bars
+        # draw temp x-bars
         for i in range(1, self.span):
             weather = self.p.DailyForecast(i)
             tLow = math.floor(weather['temp_min'])
@@ -612,9 +617,11 @@ class TwitterPane:
                 'favorite_count': tweet.favorite_count,
                 'full_text': tweet.full_text,
             })
+        # sort out: url and text
         pattern = r'http[s]*\S+'
         urls = re.findall(pattern, tweets_to_store[0]['full_text'])
         full_text = re.sub(pattern, '', tweets_to_store[0]['full_text'])
+        # translation
         if translate == 'True':
             _b = GoogleTranslator(source='auto', target='en').translate(full_text)
             # Fix EncodeError
@@ -622,6 +629,7 @@ class TwitterPane:
             b = _b.encode(en, 'ignore').decode(en)
         else:
             b = full_text
+        # keywords
         c = include_keywords.split(',')
         processing = True if c == list() else False
         for n in c:
@@ -635,6 +643,7 @@ class TwitterPane:
             if re.search(n, b, re.IGNORECASE) and not n == str():
                 processing = False
                 break
+        # time validation
         c = int()
         d_object = datetime.strptime(tweets_to_store[0]['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
         epoch = int(d_object.timestamp()) + self.p.timezone_offset # UTC + timezone_offset
@@ -884,11 +893,11 @@ class GraphPane:
         a = self.font
         d = read_i18n(self.p)
         tz = self.p.config['tz']       
-        # Canvas
+        # draw canvas
         style = f'fill:{self.bgcolor};stroke:{self.bgcolor};stroke-width:0px;'
         a += SVGtools.rect(x=sp_x, y=(y - self.h + 140), width=self.w, height=(self.h - 45), style=style).svg()
         #style = 'stroke:{};stroke-width:{}px;'.format(axis_color, axis)
-        # Graph
+        # get graph data
         points = str()
         if self.basis == 'hour':
             tMin = min([self.p.HourlyForecast(n)['temp'] for n in range(self.start, self.end, self.step)])
@@ -957,9 +966,11 @@ class GraphPane:
                     points += f'{x},{_y} '
                     points2 = points + f'{x},{y + 95} {int(sp_x + half)},{y + 95}'
                     a += SVGtools.text('middle', '16', x, (_y - 9), int(weather['temp_day'])).svg()
-                    a += SVGtools.circle((x + 12), (_y - 20), 2, 'black', 1, 'none').svg()         
+                    a += SVGtools.circle((x + 12), (_y - 20), 2, 'black', 1, 'none').svg() 
+        # draw fill pline        
         style2 = f'fill:{self.fill};stroke:{self.fill};stroke-width:0px;stroke-linecap:{self.stroke_linecap};'
         a += SVGtools.polyline(points2, style2).svg()
+        # draw pline
         style = f'fill:none;stroke:{self.stroke_color};stroke-width:{self.stroke}px;stroke-linecap:{self.stroke_linecap};'
         a += SVGtools.polyline(points, style).svg()
         a += '</g>'
@@ -980,12 +991,16 @@ class GraphPane:
         points = str()
         # get hourly temp graph data
         if self.basis == 'hour':
+            # get max and min temp
             tMin = min([self.p.HourlyForecast(n)['temp'] for n in range(self.start, self.end, self.step)])
             tMax = max([self.p.HourlyForecast(n)['temp'] for n in range(self.start, self.end, self.step)])
             if self.p.config['landscape'] == True:
+                # get graph y-axis step
                 tStep = 80 / (tMax - tMin) if (tMax - tMin) != 0 else 1
+                # title
                 title = self.title + ', 24 hours'
                 a += SVGtools.text('start', '16', 5, (600 - 5), title).svg()
+                # computes temp x and y positions
                 c = 0
                 lst = list()
                 for n in range(self.start, self.end, self.step):
@@ -1000,12 +1015,16 @@ class GraphPane:
                     c += 1
         # get daily temp graph data
         elif self.basis == 'day':
+            # get max and min temp
             tMin = min([self.p.DailyForecast(n)['temp_day'] for n in range(self.start, self.end, self.step)])
             tMax = max([self.p.DailyForecast(n)['temp_day'] for n in range(self.start, self.end, self.step)])
             if self.p.config['landscape'] == True:
+                # get graph y-axis step
                 tStep = 80 / (tMax - tMin) if (tMax - tMin) != 0 else 1
+                # title
                 title = f'{self.title}, {self.end} days'
                 a += SVGtools.text('start', '16', 5, (600 - 5), title).svg()
+                # computes temp x and y positions
                 lst = list()
                 for n in range(self.start, self.end, self.step):
                     weather = self.p.DailyForecast(n)
@@ -1014,11 +1033,12 @@ class GraphPane:
                     x = int(sp_x + box_size_x * n + half_box)
                     _y = y - (weather['temp_day'] - tMin) * tStep + 75
                     lst.append((x, _y))
+                    # add temp
                     a += SVGtools.text('middle', '25', x, (_y - 14), int(weather['temp_day'])).svg()
                     a += SVGtools.circle((x + 17), (_y - 29), 3, 'black', 2, 'none').svg()              
-        # filled graph
+        # draw filled graph
         a += SVGtools.spline(lst=lst, _x=lst[0][0], _y=(y + 95), stroke=self.fill, stroke_width=0, fill=self.fill).svg()
-        # spline graph
+        # draw spline graph
         a += SVGtools.spline(lst=lst, stroke=self.stroke_color, stroke_width=self.stroke).svg()
         a += '</g>'
         return a
