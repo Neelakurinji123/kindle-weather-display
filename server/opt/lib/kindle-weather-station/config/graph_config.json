@@ -3,7 +3,7 @@
 		"canvas": {	"default": {"width": 530, "height": 140, "bgcolor": "rgb(220,220,220)", "axis": 0,
 						"axis_color": "rgb(0,0,0)", "grid": 3, "grid_color": "rgb(255,255,255)", "grid_ext_upper": 0, "grid_ext_lower": 0},
 					"default_landscape": {"width": 800, "height": 195, "bgcolor": "rgb(255,255,255)", "axis": 0,
-						"axis_color": "rgb(0,0,0)", "grid": 2, "grid_color": "rgb(0,0,0)", "grid_ext_upper": 40, "grid_ext_lower": 0},
+						"axis_color": "rgb(0,0,0)", "grid": 2, "grid_color": "rgb(0,0,0)", "grid_ext_upper": 30, "grid_ext_lower": 0},
 					"default_landscape_noGrid": {"width": 800, "height": 195, "bgcolor": "rgb(255,255,255)", "axis": 0,
 						"axis_color": "rgb(0,0,0)", "grid": 0, "grid_color": "rgb(0,0,0)", "grid_ext_upper": 0, "grid_ext_lower": 0},
 					"default_landscape_noGrid_sp20": {"width": 760, "height": 195, "bgcolor": "rgb(255,255,255)", "axis": 0,

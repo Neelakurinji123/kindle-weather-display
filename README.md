@@ -27,7 +27,7 @@ Subscribe to a v3.0 API.
 
 - Jailbroken Kindle 3: https://wiki.mobileread.com/wiki/Kindle_Hacks_Information
 - Server: Minimum 256M/100M OpenWrt router or SBC (e.g. OrangePi zero)
-- Server OS: Openwrt, Ubuntu and Debian, etc which works with Python v3.11 or newer.
+- Server OS: Openwrt, Ubuntu and Debian, etc which work with Python v3.11 or newer.
 - Server's devices: USB port x1, LAN port x1
 - WeatherAPI key
 - API key on CloudConvert for online image converter (optional)
@@ -264,13 +264,13 @@ Examples:
 <kbd><img src="sample_screenshots/readme_imgs/main.png" /></kbd>&nbsp;
 
 - config
-  - "timezone": "Pacific/Auckland"
-  - "encoding": "iso-8859-1"
-  - "locale": "en_US.UTF-8"
-  - "lat": "-77.8400829" 
-  - "lon": "166.6445298"
-  - "units": "metric"
-  - "lang": "en"
+  - "timezone": "Pacific/Auckland" # UNIX zoneinfo
+  - "encoding": "iso-8859-1"  # encoding name
+  - "locale": "en_US.UTF-8"  # locale name
+  - "lat": "-77.8400829"  # latitude
+  - "lon": "166.6445298"  # longitude
+  - "units": "metric" # options: metric, imperial
+  - "lang": "en" # language: en (English)
 
 
 #### 2.1 Value in cloud icon
@@ -341,7 +341,7 @@ Available options are as follows:
 - config
   - "graph\_objects": ["hourly\_temperature\_spline\_landscape"]
 
-### 4. Twitter (WIP)
+### 4. Twitter
 
 <kbd><img src="sample_screenshots/readme_imgs/twitter.png" /></kbd>&nbsp;
 
@@ -356,7 +356,7 @@ Available options are as follows:
     - "include": If one of "include" keyword do match, display Twitter, otherwise, use "alternate" layout.
     - "exclude": If one of "exclude" keyword do match, use "alternate" layout. 
 
-## Landscape e-Paper layout(WIP)
+## Landscape e-Paper layout
 
 <kbd><img src="sample_screenshots/kindle_weather-display-landscape.jpg"  height="360"/></kbd>&nbsp;&nbsp;
 <kbd><img src="sample_screenshots/KindleStation_flatten_daily_temperature_landscape.png"  height="360"/></kbd>&nbsp;
