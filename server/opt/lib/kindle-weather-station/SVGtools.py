@@ -2,6 +2,30 @@
 # encoding=utf-8
 # -*- coding: utf-8 -*-
 
+class format:
+    def __init__(self, encoding, height, width, font, _svg):
+        self.encoding = encoding
+        self.height = height
+        self.width = width
+        self._svg = _svg
+        
+    def svg(self):
+        a = f'''<?xml version="1.0" encoding="{self.encoding}"?>
+<svg xmlns="http://www.w3.org/2000/svg" height="{self.height}" width="{self.width}" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink">
+{self._svg}
+</svg>\n'''
+        return a
+
+class fontfamily:
+    def __init__(self, font, _svg):
+         self.font = font
+         self._svg = _svg
+         
+    def svg(self):
+        a = f'<g font-family="{self.font}">\n'
+        a += self._svg + '</g>\n'
+        return a
+  
 # Reguler font
 class text:
     def __init__(self, anchor, fontsize, x, y, v, stroke=None):
@@ -122,6 +146,7 @@ class spline:
         
     def calc(self, _lst):
         n = len(_lst) - 1
+        # create empty lists
         p1 = [ None for _ in range(n)]
         p2 = [ None for _ in range(n)]
         a = [ None for _ in range(n)]
@@ -170,8 +195,6 @@ class spline:
         a += [f'{x[n]} {y[n]}']
         if self._x == None and self._y == None:
             svg = '<path d="M ' + ' '.join(a) + f'" stroke="{self.stroke}" stroke-width="{self.stroke_width}" stroke-linecap="{self.stroke_linecap}" fill="{self.fill}"/>'
-            #svg = '<path d="M ' + ' '.join(a) + f'" stroke="{self.stroke}" stroke-width="{self.stroke_width}" stroke-linecap={self.stroke_linecap} fill="{self.fill}"/>'
-
         else:
             _a = ' '.join(a)
             end_x = x[-1]

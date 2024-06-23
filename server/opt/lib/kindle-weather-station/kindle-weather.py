@@ -123,26 +123,7 @@ def svg_processing(p, text=str(), draw=str(), y=0):
                        
     return text, draw
 
-def create_svg(p, text, draw):
-    width, height = (800, 600) if p.config['landscape'] == True else (600, 800)
-    header = '''<?xml version="1.0" encoding="{}"?>
-<svg xmlns="http://www.w3.org/2000/svg" height="{}" width="{}" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink">\n'''.format(p.config['encoding'], height, width)
-    header += '<g font-family="{}">\n'.format(p.config['font'])
-    #svg_header += '<g font-family="{}">\n'.format("Chalkboard")
-    #svg_header += '<g font-family="{}">\n'.format("Arial")
-    
-    s1 = p.config['city'] + ' - ' if p.config['sunrise_and_sunset'] == True else str()
-    s2 = p.config['api']
-    s = s1 + s2
-    a = '<g font-family="{}">\n'.format(p.config['font'])
-    a += SVGtools.text('end', '16', (width - 5), (height - 5), (s + ' API')).svg()
-    #a += SVGtools.text2('end',  'bold', '16', (800 - 5), (600 - 5), s).svg()
-    text +=  a  + '</g>\n'
-    footer = '</svg>'
-    svg = header + text + draw + footer
-    return svg
-
-def img_processing(p, pngfile, svg):
+def img_processing(p, w, h, pngfile, svg):
     now = p.now
     landscape = p.config['landscape']
     darkmode = p.config['darkmode']
@@ -153,9 +134,9 @@ def img_processing(p, pngfile, svg):
         #if cloudconvert == False and (encoding == 'iso-8859-1' or encoding == 'iso-8859-5'):
         if cloudconvert == False:
             if landscape == True:
-                svg2png(bytestring=svg, write_to=pngfile, background_color="white", parent_width=800, parent_height=600)
+                svg2png(bytestring=svg, write_to=pngfile, background_color="white", parent_width=w, parent_height=h)
             else:
-                svg2png(bytestring=svg, write_to=pngfile, background_color="white", parent_width=600, parent_height=800)
+                svg2png(bytestring=svg, write_to=pngfile, background_color="white", parent_width=w, parent_height=h)
         elif cloudconvert == True:
             # Use cloudconvert API
             import cloudconvert
@@ -272,7 +253,14 @@ def main(setting, flag_dump, flag_config, flag_svg, flag_png):
     try:
         with open(setting, 'r') as f:
             a = json.load(f)['station']
-            api = a['api']   
+            api = a['api']
+            if 'landscape' in a:
+                if a['landscape'] == 'True':
+                    w, h = 800, 600
+                else:
+                    w, h = 600, 800
+            else:
+                w, h = 600, 800
         if api == 'OpenWeather':
             from OpenWeatherMapOnecallAPIv3 import OpenWeatherMap
             api_data = OpenWeatherMap(setting=setting).ApiCall()
@@ -285,7 +273,7 @@ def main(setting, flag_dump, flag_config, flag_svg, flag_png):
             #    api_data = json.load(f)             
             api_data = TomorrowIo(setting=setting).ApiCall()
             if not flag_dump == True:
-                p = TomorrowIo(setting=setting, api_data=api_data)     
+                p = TomorrowIo(setting=setting, api_data=api_data)    
         ## test: API data dump ##
         if flag_dump == True:
             output = path + '/' + api + '_API_output.json'
@@ -300,9 +288,15 @@ def main(setting, flag_dump, flag_config, flag_svg, flag_png):
         # Locale
         #locale.setlocale(locale.LC_TIME, p.config['locale'])
         text, draw = svg_processing(p=p)
-        svg = create_svg(p=p, text=text, draw=draw)
-        cloudconvert = p.config['cloudconvert']
-        svg = create_svg(p=p, text=text, draw=draw)
+        # add footer
+        s1 = p.config['city'] + ' - ' if p.config['sunrise_and_sunset'] == True else str()
+        s2 = p.config['api']
+        s = s1 + s2
+        _s = SVGtools.text('end', '16', (w - 5), (h - 5), (s + ' API')).svg()
+        text += SVGtools.fontfamily(font=p.config['font'], _svg=_s).svg()
+        #svg = create_svg(p=p, w=w, h=h, text=text, draw=draw)
+        _svg = text + draw 
+        svg =  SVGtools.format(encoding=p.config['encoding'], height=h, width=w, font=p.config['font'], _svg=_svg).svg()
         if flag_svg == True:
             output = svgfile
             with open(output, 'w', encoding='utf-8') as f:
@@ -310,7 +304,7 @@ def main(setting, flag_dump, flag_config, flag_svg, flag_png):
             f.close()    
             exit(0)
         else:
-            img_processing(p=p, pngfile=pngfile, svg=svg)
+            img_processing(p=p, w=w, h=h, pngfile=pngfile, svg=svg)
 
     except Exception as e:
         print(e)

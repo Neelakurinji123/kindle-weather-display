@@ -105,6 +105,7 @@ class Maintenant:
         self.p = p
         self.y = y
         self.variant = variant
+        self.font_family = self.p.config['font']
         
     def text(self):
         y = self.y + 40
@@ -157,7 +158,8 @@ class Maintenant:
             #w[0] = d["abbreviated_weekday"][w[0]] if not d == dict() else w[0]
             a += SVGtools.text('start', '30', x_city, y, self.p.config['city']).svg()
             a += SVGtools.text('end', '30', x_date, y, ' '.join(w)).svg()
-        return a + '</g>\n'
+        svg = SVGtools.fontfamily(font=self.font_family, _svg=a).svg()
+        return svg
 
     def icon(self):
         i = str()
@@ -279,7 +281,6 @@ class CurrentData:
         if self.p.config['landscape'] == True:
             wordwrap = 22
             disc = split_text(wordwrap=self.wordwrap, text=weather['description'].lower(), max_rows=2)
-            #disc = [weather['description']]
         else:
             disc = split_text(wordwrap=self.wordwrap, text=weather['description'].lower(), max_rows=2)
         for w in disc:
@@ -397,8 +398,7 @@ class CurrentWeatherPane(CurrentData):
             humi = super(CurrentWeatherPane, self).humidity() 
             wind = super(CurrentWeatherPane, self).wind() 
             disc = super(CurrentWeatherPane, self).description()
-        font = self.p.config['font']
-        a = f'<g font-family="{font}">\n' + prec + temp + pres + humi + wind + disc + '</g>\n'
+        a = SVGtools.fontfamily(font=self.p.config['font'], _svg=prec + temp + pres + humi + wind + disc).svg()
         return a
 
     def icon(self):
@@ -407,8 +407,6 @@ class CurrentWeatherPane(CurrentData):
             self.x_main += -15
             i = super(CurrentWeatherPane, self).icon()
             if int(weather['wind_speed']) != 0 and self.p.config['wind_icon'] == True:
-                #self.x_text = 465
-                #self.y_text = -85+40
                 self.x_text = 255
                 self.y_text = -85
                 i += super(CurrentWeatherPane, self).wind_icon()
@@ -431,10 +429,9 @@ class HourlyWeatherPane:
 
     def text(self):
         y = self.y
-        font = self.p.config['font']
-        a = f'<g font-family="{font}">\n'
         hrs = {3: 'three hours', 6: 'six hours', 9: 'nine hours'}
         d = read_i18n(self.p)
+        a = str()
         # 3hr forecast
         if self.p.config['landscape'] == True:
             x = 550
@@ -473,7 +470,7 @@ class HourlyWeatherPane:
                         else:
                             a += SVGtools.text('end', '25', int(x + 137 - s_padding(r) * 0.357), (y + 82), r).svg()
                 y += self.pitch
-        return a + '</g>\n'
+        return SVGtools.fontfamily(font=self.p.config['font'], _svg=a).svg()
 
     def icon(self):
         y = self.y
@@ -529,8 +526,7 @@ class DailyWeatherPane:
         day2 = self.p.DailyForecast(2)
         day3 = self.p.DailyForecast(3)
         tz = self.p.config['tz']
-        font = self.p.config['font']
-        a = f'<g font-family="{font}">\n'
+        a = str()
         # get max and min temp
         minTemp = math.floor(min([day1['temp_min'], day2['temp_min'], day3['temp_min']]))
         maxTemp = math.ceil(max([day1['temp_max'], day2['temp_max'] , day3['temp_max']]))
@@ -554,7 +550,7 @@ class DailyWeatherPane:
             style = 'stroke:black;stroke-linecap:round;stroke-width:10px;'
             a += SVGtools.line(int(tMin + 40), int(tMax - 65), (y + 18), (y + 18), style).svg() 
             y += self.pitch
-        return a + '</g>\n'
+        return SVGtools.fontfamily(font=self.p.config['font'], _svg=a).svg()
 
     def icon(self):
         y = self.y
@@ -595,9 +591,7 @@ class TwitterPane:
     def text(self):
         y, tw, keywords = self.y, self.tw, self.keywords
         encoding = self.p.config['encoding']
-        font = self.p.config['font']
-        a = f'<g font-family="{font}">\n'
-        #"twitter": {"screen_name": "tenkijp", "translate": "True", "translate_target": "en", "expiration": "1h", "alternate": "daily"}
+        a = str()
         from twikit import Client
         from deep_translator import GoogleTranslator
         screen_name, caption, translate, translate_target = tw['screen_name'], tw['caption'], tw['translate'], tw['translate_target']
@@ -667,7 +661,6 @@ class TwitterPane:
                 for w in disc:
                     a += SVGtools.text('start', '30', 180, (y + 30), w).svg()
                     y += 38
-                a += '</g>\n'
             else:
                 if not caption == str() and not a == None:
                     a += SVGtools.text('middle', '25', 95, (y + 55), caption).svg()
@@ -675,15 +668,13 @@ class TwitterPane:
                 for w in disc:
                     a += SVGtools.text('start', '20', 180, (y + 50), w).svg()
                     y += 25
-                a += '</g>\n'
             if len(urls) > 0:
                 url = urls[0]
             else:
                 url = alternate_url 
         else:
             a, url = None, None
-         
-        return a , url, processing
+        return SVGtools.fontfamily(font=self.p.config['font'], _svg=a).svg(), url, processing
         
     def draw(self, url):
         import io
@@ -777,24 +768,19 @@ class GraphLabel:
         self.step = self.label['step']
         self.basis = self.label['basis']
         self.font_size = self.label['font-size']
-        _font = self.p.config['font']
-        self.font = f'<g font-family="{_font}">\n'
 
     def text(self):
-        font = self.p.config['font']
-        a = self.font
-        #if self.s == "hourly_xlabel":
+        a = str()
         if re.match('hourly', self.s):    
             a += GraphLabel.hourly(self)
-        #elif self.s == "daily_xlabel":
         elif re.match('daily', self.s):    
             a += GraphLabel.daily(self)
-        return a + '</g>\n'
+        return a + '\n'
         
     def hourly(self):
         sp_x = int((800 - self.w) * 0.5) if self.p.config['landscape'] == True else int((600 - self.w) * 0.5)
         box_size_x = self.w / (self.end - self.start)
-        a = self.font
+        a = str()
         d = read_i18n(self.p)
         c = 0
         for n in range(self.start, self.end, self.step):
@@ -806,13 +792,12 @@ class GraphLabel:
                 heure = re.sub('^0', '', heure)
                 a += SVGtools.text('middle', self.font_size, _x, (self.y - 21+25), str(heure)).svg()
             c += 1
-        a += '</g>'
-        return a
+        return SVGtools.fontfamily(font=self.p.config['font'], _svg=a).svg()
             
     def daily(self):
         sp_x = int((800 - self.w) * 0.5) if self.p.config['landscape'] == True else int((600 - self.w) * 0.5)
         box_size_x = self.w / (self.end - self.start)
-        a = self.font
+        a = str()
         d = read_i18n(self.p)
         for n in range(self.start, self.end, self.step):
             weather = self.p.DailyForecast(n)
@@ -820,8 +805,7 @@ class GraphLabel:
             jour = d['abbreviated_weekday'][jour] if not d == dict() else jour
             _x = int(sp_x + box_size_x * (n - self.start) + box_size_x * 0.5)
             a += SVGtools.text('middle', self.font_size, _x, (self.y - 21+25), str(jour)).svg()
-        a += '</g>'
-        return a
+        return SVGtools.fontfamily(font=self.p.config['font'], _svg=a).svg()
  
 class GraphLine:
     def __init__(self, p, y, obj, variant=None):
@@ -834,8 +818,6 @@ class GraphLine:
         self.stroke_color = self.obj['stroke-color']
         self.stroke_linecap = self.obj['stroke-linecap']
         self.stroke_width = self.obj['stroke-width']
-        font = self.p.config['font']
-        self.font = f'<g font-family="{font}">\n'
         
     def draw(self): 
         style = f'stroke:{self.stroke_color};stroke-linecap:{self.stroke_linecap};stroke-width:{self.stroke_width}px;'
@@ -869,8 +851,14 @@ class GraphPane:
         self.grid_color = self.canvas['grid_color']
         self.grid_ext_upper = self.canvas['grid_ext_upper']
         self.grid_ext_lower= self.canvas['grid_ext_lower']
-        font = self.p.config['font']
-        self.font = f'<g font-family="{font}">\n'
+        self.style_bg = f'fill:{self.bgcolor};stroke:{self.bgcolor};stroke-width:0px;'
+        self.style_axis = f'stroke:{self.axis_color};stroke-linecap:{self.stroke_linecap};stroke-width:1px;'
+        self.style_grid = f'stroke:{self.grid_color};stroke-linecap:{self.stroke_linecap};stroke-width:{self.grid}px;'
+        self.style_pline_fill = f'fill:{self.fill};stroke:{self.fill};stroke-width:0px;stroke-linecap:{self.stroke_linecap};'
+        self.style_pline = f'fill:none;stroke:{self.stroke_color};stroke-width:{self.stroke}px;stroke-linecap:{self.stroke_linecap};'
+        self.style_line = f'stroke:{self.stroke_color};stroke-linecap:{self.stroke_linecap};stroke-width:{self.stroke}px;'
+        self.style_rect = f'fill:{self.fill};stroke:{self.stroke_color};stroke-linecap:{self.stroke_linecap};stroke-width:{self.stroke}px;'
+        self.style_baseline = f'stroke:{self.axis_color};stroke-width:1px;'
 
     def draw(self):
         if self.type == 'line':
@@ -890,13 +878,11 @@ class GraphPane:
         sp_x = int((800 - self.w) * 0.5) if self.p.config['landscape'] == True else int((600 - self.w) * 0.5)
         box_size_x = self.w / self.end
         half = box_size_x * 0.5
-        a = self.font
+        a = str()
         d = read_i18n(self.p)
         tz = self.p.config['tz']       
         # draw canvas
-        style = f'fill:{self.bgcolor};stroke:{self.bgcolor};stroke-width:0px;'
-        a += SVGtools.rect(x=sp_x, y=(y - self.h + 140), width=self.w, height=(self.h - 45), style=style).svg()
-        #style = 'stroke:{};stroke-width:{}px;'.format(axis_color, axis)
+        a += SVGtools.rect(x=sp_x, y=(y - self.h + 140), width=self.w, height=(self.h - 45), style=self.style_bg).svg()
         # get graph data
         points = str()
         if self.basis == 'hour':
@@ -968,25 +954,21 @@ class GraphPane:
                     a += SVGtools.text('middle', '16', x, (_y - 9), int(weather['temp_day'])).svg()
                     a += SVGtools.circle((x + 12), (_y - 20), 2, 'black', 1, 'none').svg() 
         # draw fill pline        
-        style2 = f'fill:{self.fill};stroke:{self.fill};stroke-width:0px;stroke-linecap:{self.stroke_linecap};'
-        a += SVGtools.polyline(points2, style2).svg()
+        a += SVGtools.polyline(points2, self.style_pline_fill).svg()
         # draw pline
-        style = f'fill:none;stroke:{self.stroke_color};stroke-width:{self.stroke}px;stroke-linecap:{self.stroke_linecap};'
-        a += SVGtools.polyline(points, style).svg()
-        a += '</g>'
-        return a
+        a += SVGtools.polyline(points, self.style_pline).svg()
+        return SVGtools.fontfamily(font=self.p.config['font'], _svg=a).svg()
         
     def spline(self):
         y = self.y
         sp_x = int((800 - self.w) * 0.5) if self.p.config['landscape'] == True else int((600 - self.w) * 0.5)
         box_size_x = self.w / self.end
         half_box = box_size_x * 0.5
-        a = self.font
+        a = str()
         d = read_i18n(self.p)
         tz = self.p.config['tz']       
         # draw canvas
-        style = f'fill:{self.bgcolor};stroke:{self.bgcolor};stroke-width:0px;'
-        a += SVGtools.rect(x=sp_x, y=(y - self.h + 140), width=self.w, height=(self.h - 45), style=style).svg()
+        a += SVGtools.rect(x=sp_x, y=(y - self.h + 140), width=self.w, height=(self.h - 45), style=self.style_bg).svg()
         # draw graph
         points = str()
         # get hourly temp graph data
@@ -1040,18 +1022,16 @@ class GraphPane:
         a += SVGtools.spline(lst=lst, _x=lst[0][0], _y=(y + 95), stroke=self.fill, stroke_width=0, fill=self.fill).svg()
         # draw spline graph
         a += SVGtools.spline(lst=lst, stroke=self.stroke_color, stroke_width=self.stroke).svg()
-        a += '</g>'
-        return a
+        return SVGtools.fontfamily(font=self.p.config['font'], _svg=a).svg()
 
     def bar(self):
         y = self.y
         sp_x = int((800 - self.w) * 0.5) if self.p.config['landscape'] == True else int((600 - self.w) * 0.5)
         box_size_x = self.w / self.end
-        a = self.font
+        a = str()
         i18n = read_i18n(self.p)
         # Canvas
-        style = f'fill:{self.bgcolor};stroke:{self.bgcolor};stroke-width:0px;'
-        a += SVGtools.rect(x=sp_x, y=(y - self.h + 140), width=self.w, height=(self.h - 45), style=style).svg()
+        a += SVGtools.rect(x=sp_x, y=(y - self.h + 140), width=self.w, height=(self.h - 45), style=self.style_bg).svg()
         if self.basis == 'hour' and self.title == 'rain precipitation':
             # Graph
             th = 10.0 # threshold
@@ -1066,12 +1046,10 @@ class GraphPane:
                 base_y = y - self.h + 235
                 _vol = int((vol **(1/3)) * th)
                 x = sp_x + int(box_size_x * n + box_size_x * 0.5)
-                style = f'stroke:{self.stroke_color};stroke-linecap:{self.stroke_linecap};stroke-width:{self.stroke}px;'
-                a += SVGtools.line(x1=x, x2=x, y1=base_y, y2=(base_y - _vol) , style=style).svg()
+                a += SVGtools.line(x1=x, x2=x, y1=base_y, y2=(base_y - _vol) , style=self.style_line).svg()
                 if _max == vol and _max != 0:
                     a += SVGtools.text('middle', '16', x, (base_y - _vol - 10), f'{int(round(vol, 0))} mm').svg()
-                    style2 = f'stroke:{self.axis_color};stroke-linecap:{self.stroke_linecap};stroke-width:1px;'
-                    a += SVGtools.line(x, x, (base_y - _vol), (base_y - _vol - 8), style2).svg()
+                    a += SVGtools.line(x, x, (base_y - _vol), (base_y - _vol - 8), self.style_axis).svg()
         elif self.basis == 'day' and self.title == 'rain precipitation':
             # Graph
             th = 5.75 # threshold
@@ -1087,27 +1065,22 @@ class GraphPane:
                 base_y = y - self.h + 235
                 _vol = int((vol **(1/3)) * th)
                 x = sp_x + int(box_size_x * n + box_size_x * 0.5)
-                style = f'stroke:{self.stroke_color};stroke-linecap:{self.stroke_linecap};stroke-width:{self.stroke}px;'
-                a += SVGtools.line(x1=x, x2=x, y1=base_y, y2=(base_y - _vol) , style=style).svg()
+                a += SVGtools.line(x1=x, x2=x, y1=base_y, y2=(base_y - _vol) , style=self.style_line).svg()
                 if _max == vol and _max != 0:
                     a += SVGtools.text('middle', '16', x, (base_y - _vol - 12), f'{int(round(vol, 0))} mm').svg()
-                    style2 = f'stroke:{self.axis_color};stroke-linecap:{self.stroke_linecap};stroke-width:1px;'
-                    a += SVGtools.line(x, x, (base_y - _vol), (base_y - _vol - 10), style2).svg()
+                    a += SVGtools.line(x, x, (base_y - _vol), (base_y - _vol - 10), self.style_axis).svg()
         # Baseline
-        style = f'stroke:{self.axis_color};stroke-width:1px;'
-        a += SVGtools.line(x1=sp_x, x2=(sp_x + self.w), y1=(y + 95), y2=(y + 95), style=style).svg()
-        a += '</g>'
-        return a
+        a += SVGtools.line(x1=sp_x, x2=(sp_x + self.w), y1=(y + 95), y2=(y + 95), style=self.style_baseline).svg()
+        return SVGtools.fontfamily(font=self.p.config['font'], _svg=a).svg()
 
     def rect(self):
         y = self.y
         sp_x = int((800 - self.w) * 0.5) if self.p.config['landscape'] == True else int((600 - self.w) * 0.5)
         box_size_x = self.w / self.end
-        a = self.font
+        a = str()
         i18n = read_i18n(self.p)
         # Canvas
-        style = f'fill:{self.bgcolor};stroke:{self.bgcolor};stroke-width:0px;'
-        a += SVGtools.rect(x=sp_x, y=(y - self.h + 140), width=self.w, height=(self.h - 45), style=style).svg() 
+        a += SVGtools.rect(x=sp_x, y=(y - self.h + 140), width=self.w, height=(self.h - 45), style=self.style_bg).svg() 
         if self.basis == 'hour' and self.title == 'snow accumulation':
             # Graph
             th = 10.0 # threshold 
@@ -1122,12 +1095,10 @@ class GraphPane:
                 _vol = int(vol **(1/3) * th)
                 #_x = sp_x + int(box_size_x * n + box_size_x * 0.5 - width * 0.5)
                 _x = sp_x + int(box_size_x * n + box_size_x * 0.5)
-                style = f'fill:{self.fill};stroke:{self.stroke_color};stroke-linecap:{self.stroke_linecap};stroke-width:{self.stroke}px;'
-                a += SVGtools.rect(x=_x - int(self.width / 2), y=(base_y - _vol), width=self.width , height=_vol , style=style).svg()
+                a += SVGtools.rect(x=_x - int(self.width / 2), y=(base_y - _vol), width=self.width , height=_vol , style=self.style_rect).svg()
                 if _max == vol and _max != 0:
                     a += SVGtools.text('middle', '16', _x, (base_y - _vol - 12), f'{int(round(vol, 0))} mm').svg()
-                    style2 = f'stroke:{self.axis_color};stroke-linecap:{self.stroke_linecap};stroke-width:1px;'
-                    a += SVGtools.line(_x, _x, (base_y - _vol), (base_y - _vol - 10), style2).svg()
+                    a += SVGtools.line(_x, _x, (base_y - _vol), (base_y - _vol - 10), self.style_axis).svg()
 
         elif self.basis == 'day' and self.title == 'snow accumulation':
             # Graph
@@ -1143,19 +1114,15 @@ class GraphPane:
                 _vol = int(vol **(1/3) * th)
                 #_x = sp_x + int(box_size_x * n + box_size_x * 0.5 - width * 0.5)
                 _x = sp_x + int(box_size_x * n + box_size_x * 0.5)
-                style = f'fill:{self.fill};stroke:{self.stroke_color};stroke-linecap:{self.stroke_linecap};stroke-width:{self.stroke}px;'
-                a += SVGtools.rect(x=_x - int(self.width / 2), y=(base_y - _vol), width=self.width , height=_vol , style=style).svg()
+                a += SVGtools.rect(x=_x - int(self.width / 2), y=(base_y - _vol), width=self.width , height=_vol , style=self.style_rect).svg()
                 if _max == vol and _max != 0:
                     a += SVGtools.text('middle', '16', _x, (base_y - _vol - 12), f'{int(round(vol, 0))} mm').svg()
-                    style2 = f'stroke:{self.axis_color};stroke-linecap:{self.stroke_linecap};stroke-width:1px;'
-                    a += SVGtools.line(_x, _x, (base_y - _vol), (base_y - _vol - 10), style2).svg()
+                    a += SVGtools.line(_x, _x, (base_y - _vol), (base_y - _vol - 10), self.style_axis).svg()
         # Baseline
-        style = f'stroke:{self.axis_color};stroke-width:1px;'
-        a += SVGtools.line(x1=(sp_x), x2=(sp_x + self.w), y1=(y + 95), y2=(y + 95), style=style).svg()
+        a += SVGtools.line(x1=(sp_x), x2=(sp_x + self.w), y1=(y + 95), y2=(y + 95), style=self.style_baseline).svg()
         # Text processing
         a += SVGtools.text('start', '16', sp_x+5, (y - self.h + 156), f'{title}, total: {int(round(_sum, 0))} mm').svg()
-        a += '</g>'
-        return a
+        return SVGtools.fontfamily(font=self.p.config['font'], _svg=a).svg()
 
     def tile(self):
         tz = self.p.config['tz']
@@ -1168,10 +1135,9 @@ class GraphPane:
                     'stroke_color': self.stroke_color, 'fill': self.fill, 'stroke_linecap': self.stroke_linecap, 
                     'tz': tz, 'sp_x': sp_x, 'variant': self.variant}
         # Start
-        a = self.font
-        # Canvas
-        style = f'fill:{self.bgcolor};stroke:{self.bgcolor};stroke-width:0px;' 
-        a += SVGtools.rect(x=sp_x, y=(self.y - self.h + 140), width=self.w, height=(self.h - 45), style=style).svg()
+        a = str()
+        # Canvas 
+        a += SVGtools.rect(x=sp_x, y=(self.y - self.h + 140), width=self.w, height=(self.h - 45), style=self.style_bg).svg()
 
         def daily_weather(p, y, w, h, bgcolor, axis, axis_color, grid, grid_color, grid_ext_upper, grid_ext_lower, \
                             stroke, stroke_color, fill, stroke_linecap, \
@@ -1202,8 +1168,7 @@ class GraphPane:
                     s += SVGtools.text('end', '30', (_x + half + 45), _y, round(weather['temp_max'])).svg()
                     s += SVGtools.circle((_x + half + 51), (_y - 20), 3, 'black', 2, 'none').svg()
                     if n < (end - 1):
-                        style = f'stroke:{grid_color};stroke-linecap:{stroke_linecap};stroke-width:{grid}px;'
-                        i += SVGtools.line((_x + box_size_x), (_x + box_size_x), (_y - h + 55 - grid_ext_upper), (_y + 5), style).svg()
+                        i += SVGtools.line((_x + box_size_x), (_x + box_size_x), (_y - h + 55 - grid_ext_upper), (_y + 5), self.style_grid).svg()
                 else:
                     sp = 0 if (end - start) == 6 else -10
                     i += SVGtools.transform(f'(1.0,0,0,1.0,{(_x - 10 + sp)},{(_y - 100)})', addIcon(weather['main'])).svg()
@@ -1213,8 +1178,7 @@ class GraphPane:
                     s += SVGtools.text('end', '16', (_x + half + 22), _y, round(weather['temp_max'])).svg()
                     s += SVGtools.circle((_x + half + 24), (_y - 10), 2, 'black', 1, 'none').svg()
                     #if n < (end - 1):
-                    style = f'stroke:{grid_color};stroke-linecap:{stroke_linecap};stroke-width:{grid}px;'
-                    i += SVGtools.line((_x + box_size_x), (_x + box_size_x), (_y - h + 55-10), (_y + 10), style).svg()
+                    i += SVGtools.line((_x + box_size_x), (_x + box_size_x), (_y - h + 55-10), (_y + 10), self.style_grid).svg()
             return s,i
 
         def moon_phase(p, y, w, h, bgcolor, axis, axis_color, grid, grid_color, stroke, stroke_color, fill, stroke_linecap, \
@@ -1333,7 +1297,7 @@ class GraphPane:
                         py1 = math.sin(pi * 1.5 - m) * rp + ry
                         px2 = math.cos(pi * 1.5 - m) * rp + rx
                         py2 = -math.sin(pi * 1.5 - m) * rp +ry
-                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {(ra3+1)} 0 0 1 {px1} {py1}z'
+                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 1 {px1} {py1}z'
                         ps = phase(rad)
                         ram = calc_ramadhan(day, mon, yr) if ramadhan == True else str()
                     elif pi > rad >= pi * 0.5:
@@ -1357,7 +1321,7 @@ class GraphPane:
                         py1 = math.sin(pi * 0.5 - m) * rp + ry
                         px2 = math.cos(pi * 0.5 - m) * rp + rx
                         py2 = -math.sin(pi * 0.5 - m) * rp + ry
-                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {(ra3+1.75)} 0 0 1 {px1} {py1}z'
+                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 1 {px1} {py1}z'
                         ps = phase(rad)
                         ram = calc_ramadhan(day, mon, yr) if ramadhan == True else str()
                 return dm, ps, ram
@@ -1375,8 +1339,7 @@ class GraphPane:
                     _y = y - 10
                     # grid
                     if n < (end - 1):
-                        style = f'stroke:{grid_color};stroke-linecap:{stroke_linecap};stroke-width:{grid}px;'
-                        i += SVGtools.line((_x + box_size_x), (_x + box_size_x), (_y - h + 150 - grid_ext_upper), (_y + 105), style).svg()                 
+                        i += SVGtools.line((_x + box_size_x), (_x + box_size_x), (_y - h + 150 - grid_ext_upper), (_y + 105), self.style_grid).svg()                 
                     # Moon icon
                     r = 25
                     kwargsPlus = {'day': day, 'mon': mon, 'yr': yr, 'lat': lat, 'x': _x, 'y': _y, 'r': r, 'half': half, 'ramadhan': ramadhan}
@@ -1401,9 +1364,7 @@ class GraphPane:
                     _x = int(sp_x + (box_size_x + grid) * (n - start)) 
                     _y = y + 25  
                     r = 18 if end == 6 else 14
-                    #if n < (end - 1):
-                    style = f'stroke:{grid_color};stroke-linecap:{stroke_linecap};stroke-width:{grid}px;'
-                    i += SVGtools.line((_x + box_size_x), (_x + box_size_x), (_y - h + 115), (_y + 70), style).svg()                 
+                    i += SVGtools.line((_x + box_size_x), (_x + box_size_x), (_y - h + 115), (_y + 70), self.style_grid).svg()                 
                     # Moon icon
                     kwargsPlus = {'day': day, 'mon': mon, 'yr': yr, 'lat': lat, 'x': _x, 'y': _y, 'r': r, 'half': half, 'ramadhan': ramadhan}
                     dm, ps, ram = calc_moonphase(**kwargsPlus)
@@ -1422,13 +1383,13 @@ class GraphPane:
         # Graph
         if self.basis == 'day' and self.title == 'weather':
             s,i = daily_weather(**kwargs)
-            a += s + '</g>' + i
+            a += s + i
         elif self.basis == 'day' and self.title == 'moon phase':
             s,i = moon_phase(**kwargs)        
             if self.p.config['landscape'] == True:
                 s += SVGtools.text('start', '16', 10, (600 - 5), 'moon phase').svg()
-            a += s + '</g>' + i         
-        return a
+            a += s + i         
+        return SVGtools.fontfamily(font=self.p.config['font'], _svg=a).svg()
 
 def addIcon(s):
     if s == 'ClearDay':
