@@ -9,7 +9,6 @@
 import time as t
 import sys, re, json, io, os
 from pathlib import Path
-#from pytz import timezone
 import zoneinfo
 import locale
 import shutil
@@ -38,11 +37,9 @@ def svg_processing(p, text=str(), draw=str(), y=0):
     utc = zoneinfo.ZoneInfo('UTC')
     layout = p.config['layout']
     graph_objects = p.config['graph_objects']
-    # Landscape's paper layout
-    variant = 1 if p.config['landscape'] == True else None
     for s in layout:
         if s == 'maintenant':    
-            a = Maintenant(p=p, y=y, variant=None)
+            a = Maintenant(p=p, y=y)
             text += a.text()
             draw += a.icon()
             y += 50
@@ -50,11 +47,11 @@ def svg_processing(p, text=str(), draw=str(), y=0):
         elif s == 'main':      
             if p.config['landscape'] == True:
                 wordwrap = 18
-                a = CurrentWeatherPane(p=p, y=y, wordwrap=wordwrap, variant=None)
+                a = CurrentWeatherPane(p=p, y=y, wordwrap=wordwrap)
                 text += a.text()
                 draw += a.icon()
                 start_hour, span, step, pitch = 3, 9, 3, 155
-                a = HourlyWeatherPane(p=p, y=y, hour=start_hour, span=span, step=step, pitch=pitch, variant=None)
+                a = HourlyWeatherPane(p=p, y=y, hour=start_hour, span=span, step=step, pitch=pitch)
                 text += a.text()
                 draw += a.icon()
                 y += 340
@@ -73,13 +70,13 @@ def svg_processing(p, text=str(), draw=str(), y=0):
         elif s == 'daily':
             # Daily weather: size(y=280)
             span, pitch = 4, 90
-            a = DailyWeatherPane(p=p, y=y, span=span, pitch=pitch, variant=variant)
+            a = DailyWeatherPane(p=p, y=y, span=span, pitch=pitch)
             text += a.text()
             draw += a.icon()
             y += 280
         elif s == 'twitter':
             try:
-                a = TwitterPane(p=p, y=y, variant=None)
+                a = TwitterPane(p=p, y=y)
                 _text, url, processing = a.text()
                 if processing == True:
                     text += _text
@@ -97,28 +94,27 @@ def svg_processing(p, text=str(), draw=str(), y=0):
             obj = graph_objects.pop()
             if p.config['landscape'] == True:
                 # pane size(y=120)
-                a = GraphPane(p=p, y=y+40, obj=obj, variant=None)
+                a = GraphPane(p=p, y=y+40, obj=obj)
                 draw += a.draw()
                 y += 120
             else:
                 # pane size(y=120)
-                a = GraphPane(p=p, y=y, obj=obj, variant=None)
+                a = GraphPane(p=p, y=y, obj=obj)
                 draw += a.draw()
                 y += 120 
-        #elif s == 'hourly_xlabel' or s == 'daily_xlabel':
         elif re.search('xlabel', s):
             if p.config['landscape'] == True:
-                a = GraphLabel(p=p, y=y+25, s=s, variant=None)
+                a = GraphLabel(p=p, y=y+25, s=s)
                 text += a.text()
                 y += 40
             else:
-                a = GraphLabel(p=p, y=y, s=s, variant=None)
+                a = GraphLabel(p=p, y=y, s=s)
                 text += a.text()
                 y += 20
         elif re.match(r'(padding[\+\-0-9]*)', s):
             y += int(re.sub('padding', '', s))
         elif re.search('h_line', s):
-            a = GraphLine(p=p, y=y, obj=p.config['graph_lines'][s], variant=None)
+            a = GraphLine(p=p, y=y, obj=p.config['graph_lines'][s])
             draw += a.draw()
                        
     return text, draw
@@ -133,11 +129,10 @@ def img_processing(p, w, h, pngfile, svg):
     try:
         #if cloudconvert == False and (encoding == 'iso-8859-1' or encoding == 'iso-8859-5'):
         if cloudconvert == False:
-            if landscape == True:
-                svg2png(bytestring=svg, write_to=pngfile, background_color="white", parent_width=w, parent_height=h)
-            else:
-                svg2png(bytestring=svg, write_to=pngfile, background_color="white", parent_width=w, parent_height=h)
+            svg2png(bytestring=svg, write_to=pngfile, background_color="white", parent_width=w, parent_height=h)
         elif cloudconvert == True:
+            with open(svgfile, 'w') as f:
+                f.write(svg)
             # Use cloudconvert API
             import cloudconvert
             with open('./config/cloudconvert.json') as f:
@@ -254,13 +249,7 @@ def main(setting, flag_dump, flag_config, flag_svg, flag_png):
         with open(setting, 'r') as f:
             a = json.load(f)['station']
             api = a['api']
-            if 'landscape' in a:
-                if a['landscape'] == 'True':
-                    w, h = 800, 600
-                else:
-                    w, h = 600, 800
-            else:
-                w, h = 600, 800
+
         if api == 'OpenWeather':
             from OpenWeatherMapOnecallAPIv3 import OpenWeatherMap
             api_data = OpenWeatherMap(setting=setting).ApiCall()
@@ -292,11 +281,10 @@ def main(setting, flag_dump, flag_config, flag_svg, flag_png):
         s1 = p.config['city'] + ' - ' if p.config['sunrise_and_sunset'] == True else str()
         s2 = p.config['api']
         s = s1 + s2
-        _s = SVGtools.text('end', '16', (w - 5), (h - 5), (s + ' API')).svg()
+        _s = SVGtools.text('end', '16', (p.config['w'] - 5), (p.config['h'] - 5), (s + ' API')).svg()
         text += SVGtools.fontfamily(font=p.config['font'], _svg=_s).svg()
-        #svg = create_svg(p=p, w=w, h=h, text=text, draw=draw)
         _svg = text + draw 
-        svg =  SVGtools.format(encoding=p.config['encoding'], height=h, width=w, font=p.config['font'], _svg=_svg).svg()
+        svg =  SVGtools.format(encoding=p.config['encoding'], height=p.config['h'], width=p.config['w'], font=p.config['font'], _svg=_svg).svg()
         if flag_svg == True:
             output = svgfile
             with open(output, 'w', encoding='utf-8') as f:
@@ -304,7 +292,7 @@ def main(setting, flag_dump, flag_config, flag_svg, flag_png):
             f.close()    
             exit(0)
         else:
-            img_processing(p=p, w=w, h=h, pngfile=pngfile, svg=svg)
+            img_processing(p=p, w=p.config['w'], h=p.config['h'], pngfile=pngfile, svg=svg)
 
     except Exception as e:
         print(e)

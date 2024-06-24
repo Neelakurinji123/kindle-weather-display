@@ -40,6 +40,12 @@ def readSettings(setting):
     a['cloudconvert'] = bool(eval(service['cloudconvert'])) if 'cloudconvert' in service else False
     a['layout'] = service['layout']
     a['landscape'] = bool(eval(service['landscape'])) if 'landscape' in service else False
+    
+    if a['landscape'] == True:
+        a['w'], a['h'] = 800, 600
+    else:
+        a['w'], a['h']= 600, 800
+
     a['ramadhan'] = bool(eval(service['ramadhan'])) if 'ramadhan' in service else False
     a['twitter'] = service['twitter'] if 'twitter' in service else False 
     tz = zoneinfo.ZoneInfo(a['timezone'])
@@ -109,7 +115,7 @@ class OpenWeatherMap:
         s += 'lat=' + config['lat'] + '&lon=' + config['lon']
         s += '&units=' + config['units'] if 'units' in config and not config['units'] == None else ''
         s += '&lang=' + config['lang']
-        s += ('&exclude=' + config['exclude'] if 'exclude' in config and not config['exclude'] == None else '')
+        s += '&exclude=' + config['exclude'] if 'exclude' in config and not config['exclude'] == None else ''
         s += '&appid=' + config['api_key']
         url = 'https://api.openweathermap.org/data/' + config['api_version'] + '/onecall?' + s
         api_data = requests.get(url).json()            
