@@ -1178,7 +1178,11 @@ class GraphPane:
             def calc_moonphase(day, mon, yr, half, x, y, r, lat, ramadhan, **kwargsPlus):
 
                 def phase(rad):
-                    one_day_step = abs(2 * pi / 56)  # cairo fix
+                    if p.config['cloudconvert'] == True:
+                        one_day_step = 2 * pi / 56
+                    else:
+                        one_day_step = abs(2 * pi / 56)  # cairo fix
+                        
                     if one_day_step > rad >= 0 or one_day_step > (pi * 2 - rad) >= 0:
                         a = 'n'
                     elif one_day_step > abs(rad - pi * 0.5) >= 0:
@@ -1211,7 +1215,10 @@ class GraphPane:
                 # moon phase:  360d = 2pi(rad)
                 #lat = -1  # test
                 # cairosvg bug?
-                pi = -math.pi
+                if p.config['cloudconvert'] == True:
+                    pi = math.pi
+                else:
+                    pi = -math.pi
                 #rad = weather['moon_phase'] * pi * 2  
                 # One call API: 0 or 1:new moon, 0.25:first qurater moon, 0.5:full moon, 0.75:third quarter moon 
                 m = moonphase(day, mon, yr)
