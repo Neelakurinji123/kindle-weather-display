@@ -7,7 +7,7 @@
 
 
 import time as t
-import sys, re, math, json, os, pathlib
+import sys, re, math, json, os, pathlib, io
 from datetime import datetime, timedelta, date
 import zoneinfo
 import locale
@@ -42,6 +42,8 @@ def split_text(wordwrap, text, max_rows):
     d = dict()
     max_rows -= 1
     rows = 0
+    if wordwrap == -1:
+        return text
     for w in text.split():
         if len(''.join(s)) + len(w)  + len(s) > wordwrap and rows < max_rows:
             d[rows] = s
@@ -98,12 +100,10 @@ def daytime(p, dt, sunrise, sunset):
             state = 'polar_night'
     return state
 
-
 class Maintenant:
-    def __init__(self, p, y, variant=None):
+    def __init__(self, p, y):
         self.p = p
         self.y = y
-        self.variant = variant
         self.font_family = self.p.config['font']
         
     def text(self):
@@ -116,39 +116,48 @@ class Maintenant:
                 sunrise = "--:--"
             else:
                 try:
-                    sunrise = str(datetime.fromtimestamp(weather['sunrise'], tz).strftime('%H:%M'))
+                    sunrise = str(datetime.fromtimestamp(weather['sunrise'], tz).strftime('%-H:%M'))
                 except Exception as e:
                     sunrise = '--:--'
             if weather['sunset'] == 0:
                 sunset = '--:--'
             else:
                 try:
-                    sunset = str(datetime.fromtimestamp(weather['sunset'], tz).strftime('%H:%M'))
+                    sunset = str(datetime.fromtimestamp(weather['sunset'], tz).strftime('%-H:%M'))
                 except Exception as e:
                     sunset = '--:--'
             # localtime
             if self.p.config['landscape'] == True:
-                maintenant = (str.lower(datetime.fromtimestamp(self.p.now, tz).strftime('%A, %d %B %H:%M')))
+                maintenant = (str.lower(datetime.fromtimestamp(self.p.now, tz).strftime('%A, %d %B %-H:%M')))
             else:
-                maintenant = (str.lower(datetime.fromtimestamp(self.p.now, tz).strftime('%a, %d %b %H:%M')))
+                maintenant = (str.lower(datetime.fromtimestamp(self.p.now, tz).strftime('%a, %d %b %-H:%M')))
             w = maintenant.split()
             #d = read_i18n(self.p)
             #w[0] = d["abbreviated_weekday"][w[0][:-1]] + ',' if not d == dict() else w[0]
             #w[2] = d["abbreviated_month"][w[2]] if not d == dict() else w[2]
             if self.p.config['landscape'] == True:
-                x_sun = 645
+                x_sun = 550
                 x_date = 20            
                 a += SVGtools.text('start', '30', x_date, y, ' '.join(w)).svg()
-                a += SVGtools.text('end', '30', x_sun, y, sunrise).svg()
-                a += SVGtools.text('end', '30', (x_sun + 135), y, sunset).svg()
+                a += SVGtools.text('start', '30', x_sun, y, sunrise).svg()
+                a += SVGtools.text('start', '30', (x_sun + 125), y, sunset).svg()
+                # moon icon
+                x_moon = 775
+                r = 8
+                yr, mon, day, _, _, _, _, _, _ = datetime.now().timetuple()
+                kw = {'p': self.p, 'day': day, 'mon': mon, 'yr': yr, 'lat': float(self.p.config['lat']), 'rx': x_moon, 'ry': (y - 10), 'r': r, 'ramadhan': self.p.config['ramadhan']}
+                m = Moonphase(**kw)
+                dm, ps, ram = m.calc()
+                style = 'fill:rgb(0,0,0);stroke:rgb(0,0,0);stroke-width:1px;'
+                a += m.svg(dm=dm, ps=ps, stroke_color="rgb(0,0,0)", r_plus=1, stroke=3, style=style)
             else:
-                x_sun = 445
+                x_sun = 365
                 x_date = 20
-                a += SVGtools.text('end', '30', x_sun, y, sunrise).svg()
-                a += SVGtools.text('end', '30', (x_sun + 135), y, sunset).svg()
+                a += SVGtools.text('start', '30', x_sun, y, sunrise).svg()
+                a += SVGtools.text('start', '30', (x_sun + 135), y, sunset).svg()
                 a += SVGtools.text('start', '30', x_date, y, ' '.join(w)).svg()
         else:
-            maintenant = str.lower(datetime.fromtimestamp(self.p.now, tz).strftime('%a %Y/%m/%d %H:%M'))
+            maintenant = str.lower(datetime.fromtimestamp(self.p.now, tz).strftime('%a %Y/%m/%d %-H:%M'))
             w = maintenant.split()
             x_city = 20
             x_date = 580
@@ -163,10 +172,10 @@ class Maintenant:
         i = str()
         if self.p.config['sunrise_and_sunset'] == True:
             if self.p.config['landscape'] == True:
-                x_sun = 528
+                x_sun = 513
                 y_sun = self.y + 14
                 i += SVGtools.transform(f'(1.1,0,0,1.1,{x_sun},{y_sun})', Icons.Sunrise()).svg()
-                x_sun += 137
+                x_sun += 127
                 y_sun = self.y + 14
                 i += SVGtools.transform(f'(1.1,0,0,1.1,{x_sun},{y_sun})', Icons.Sunset()).svg()
             else:
@@ -326,12 +335,11 @@ class CurrentData:
             return SVGtools.transform(f'(1.6,0,0,1.6,{x_wind},{y_wind})', addIcon(weather['cardinal'])).svg()
 
 class CurrentWeatherPane(CurrentData):
-    def __init__(self, p, y=int(), wordwrap=int(), variant=None):
+    def __init__(self, p, y=0, wordwrap=-1):
         self.p = p
         self.x = 0
         self.y = y
         self.wordwrap = wordwrap 
-        self.variant = variant
         self.x_main = self.x - 25
         self.y_main = y - 90
         self.x_sub_main = self.x
@@ -411,14 +419,13 @@ class CurrentWeatherPane(CurrentData):
 
 
 class HourlyWeatherPane:
-    def __init__(self, p, y, hour, span, step, pitch, variant=None):
+    def __init__(self, p, y, hour, span, step, pitch):
         self.p = p
         self.y = y
         self.hour = hour
         self.span = span
         self.step = step
         self.pitch = pitch
-        self.variant = variant
 
     def text(self):
         y = self.y
@@ -506,7 +513,7 @@ class HourlyWeatherPane:
         return a
 
 class DailyWeatherPane:
-    def __init__(self, p, y, span, pitch, variant=None):
+    def __init__(self, p, y, span, pitch):
         self.p = p
         self.y = y
         self.pitch = 90
@@ -574,7 +581,7 @@ class DailyWeatherPane:
         return a
 
 class TwitterPane:
-    def __init__(self, p, y, variant=None):
+    def __init__(self, p, y):
         self.p = p
         self.y = y
         self.tw = p.config['twitter']
@@ -668,85 +675,19 @@ class TwitterPane:
             a, url = None, None
         return SVGtools.fontfamily(font=self.p.config['font'], _svg=a).svg(), url, processing
         
-    def draw(self, url):
-        import io
+    def qrcode(self, url):
         import qrcode
-        import qrcode.image.svg
-        #from qrcode.image.pure import PyPNGImage
-        multiple = 5       
-        # define a method to choose which factory metho to use
-        # possible values 'basic' 'fragment' 'path'
-        method = 'basic'
-        if method == 'basic':
-            # Simple factory, just a set of rects.
-            factory = qrcode.image.svg.SvgImage
-        elif method == 'fragment':
-            # Fragment factory (also just a set of rects)
-            factory = qrcode.image.svg.SvgFragmentImage
-        elif method == 'path':
-            # Combined path factory, fixes white space that may occur when zooming
-            factory = qrcode.image.svg.SvgPathImage
-        # Set data to qrcode
-        img = qrcode.make(url, image_factory = factory)
-        stream = io.BytesIO()
-        img.save(stream)
-        # Save svg file somewhere
-        #img.save("qrcode.svg")
-        #img2 = qrcode.make(data, image_factory=PyPNGImage)
-        #img2.save("qrcode.png")
-        i = stream.getvalue().decode()
-        # Strip unnecessary codes
-        i = re.sub(r'<\?xml.+\?>\n', '', i)
-        i = re.sub(r'''<svg width=[^<]+>''', '', i)
-        i = re.sub(r'</svg>$', '', i)
-        i = re.sub('([0-9]+)mm', r'\1', i)
-        # Transformation
-        if self.p.config['landscape'] == True:
-            if not self.tw['caption'] == str():
-                offset_x, offset_y = 8, 425
-            else:
-                offset_x, offset_y = 8, 390
-        else:
-            if not self.tw['caption'] == str():
-                offset_x, offset_y = 8, 585
-            else:
-                offset_x, offset_y = 8, 560
-        def multi_x(match):
-            d = int(match.group(1))
-            d *= multiple
-            d += offset_x
-            s = 'x="' + str(d) + '"'
-            return s
-        def multi_y(match):
-            d = int(match.group(1))
-            d *= multiple
-            d += offset_y
-            s = 'y="' + str(d) + '"'
-            return s
-        def multi_w(match):
-            d = int(match.group(1))
-            d *= multiple
-            s = 'width="' + str(d) + '"'
-            return s
-        def multi_h(match):
-            d = int(match.group(1))
-            d *= multiple
-            s = 'height="' + str(d) + '"'
-            return s
-        i = re.sub(r'x="([0-9]+)"', multi_x, i)
-        i = re.sub(r'y="([0-9]+)"', multi_y, i)
-        i = re.sub(r'width="([0-9]+)"', multi_w, i)
-        i = re.sub(r'height="([0-9]+)"', multi_h, i)
-        return i    
-    
+        img = qrcode.make(url)
+        png_qr = io.BytesIO()
+        img.save(png_qr)
+        return png_qr.getvalue()
 
 class GraphLabel:
-    def __init__(self, p, y, s, variant=None):
+    def __init__(self, p, y, s):
         self.p = p
         self.y = y 
         self.s = s
         self.label = p.config['graph_labels'][s]
-        self.variant = variant
         self.canvas = p.config['graph_canvas']
         self.w =  self.canvas['width']
         self.h = self.canvas['height']
@@ -799,11 +740,10 @@ class GraphLabel:
         return SVGtools.fontfamily(font=self.p.config['font'], _svg=a).svg()
  
 class GraphLine:
-    def __init__(self, p, y, obj, variant=None):
+    def __init__(self, p, y, obj):
         self.p = p
         self.y = y
         self.obj = obj
-        self.variant = variant
         self.start = self.obj['start']
         self.end = self.obj['end']
         self.stroke_color = self.obj['stroke-color']
@@ -816,10 +756,9 @@ class GraphLine:
         return i
         
 class GraphPane:
-    def __init__(self, p, y, obj, variant=None):
+    def __init__(self, p, y, obj):
         self.p = p
         self.y = y
-        self.variant = variant
         self.obj = obj
         self.type = self.obj['type']
         self.stroke = self.obj['stroke']
@@ -1117,7 +1056,7 @@ class GraphPane:
                     'title': self.title, 'start': self.start, 'step': self.step, 'end': self.end, 
                     'basis': self.basis, 'stroke': self.stroke, 
                     'stroke_color': self.stroke_color, 'fill': self.fill, 'stroke_linecap': self.stroke_linecap, 
-                    'tz': tz, 'sp_x': sp_x, 'variant': self.variant}
+                    'tz': tz, 'sp_x': sp_x}
         # Start
         a = str()
         # Canvas 
@@ -1125,7 +1064,7 @@ class GraphPane:
 
         def daily_weather(p, y, w, h, bgcolor, axis, axis_color, grid, grid_color, grid_ext_upper, grid_ext_lower, \
                             stroke, stroke_color, fill, stroke_linecap, \
-                            title, start, end, step, basis, tz, sp_x, variant, **kwargs):
+                            title, start, end, step, basis, tz, sp_x, **kwargs):
             box_size_x = (w - (end - start - 1) * grid) / (end - start)
             half = int(box_size_x * 0.5)
             i18n = read_i18n(p)
@@ -1166,157 +1105,12 @@ class GraphPane:
             return s,i
 
         def moon_phase(p, y, w, h, bgcolor, axis, axis_color, grid, grid_color, stroke, stroke_color, fill, stroke_linecap, \
-                             grid_ext_upper, grid_ext_lower, title, start, end, step, basis, tz, sp_x, variant, **kwargs):
-            from hijridate import Hijri, Gregorian
-            from astral import moon  
+                             grid_ext_upper, grid_ext_lower, title, start, end, step, basis, tz, sp_x, **kwargs):
             box_size_x = (w - (end - start - 1) * grid) / (end - start)
             half = int(box_size_x * 0.5)
             i18n = read_i18n(p)
             ramadhan = p.config['ramadhan']
             i, s = str(),str()
-
-            def calc_moonphase(day, mon, yr, half, x, y, r, lat, ramadhan, **kwargsPlus):
-
-                def phase(rad):
-                    if p.config['cloudconvert'] == True:
-                        one_day_step = 2 * pi / 56
-                    else:
-                        one_day_step = abs(2 * pi / 56)  # cairo fix
-                        
-                    if one_day_step > rad >= 0 or one_day_step > (pi * 2 - rad) >= 0:
-                        a = 'n'
-                    elif one_day_step > abs(rad - pi * 0.5) >= 0:
-                        a = '1'
-                    elif one_day_step > abs(rad - pi) >= 0:
-                        a = 'f'
-                    elif one_day_step > abs(rad - pi * 1.5) >= 0:
-                        a = '3'
-                    else:
-                        a = str()
-                    return a
-
-                def moonphase(day, mon, yr):
-                    #g = Gregorian(yr, mon, day).to_hijri()
-                    #_, _, d = g.datetuple()
-                    #mooncycle = 29.55
-                    mooncycle = 27.99
-                    #a = d / mooncycle
-                    a = moon.phase(date(yr, mon, day)) / mooncycle
-                    return a
-
-                def calc_ramadhan(day, mon, yr):
-                    g = Gregorian(yr, mon, day).to_hijri()
-                    if g.month_name() == 'Ramadhan':
-                        a = 'r'
-                    else:
-                        a = str()
-                    return a
-
-                # moon phase:  360d = 2pi(rad)
-                #lat = -1  # test
-                # cairosvg bug?
-                if p.config['cloudconvert'] == True:
-                    pi = math.pi
-                else:
-                    pi = -math.pi
-                #rad = weather['moon_phase'] * pi * 2  
-                # One call API: 0 or 1:new moon, 0.25:first qurater moon, 0.5:full moon, 0.75:third quarter moon 
-                m = moonphase(day, mon, yr)
-                rad = m * pi * 2 if m <= 1 else pi * 2  # Astral v3.0 module
-                c = 0.025
-                m = rad * c * math.cos(rad)
-                #rx = _x - 3
-                rx = x + half   # center x
-                ry = y + 7      # center y
-                rp = r + 2      # diameter r
-                #rp = r - 2 # test
-                ra1 = 1 * rp
-                ra2 = (math.cos(rad) * rp)
-                ra3 = 1 * rp
-                if lat >= 0:
-                    if phase(rad) == 'n':  # new moon
-                        px1 = math.cos(pi * 0.5 - m) * rp + rx
-                        py1 = math.sin(pi * 0.5 - m ) * rp + ry
-                        px2 = math.cos(pi * 0.5 - m) * rp + rx
-                        py2 = -math.sin(pi * 0.5 - m) * rp + ry
-                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 1 {px1} {py1}z'
-                        ps = phase(rad)
-                        ram = calc_ramadhan(day, mon, yr) if ramadhan == True else str()
-                    elif rad < pi * 0.5:  # new moon to first quarter
-                        px1 = math.cos(pi * 0.5 - m) * rp + rx
-                        py1 = math.sin(pi * 0.5 - m) * rp + ry
-                        px2 = math.cos(pi * 0.5 - m) * rp + rx
-                        py2 = -math.sin(pi * 0.5 - m) * rp + ry
-                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 1 {px1} {py1}z'
-                        ps = phase(rad)
-                        ram = calc_ramadhan(day, mon, yr) if ramadhan == True else str()
-                    elif pi > rad >= pi * 0.5:  # first quarter to full moon
-                        px1 = math.cos(pi * 0.5 + m) * rp + rx
-                        py1 = math.sin(pi * 0.5 + m) * rp + ry
-                        px2 = math.cos(pi * 0.5 + m) * rp + rx
-                        py2 = -math.sin(pi * 0.5 + m) * rp + ry
-                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 0 {px1} {py1}z'
-                        ps = phase(rad)
-                        ram = calc_ramadhan(day, mon, yr) if ramadhan == True else str()
-                    elif pi * 1.5 > rad >= pi:  # full moon to third quarter
-                        px1 = math.cos(pi * 1.5 + m) * rp + rx
-                        py1 = math.sin(pi * 1.5 + m) * rp + ry
-                        px2 = math.cos(pi * 1.5 + m) * rp + rx
-                        py2 = -math.sin(pi * 1.5 + m) * rp + ry
-                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 0 {px1} {py1}z'
-                        ps = phase(rad)
-                        ram = calc_ramadhan(day, mon, yr) if ramadhan == True else str()
-                    else:  # third quarter to new moon
-                        px1 = math.cos(pi * 1.5 - m) * rp + rx
-                        py1 = math.sin(pi * 1.5 - m) * rp + ry
-                        px2 = math.cos(pi * 1.5 - m) * rp + rx
-                        py2 = -math.sin(pi * 1.5 - m) * rp + ry
-                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 1 {px1} {py1}z'
-                        ps = phase(rad)
-                        ram = calc_ramadhan(day, mon, yr) if ramadhan == True else str()
-                else:
-                    if phase(rad) == 'n':
-                        px1 = math.cos(pi * 0.5 + m) * rp + rx
-                        py1 = math.sin(pi * 0.5 + m) * rp + ry
-                        px2 = math.cos(pi * 0.5 + m) * rp + rx
-                        py2 = -math.sin(pi * 0.5 + m) * rp + ry
-                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 1 {px1} {py1}z'
-                        ps = phase(rad)
-                        ram = calc_ramadhan(day, mon, yr) if ramadhan == True else str()
-                    elif rad < pi * 0.5:
-                        px1 = math.cos(pi * 1.5 - m) * rp + rx
-                        py1 = math.sin(pi * 1.5 - m) * rp + ry
-                        px2 = math.cos(pi * 1.5 - m) * rp + rx
-                        py2 = -math.sin(pi * 1.5 - m) * rp +ry
-                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 1 {px1} {py1}z'
-                        ps = phase(rad)
-                        ram = calc_ramadhan(day, mon, yr) if ramadhan == True else str()
-                    elif pi > rad >= pi * 0.5:
-                        px1 = math.cos(pi * 1.5 + m) * rp + rx
-                        py1 = math.sin(pi * 1.5 + m) * rp + ry
-                        px2 = math.cos(pi * 1.5 + m) * rp + rx
-                        py2 = -math.sin(pi * 1.5 + m) * rp + ry
-                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 0 {px1} {py1}z'
-                        ps = phase(rad)
-                        ram = calc_ramadhan(day, mon, yr) if ramadhan == True else str()
-                    elif pi * 1.5 > rad >= pi:
-                        px1 = math.cos(pi * 0.5 + m) * rp + rx
-                        py1 = math.sin(pi * 0.5 + m) * rp + ry
-                        px2 = math.cos(pi * 0.5 + m) * rp + rx
-                        py2 = -math.sin(pi * 0.5 + m) * rp + ry
-                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 0 {px1} {py1}z'
-                        ps = phase(rad)
-                        ram = calc_ramadhan(day, mon, yr) if ramadhan == True else str()
-                    else:
-                        px1 = math.cos(pi * 0.5 - m) * rp + rx
-                        py1 = math.sin(pi * 0.5 - m) * rp + ry
-                        px2 = math.cos(pi * 0.5 - m) * rp + rx
-                        py2 = -math.sin(pi * 0.5 - m) * rp + ry
-                        dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 1 {px1} {py1}z'
-                        ps = phase(rad)
-                        ram = calc_ramadhan(day, mon, yr) if ramadhan == True else str()
-                return dm, ps, ram
-                
             for n in range(start, end, step):
                 weather = p.DailyForecast(n)
                 jour = str.lower(datetime.fromtimestamp(weather['dt'], tz).strftime('%a'))
@@ -1333,11 +1127,11 @@ class GraphPane:
                         i += SVGtools.line((_x + box_size_x), (_x + box_size_x), (_y - h + 150 - grid_ext_upper), (_y + 105), self.style_grid).svg()                 
                     # Moon icon
                     r = 25
-                    kwargsPlus = {'day': day, 'mon': mon, 'yr': yr, 'lat': lat, 'x': _x, 'y': _y, 'r': r, 'half': half, 'ramadhan': ramadhan}
-                    dm, ps, ram = calc_moonphase(**kwargsPlus)
+                    kw = {'p': p, 'day': day, 'mon': mon, 'yr': yr, 'lat': lat, 'rx': _x + half, 'ry': _y + 7, 'r': r, 'ramadhan': ramadhan}
+                    m = Moonphase(**kw)
+                    dm, ps, ram = m.calc()
                     style = f'fill:{fill};stroke:{stroke_color};stroke-width:1px;'
-                    i += SVGtools.circle((_x + half), (_y + 7), (r + 2), stroke_color, (stroke + 1), 'none').svg()
-                    i += SVGtools.path(dm, style).svg() if ps != 'f' else ''
+                    i += m.svg(dm=dm, ps=ps, stroke_color=stroke_color, r_plus=2, stroke=stroke, style=style)
                     # Text: moonrise and moonset
                     s += SVGtools.text('middle', '25', (_x + half), (_y + 80), moonrise).svg()
                     s += SVGtools.text(anchor='middle', fontsize='25', x=(_x + half), y=(_y + 103), v=moonset, stroke='rgb(128,128,128)').svg()
@@ -1357,11 +1151,14 @@ class GraphPane:
                     r = 18 if end == 6 else 14
                     i += SVGtools.line((_x + box_size_x), (_x + box_size_x), (_y - h + 115), (_y + 70), self.style_grid).svg()                 
                     # Moon icon
-                    kwargsPlus = {'day': day, 'mon': mon, 'yr': yr, 'lat': lat, 'x': _x, 'y': _y, 'r': r, 'half': half, 'ramadhan': ramadhan}
-                    dm, ps, ram = calc_moonphase(**kwargsPlus)
+                    kw = {'p': p, 'day': day, 'mon': mon, 'yr': yr, 'lat': lat, 'rx': _x + half, 'ry': _y + 7, 'r': r, 'ramadhan': ramadhan}
+                    #dm, ps, ram = self.calc_moonphase(**kw)
+                    m = Moonphase(**kw)
+                    dm, ps, ram = m.calc()
                     style = f'fill:{fill};stroke:{stroke_color};stroke-width:1px;'
-                    i += SVGtools.circle((_x + box_size_x / 2), (_y + 7), (r + 2), stroke_color, stroke, "none").svg()
-                    i += SVGtools.path(dm, style).svg() if ps != 'f' else ''
+                    i += m.svg(dm=dm, ps=ps, stroke_color=stroke_color, r_plus=2, stroke=stroke, style=style)
+                    #i += SVGtools.circle((_x + box_size_x / 2), (_y + 7), (r + 2), stroke_color, stroke, "none").svg()
+                    #i += SVGtools.path(dm, style).svg() if ps != 'f' else ''
                     # Text: moonrise and moonset
                     s += SVGtools.text('middle', '16', (_x + int(box_size_x * 0.5)), (_y + 50), moonrise).svg()
                     s += SVGtools.text('middle', '16', (_x + int(box_size_x * 0.5)), (_y + 68), moonset).svg()
@@ -1381,6 +1178,164 @@ class GraphPane:
                 s += SVGtools.text('start', '16', 10, (self.p.config['h'] - 5), 'moon phase').svg()
             a += s + i         
         return SVGtools.fontfamily(font=self.p.config['font'], _svg=a).svg()
+ 
+class Moonphase:
+    def __init__(self, **kw):
+        self.p = kw.get('p')
+        self.day = kw.get('day')
+        self.mon = kw.get('mon')
+        self.yr = kw.get('yr')
+        self.lat = kw.get('lat')
+        self.rx = kw.get('rx')
+        self.ry = kw.get('ry')
+        self.r = kw.get('r')
+        self.ramadhan = kw.get('ramadhan')
+        
+    def svg(self, dm, ps, stroke_color, r_plus, stroke, style):
+        s = SVGtools.circle(self.rx, self.ry, (self.r + 2), stroke_color, stroke, "none").svg()
+        s += SVGtools.path(dm, style).svg() if ps != 'f' else ''
+        return s
+        
+    def calc(self):
+        from hijridate import Hijri, Gregorian
+        from astral import moon
+        
+        def phase(rad):
+            if self.p.config['cloudconvert'] == True:
+                one_day_step = 2 * pi / 56
+            else:
+                one_day_step = abs(2 * pi / 56)  # cairo fix
+                
+            if one_day_step > rad >= 0 or one_day_step > (pi * 2 - rad) >= 0:
+                a = 'n'
+            elif one_day_step > abs(rad - pi * 0.5) >= 0:
+                a = '1'
+            elif one_day_step > abs(rad - pi) >= 0:
+                a = 'f'
+            elif one_day_step > abs(rad - pi * 1.5) >= 0:
+                a = '3'
+            else:
+                a = str()
+            return a
+
+        def moonphase(day, mon, yr):
+            #g = Gregorian(yr, mon, day).to_hijri()
+            #_, _, d = g.datetuple()
+            #mooncycle = 29.55
+            mooncycle = 27.99
+            #a = d / mooncycle
+            a = moon.phase(date(yr, mon, day)) / mooncycle
+            return a
+
+        def calc_ramadhan(day, mon, yr):
+            g = Gregorian(yr, mon, day).to_hijri()
+            if g.month_name() == 'Ramadhan':
+                a = 'r'
+            else:
+                a = str()
+            return a
+
+        # moon phase:  360d = 2pi(rad)
+        #lat = -1  # test
+        # cairosvg bug?
+        if self.p.config['cloudconvert'] == True:
+            pi = math.pi
+        else:
+            pi = -math.pi
+        #rad = weather['moon_phase'] * pi * 2  
+        # One call API: 0 or 1:new moon, 0.25:first qurater moon, 0.5:full moon, 0.75:third quarter moon 
+        m = moonphase(self.day, self.mon, self.yr)
+        rad = m * pi * 2 if m <= 1 else pi * 2  # Astral v3.0 module
+        c = 0.025
+        m = rad * c * math.cos(rad)
+        rp = self.r + 2      # diameter r
+        #rp = r - 2 # test
+        ra1 = 1 * rp
+        ra2 = (math.cos(rad) * rp)
+        ra3 = 1 * rp
+        if self.lat >= 0:
+            if phase(rad) == 'n':  # new moon
+                px1 = math.cos(pi * 0.5 - m) * rp + self.rx
+                py1 = math.sin(pi * 0.5 - m ) * rp + self.ry
+                px2 = math.cos(pi * 0.5 - m) * rp + self.rx
+                py2 = -math.sin(pi * 0.5 - m) * rp + self.ry
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 1 {px1} {py1}z'
+                ps = phase(rad)
+                ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
+            elif rad < pi * 0.5:  # new moon to first quarter
+                px1 = math.cos(pi * 0.5 - m) * rp + self.rx
+                py1 = math.sin(pi * 0.5 - m) * rp + self.ry
+                px2 = math.cos(pi * 0.5 - m) * rp + self.rx
+                py2 = -math.sin(pi * 0.5 - m) * rp + self.ry
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 1 {px1} {py1}z'
+                ps = phase(rad)
+                ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
+            elif pi > rad >= pi * 0.5:  # first quarter to full moon
+                px1 = math.cos(pi * 0.5 + m) * rp + self.rx
+                py1 = math.sin(pi * 0.5 + m) * rp + self.ry
+                px2 = math.cos(pi * 0.5 + m) * rp + self.rx
+                py2 = -math.sin(pi * 0.5 + m) * rp + self.ry
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 0 {px1} {py1}z'
+                ps = phase(rad)
+                ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
+            elif pi * 1.5 > rad >= pi:  # full moon to third quarter
+                px1 = math.cos(pi * 1.5 + m) * rp + self.rx
+                py1 = math.sin(pi * 1.5 + m) * rp + self.ry
+                px2 = math.cos(pi * 1.5 + m) * rp + self.rx
+                py2 = -math.sin(pi * 1.5 + m) * rp + self.ry
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 0 {px1} {py1}z'
+                ps = phase(rad)
+                ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
+            else:  # third quarter to new moon
+                px1 = math.cos(pi * 1.5 - m) * rp + self.rx
+                py1 = math.sin(pi * 1.5 - m) * rp + self.ry
+                px2 = math.cos(pi * 1.5 - m) * rp + self.rx
+                py2 = -math.sin(pi * 1.5 - m) * rp + self.ry
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 1 {px1} {py1}z'
+                ps = phase(rad)
+                ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
+        else:
+            if phase(rad) == 'n':
+                px1 = math.cos(pi * 0.5 + m) * rp + self.rx
+                py1 = math.sin(pi * 0.5 + m) * rp + self.ry
+                px2 = math.cos(pi * 0.5 + m) * rp + self.rx
+                py2 = -math.sin(pi * 0.5 + m) * rp + self.ry
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 1 {px1} {py1}z'
+                ps = phase(rad)
+                ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
+            elif rad < pi * 0.5:
+                px1 = math.cos(pi * 1.5 - m) * rp + self.rx
+                py1 = math.sin(pi * 1.5 - m) * rp + self.ry
+                px2 = math.cos(pi * 1.5 - m) * rp + self.rx
+                py2 = -math.sin(pi * 1.5 - m) * rp + self.ry
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 1 {px1} {py1}z'
+                ps = phase(rad)
+                ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
+            elif pi > rad >= pi * 0.5:
+                px1 = math.cos(pi * 1.5 + m) * rp + rx
+                py1 = math.sin(pi * 1.5 + m) * rp + ry
+                px2 = math.cos(pi * 1.5 + m) * rp + rx
+                py2 = -math.sin(pi * 1.5 + m) * rp + ry
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 0 {px1} {py1}z'
+                ps = phase(rad)
+                ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
+            elif pi * 1.5 > rad >= pi:
+                px1 = math.cos(pi * 0.5 + m) * rp + self.rx
+                py1 = math.sin(pi * 0.5 + m) * rp + self.ry
+                px2 = math.cos(pi * 0.5 + m) * rp + self.rx
+                py2 = -math.sin(pi * 0.5 + m) * rp + self.ry
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 0 {px1} {py1}z'
+                ps = phase(rad)
+                ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
+            else:
+                px1 = math.cos(pi * 0.5 - m) * rp + self.rx
+                py1 = math.sin(pi * 0.5 - m) * rp + self.ry
+                px2 = math.cos(pi * 0.5 - m) * rp + self.rx
+                py2 = -math.sin(pi * 0.5 - m) * rp + self.ry
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 1 {px1} {py1}z'
+                ps = phase(rad)
+                ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
+        return dm, ps, ram
 
 def addIcon(s):
     if s == 'ClearDay':

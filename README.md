@@ -34,7 +34,7 @@ Subscribe to a v3.0 API.
 - user account on X (twitter) (optional)
 
 
-## (WIP) Create API key on CloudConvert (optional)
+## Create API key on CloudConvert (optional)
 
 Create API key with the following options:
 
@@ -95,6 +95,7 @@ Default config is `setting.json`.
 
 
 e.g.) Openwrt
+
 ```
 opkg update
 opkg install python3 python3-requests python3-setuptools python3-pip
@@ -108,9 +109,8 @@ pip3 install deep_translator (optional)
 pip3 install qrcode (optional)
 pip3 install cloudconvert (optional)
 pip3 install hijridate (optional)
-
-
 ```
+
 #### Advanced Installation for Openwrt: To use Cairo on Openwrt.
 
 Install cairo and Python cairosvg module.&nbsp;
@@ -123,6 +123,7 @@ Note: Converting QR code still has an issue.&nbsp;
 5. Run `fc-cache -f`
 
 e.g.)
+
 ```
 opkg install cairo_1.18.0-1_aarch64_generic.ipk
 opkg install fontconfig
@@ -271,8 +272,8 @@ Examples:
   - "lon": "166.6445298"  # longitude
   - "units": "metric" # options: metric, imperial
   - "lang": "en" # language: en (English)
-
-
+  - "darkmode": "True", "False" and "Auto"( Note: To enable on openwrt, add `"system": "openwrt"`)	
+  
 #### 2.1 Value in cloud icon
 
 <kbd><img src="sample_screenshots/readme_imgs/inside_clouds.png" /></kbd>&nbsp;

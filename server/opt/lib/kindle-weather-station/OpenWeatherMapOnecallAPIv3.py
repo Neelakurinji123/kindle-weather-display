@@ -39,6 +39,7 @@ def readSettings(setting):
     a['wind_icon'] = bool(eval(service['wind_icon'])) if 'wind_icon' in service else False
     a['cloudconvert'] = bool(eval(service['cloudconvert'])) if 'cloudconvert' in service else False
     a['layout'] = service['layout']
+    a['system'] = service['system'] if 'system' in service else None
     a['landscape'] = bool(eval(service['landscape'])) if 'landscape' in service else False
     
     if a['landscape'] == True:

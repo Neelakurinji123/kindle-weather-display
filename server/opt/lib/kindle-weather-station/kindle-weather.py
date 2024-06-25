@@ -37,6 +37,7 @@ def svg_processing(p, text=str(), draw=str(), y=0):
     utc = zoneinfo.ZoneInfo('UTC')
     layout = p.config['layout']
     graph_objects = p.config['graph_objects']
+    qr_png_val = None
     for s in layout:
         if s == 'maintenant':    
             a = Maintenant(p=p, y=y)
@@ -80,7 +81,8 @@ def svg_processing(p, text=str(), draw=str(), y=0):
                 _text, url, processing = a.text()
                 if processing == True:
                     text += _text
-                    draw += a.draw(url)
+                    #draw += a.draw(url)
+                    qr_png_val = a.qrcode(url)
                 else:
                     # Alternate layout
                     p.config['layout'] = p.config['twitter']['alternate']
@@ -117,19 +119,23 @@ def svg_processing(p, text=str(), draw=str(), y=0):
             a = GraphLine(p=p, y=y, obj=p.config['graph_lines'][s])
             draw += a.draw()
                        
-    return text, draw
+    return text, draw, qr_png_val
 
-def img_processing(p, w, h, pngfile, svg):
+def img_processing(p, svg, qr_png_val):
     now = p.now
     landscape = p.config['landscape']
     darkmode = p.config['darkmode']
     cloudconvert = p.config['cloudconvert']
     encoding = p.config['encoding']
+    w = p.config['w']
+    h = p.config['h'],
     state = CurrentWeatherPane(p=p).state
     try:
+        b_png = io.BytesIO()
         #if cloudconvert == False and (encoding == 'iso-8859-1' or encoding == 'iso-8859-5'):
         if cloudconvert == False:
-            svg2png(bytestring=svg, write_to=pngfile, background_color="white", parent_width=w, parent_height=h)
+            svg2png(bytestring=svg, write_to=b_png, background_color="white", parent_width=w, parent_height=h)
+            png_val = b_png.getvalue()
         elif cloudconvert == True:
             with open(svgfile, 'w') as f:
                 f.write(svg)
@@ -171,78 +177,52 @@ def img_processing(p, w, h, pngfile, svg):
             r = cloudconvert.Task.wait(id=exported_url_task_id) # Wait for job done
             file = r.get("result").get("files")[0]
             r = cloudconvert.download(filename=pngfile, url=file['url'])  # download and get filename
+            with open(pngfile, mode='rb') as f:
+                png_val = f.read()
+                with Image(width=800, height=600, background='white') as bg_img: 
+                    with Image(blob=png_val) as fg_img:
+                        bg_img.composite(fg_img, left=0, top=0)
+                        bg_img.format = 'png'
+                        img_blob = bg_img.make_blob('png')
+                        fg_img.close()
+                    bg_img.close()
+                png_val = img_blob
 
     except Exception as e:
         print(e)
 
-    t.sleep(2)
-    if darkmode == 'True':
+    # insert QR code
+    if not qr_png_val == None:
+        with Image(blob=png_val) as bg_img:
+            with Image(blob=qr_png_val) as fg_img:
+                fg_img.resize(150, 150)
+                if landscape == True:
+                    bg_img.composite(fg_img, left=15, top=430)
+                else:
+                    bg_img.composite(fg_img, left=15, top=600)
+                bg_img.format = 'png'
+            fg_img.close()
+            img_blob = bg_img.make_blob('png')
+        bg_img.close()
+        png_val = img_blob
+
+    if darkmode == 'True' or (darkmode == 'Auto' and (state == 'night' or state == 'polar_night')):
+        with Image(blob=png_val) as img:
+            img.negate(True,"all_channels")
+            img.format = 'png'
+            img_blob = img.make_blob('png')
+        img.close()
+        png_val = img_blob
+
+    with Image(blob=png_val) as img:
         if landscape == True:
-            with Image(filename=pngfile) as img:
-                with img.clone() as i:
-                    i.rotate(90)
-                    i.alpha_channel_types = 'flatten'
-                    i.negate(True,"all_channels")
-                    i.save(filename=flatten_pngfile)
-            #out = Popen(['convert', '-rotate', '+90', '-flatten', pngfile, flatten_pngfile])
-        else:
-            with Image(filename=pngfile) as img:
-                with img.clone() as i:
-                    i.alpha_channel_types = 'flatten'
-                    i.negate(True,"all_channels")
-                    i.save(filename=flatten_pngfile)
-            #out = Popen(['convert', '-flatten', pngfile, pngtmpfile])
-        #t.sleep(3)
-        #out = Popen(['convert', '-negate', pngtmpfile, flatten_pngfile])
-    elif darkmode == 'Auto':
-        if state == 'day' or  state == 'midnight_sun':
-            if landscape == True:
-                with Image(filename=pngfile) as img:
-                    with img.clone() as i:
-                        i.rotate(90)
-                        i.alpha_channel_types = 'flatten'
-                        i.save(filename=flatten_pngfile)
-                #out = Popen(['convert', '-rotate', '+90', '-flatten', pngfile, flatten_pngfile])
-            else:
-                with Image(filename=pngfile) as img:
-                    with img.clone() as i:
-                        i.alpha_channel_types = 'flatten'
-                        i.save(filename=flatten_pngfile)
-                #out = Popen(['convert', '-flatten', pngfile, pngtmpfile])
-        else:
-            if landscape == True:
-                with Image(filename=pngfile) as img:
-                    with img.clone() as i:
-                        i.rotate(90)
-                        i.alpha_channel_types = 'flatten'
-                        i.negate(True,"all_channels")
-                        i.save(filename=flatten_pngfile)
-                #out = Popen(['convert', '-rotate', '+90', '-flatten', pngfile, flatten_pngfile])
-            else:
-                with Image(filename=pngfile) as img:
-                    with img.clone() as i:
-                        i.alpha_channel_types = 'flatten'
-                        i.negate(True,"all_channels")
-                        i.save(filename=flatten_pngfile)
-                #out = Popen(['convert', '-flatten', pngfile, pngtmpfile])
-            #t.sleep(3)
-            #out = Popen(['convert', '-negate', pngtmpfile, flatten_pngfile])
-    else:
-        if landscape == True:
-            #with Image(filename=pngfile) as img:
-            #    with img.clone() as i:
-            #        i.rotate(90)
-            #        i.alpha_channel_types = 'flatten'
-            #        i.save(filename=flatten_pngfile)
-            cmd = f'convert -rotate +90 -flatten {pngfile} {flatten_pngfile}'
-            out = Popen([cmd], shell=True, stdout=PIPE, stderr=PIPE).wait()
-        else:
-            #with Image(filename=pngfile) as img:
-            #    with img.clone() as i:
-            #        i.alpha_channel_types = 'flatten'
-            #        i.save(filename=flatten_pngfile)
-            cmd = f'convert -flatten {pngfile} {flatten_pngfile}'
-            out = Popen([cmd], shell=True, stdout=PIPE, stderr=PIPE).wait()
+            img.rotate(90)
+        img.alpha_channel_types = 'flatten'
+        if darkmode == 'True' or (darkmode == 'Auto' and (state == 'night' or state == 'polar_night')):
+            if p.config['system'] == 'openwrt':
+                img.negate(True,"all_channels")
+        img.save(filename=flatten_pngfile)
+    img.close()
 
 def main(setting, flag_dump, flag_config, flag_svg, flag_png):
     try:
@@ -276,7 +256,7 @@ def main(setting, flag_dump, flag_config, flag_svg, flag_png):
                 exit(0)
         # Locale
         #locale.setlocale(locale.LC_TIME, p.config['locale'])
-        text, draw = svg_processing(p=p)
+        text, draw, qr_png_val = svg_processing(p=p)
         # add footer
         s1 = p.config['city'] + ' - ' if p.config['sunrise_and_sunset'] == True else str()
         s2 = p.config['api']
@@ -292,7 +272,7 @@ def main(setting, flag_dump, flag_config, flag_svg, flag_png):
             f.close()    
             exit(0)
         else:
-            img_processing(p=p, w=p.config['w'], h=p.config['h'], pngfile=pngfile, svg=svg)
+            img_processing(p=p, svg=svg, qr_png_val=qr_png_val)
 
     except Exception as e:
         print(e)
