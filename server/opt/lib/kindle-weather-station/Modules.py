@@ -1152,13 +1152,10 @@ class GraphPane:
                     i += SVGtools.line((_x + box_size_x), (_x + box_size_x), (_y - h + 115), (_y + 70), self.style_grid).svg()                 
                     # Moon icon
                     kw = {'p': p, 'day': day, 'mon': mon, 'yr': yr, 'lat': lat, 'rx': _x + half, 'ry': _y + 7, 'r': r, 'ramadhan': ramadhan}
-                    #dm, ps, ram = self.calc_moonphase(**kw)
                     m = Moonphase(**kw)
                     dm, ps, ram = m.calc()
                     style = f'fill:{fill};stroke:{stroke_color};stroke-width:1px;'
                     i += m.svg(dm=dm, ps=ps, stroke_color=stroke_color, r_plus=2, stroke=stroke, style=style)
-                    #i += SVGtools.circle((_x + box_size_x / 2), (_y + 7), (r + 2), stroke_color, stroke, "none").svg()
-                    #i += SVGtools.path(dm, style).svg() if ps != 'f' else ''
                     # Text: moonrise and moonset
                     s += SVGtools.text('middle', '16', (_x + int(box_size_x * 0.5)), (_y + 50), moonrise).svg()
                     s += SVGtools.text('middle', '16', (_x + int(box_size_x * 0.5)), (_y + 68), moonset).svg()
@@ -1190,6 +1187,8 @@ class Moonphase:
         self.ry = kw.get('ry')
         self.r = kw.get('r')
         self.ramadhan = kw.get('ramadhan')
+        weather = self.p.CurrentWeather()
+        self.state = daytime(self.p, self.p.now, weather['sunrise'], weather['sunset'])
         
     def svg(self, dm, ps, stroke_color, r_plus, stroke, style):
         s = SVGtools.circle(self.rx, self.ry, (self.r + 2), stroke_color, stroke, "none").svg()
@@ -1238,10 +1237,14 @@ class Moonphase:
         # moon phase:  360d = 2pi(rad)
         #lat = -1  # test
         # cairosvg bug?
-        if self.p.config['cloudconvert'] == True:
-            pi = math.pi
-        else:
-            pi = -math.pi
+        pi = math.pi
+        if self.p.config['darkmode'] == 'True' or (self.p.config['darkmode'] == 'Auto' and (self.state == 'night' or self.state == 'polar_night')):
+            pi = -pi
+            self.lat = -self.lat
+            
+        if not self.p.config['cloudconvert'] == True: 
+            pi = -pi
+
         #rad = weather['moon_phase'] * pi * 2  
         # One call API: 0 or 1:new moon, 0.25:first qurater moon, 0.5:full moon, 0.75:third quarter moon 
         m = moonphase(self.day, self.mon, self.yr)
