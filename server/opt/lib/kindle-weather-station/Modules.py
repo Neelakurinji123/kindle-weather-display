@@ -143,7 +143,7 @@ class Maintenant:
                 a += SVGtools.text('start', '30', (x_sun + 125), y, sunset).svg()
                 # moon icon
                 state = daytime(self.p, self.p.now, weather['sunrise'], weather['sunset'])
-                if self.p.config['darkmode'] == 'True' or (self.p.config['darkmode'] == 'Auto' and (state == 'night' or 'polar_night')):
+                if self.p.config['darkmode'] == 'True' or (self.p.config['darkmode'] == 'Auto' and (state == 'night' or state == 'polar_night')):
                     darkmode = True
                     fg_color = 'rgb(255,255,255)'
                     bg_color = 'rgb(0,0,0)'
