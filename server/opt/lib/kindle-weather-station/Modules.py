@@ -61,6 +61,12 @@ def split_text(wordwrap, text, max_rows):
         a += [' '.join(n) + '\n']
     return a
 
+def fix_text(w):
+    w = re.sub(r'\&','&amp;', w)
+    w = re.sub(r'\<','&lt;', w)
+    w = re.sub(r'\>','&gt;', w)
+    return w
+
 def python_encoding(encoding):
     # convert Unix encoding to python encoding
     encoding_list={'us-ascii': 'ascii', 'iso-8859-1': 'latin_1', 'iso8859-1': 'latin_1', 'cp819': 'latin_1', \
@@ -149,7 +155,7 @@ class Maintenant:
             #w[0] = d["abbreviated_weekday"][w[0][:-1]] + ',' if not d == dict() else w[0]
             #w[2] = d["abbreviated_month"][w[2]] if not d == dict() else w[2]
             if self.p.config['landscape'] == True:
-                x_sun = 550 - 10
+                x_sun = 540
                 x_date = 20            
                 a += SVGtools.text('start', '30', x_date, y, ' '.join(w)).svg()
                 a += SVGtools.text('start', '30', x_sun, y, sunrise).svg()
@@ -180,10 +186,10 @@ class Maintenant:
         else:
             maintenant = str.lower(datetime.fromtimestamp(self.p.now, tz).strftime('%a %Y/%m/%d %-H:%M'))
             w = maintenant.split()
-            x_city = 20
-            x_date = 580
             #d = read_i18n(self.p)
             #w[0] = d["abbreviated_weekday"][w[0]] if not d == dict() else w[0]
+            x_city = 20
+            x_date = 580
             a += SVGtools.text('start', '30', x_city, y, self.p.config['city']).svg()
             a += SVGtools.text('end', '30', x_date, y, ' '.join(w)).svg()
         svg = SVGtools.fontfamily(font=self.font_family, _svg=a).svg()
@@ -193,19 +199,15 @@ class Maintenant:
         i = str()
         if self.p.config['sunrise_and_sunset'] == True:
             if self.p.config['landscape'] == True:
-                x_sun = 513 - 10
+                x_sunrise = 503
+                x_sunset = x_sunrise + 127
                 y_sun = self.y + 14
-                i += SVGtools.transform(f'(1.1,0,0,1.1,{x_sun},{y_sun})', Icons.Sunrise()).svg()
-                x_sun += 127
-                y_sun = self.y + 14
-                i += SVGtools.transform(f'(1.1,0,0,1.1,{x_sun},{y_sun})', Icons.Sunset()).svg()
             else:
-                x_sun = 328
-                y_sun = self.y + 14             
-                i += SVGtools.transform(f'(1.1,0,0,1.1,{x_sun},{y_sun})', Icons.Sunrise()).svg() 
-                x_sun += 137
+                x_sunrise = 328
+                x_sunset = x_sunrise + 137
                 y_sun = self.y + 14               
-                i += SVGtools.transform(f'(1.1,0,0,1.1,{x_sun},{y_sun})', Icons.Sunset()).svg()
+            i += SVGtools.transform(f'(1.1,0,0,1.1,{x_sunrise},{y_sun})', Icons.Sunrise()).svg()     
+            i += SVGtools.transform(f'(1.1,0,0,1.1,{x_sunset},{y_sun})', Icons.Sunset()).svg()
         return i
 
 
@@ -679,6 +681,7 @@ class TwitterPane:
                     a += SVGtools.text('middle', '35', 95, (y + 35), caption).svg()
                 disc = split_text(wordwrap=38, text=b, max_rows=5)
                 for w in disc:
+                    w = fix_text(w)
                     a += SVGtools.text('start', '30', 180, (y + 30), w).svg()
                     y += 38
             else:
@@ -686,6 +689,7 @@ class TwitterPane:
                     a += SVGtools.text('middle', '25', 95, (y + 55), caption).svg()
                 disc = split_text(wordwrap=36, text=b, max_rows=8)
                 for w in disc:
+                    w = fix_text(w)
                     a += SVGtools.text('start', '20', 180, (y + 50), w).svg()
                     y += 25
             if len(urls) > 0:
@@ -1160,12 +1164,8 @@ class GraphPane:
                     d = {'n': 'new', '1': 'first', 'f': 'full', '3': 'last'}
                     ps = d[ps] if ps in d else str()
                     ram = 'ram' if ram == 'r' else str()
-                    if not ps == str() and not ram == str():
-                        s += SVGtools.text2('middle', 'bold', '18', (_x + half), (_y + 55), f'{ps},{ram}').svg()
-                    elif ps == str() and not ram == str():
-                        s += SVGtools.text2('middle', 'bold', '18', (_x + half), (_y + 55), f'{ram}').svg()
-                    else:
-                        s += SVGtools.text2('middle', 'bold', '18', (_x + half), (_y + 55), f'{ps}').svg()
+                    cap = ','.join(x for x in [ps, ram] if not x == str())
+                    s += SVGtools.text2('middle', 'bold', '18', (_x + half), (_y + 55), cap).svg()
                 else:
                     _x = int(sp_x + (box_size_x + grid) * (n - start)) 
                     _y = y + 25  
