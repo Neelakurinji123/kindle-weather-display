@@ -31,7 +31,7 @@ def readSettings(setting):
     a['encoding'] = service['encoding'] if 'encoding' in service else 'iso-8859-1'
     a['font'] = service['font'] if 'font' in service else 'Droid Sans'
     a['sunrise_and_sunset'] = bool(eval(service['sunrise_and_sunset'])) if 'sunrise_and_sunset' in service else True
-    a['darkmode'] = service['darkmode'] if 'darkmode' in service else 'False'
+    a['darkmode'] = service['darkmode'] if 'darkmode' in service else None
     a['api'] = service['api']
     a['lat'] = service['lat']
     a['lon'] = service['lon']
