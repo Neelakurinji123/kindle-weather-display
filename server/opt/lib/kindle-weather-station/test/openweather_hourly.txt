@@ -1,2 +1,0 @@
-{'dt': 1715605200, 'temp': 16.4, 'feels_like': 16.47, 'pressure': 1012, 'humidity': 91, 'dew_point': 14.93, 'uvi': 0, 'clouds': 100, 'visibility': 10000, 'wind_speed': 4.73, 'wind_deg': 4, 'wind_gust': 8.24, 'weather': [{'id': 501, 'main': 'Rain', 'description': 'moderate rain', 'icon': '10n'}], 'pop': 0.36, 'rain': {'1h': 1.78}, 'precipitation': 1.78, 'cardinal': 'N', 'id': 501, 'main': 'Rain', 'description': 'moderate rain', 'icon': '10n'} 
-

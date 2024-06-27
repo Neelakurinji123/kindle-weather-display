@@ -1,3 +1,0 @@
-{'dt': 1715603698, 'sunrise': 1715542702, 'sunset': 1715593094, 'temp': 16.4, 'feels_like': 16.47, 'pressure': 1012, 'humidity': 91, 'dew_point': 14.93, 'uvi': 0, 'clouds': 100, 'visibility': 10000, 'wind_speed': 4.63, 'wind_deg': 330, 'weather': [{'id': 500, 'main': 'Rain', 'description': 'light rain', 'icon': '10n'}, {'id': 300, 'main': 'Drizzle', 'description': 'light intensity drizzle', 'icon': '09n'}], 'rain': {'1h': 0.75}, 'precipitation': 0.23, 'pop': 1, 'cardinal': 'NW', 'id': 500, 'main': 'Rain', 'description': 'light rain', 'icon': '10n'} 
-
-

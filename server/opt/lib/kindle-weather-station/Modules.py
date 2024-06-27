@@ -7,7 +7,7 @@
 
 
 import time as t
-import sys, re, math, json, os, pathlib, io
+import sys, re, json, os, pathlib, io, math
 from datetime import datetime, timedelta, date
 import zoneinfo
 import locale
@@ -177,14 +177,14 @@ class Maintenant:
                     fg_color = 'rgb(0,0,0)'
                     bg_color = 'rgb(255,255,255)'
                 x_moon = 775
-                r = 10
+                r = 12
                 yr, mon, day, _, _, _, _, _, _ = datetime.now().timetuple()
                 kw = {'p': self.p, 'day': day, 'mon': mon, 'yr': yr, 'lat': float(self.p.config['lat']), 'rx': x_moon, 'ry': (y - 10), 'r': r, 'ramadhan': self.p.config['ramadhan']}
-                a += SVGtools.circle(x_moon, (y - 10), r, fg_color, 3, fg_color).svg()
+                a += SVGtools.circle(x_moon, (y - 10), r-1, fg_color, 0, fg_color).svg()
                 m = Moonphase(**kw)
                 dm, ps, ram = m.calc()
                 style = f'fill:{bg_color};stroke:{bg_color};stroke-width:0px;'
-                a += m.svg(dm=dm, ps=ps, stroke_color=bg_color, r_plus=1, stroke=0, style=style)
+                a += m.svg(dm=dm, ps=ps, stroke_color=bg_color, r_plus=0, stroke=0, style=style)
             else:
                 x_sunrise = 365
                 x_sunset = x_sunrise + 135
@@ -1204,13 +1204,18 @@ class Moonphase:
         self.darkmode = dark_mode(self.p, self.p.now, weather['sunrise'], weather['sunset'])
         
     def svg(self, dm, ps, stroke_color, r_plus, stroke, style):
-        s = SVGtools.circle(self.rx, self.ry, (self.r + 2), stroke_color, stroke, "none").svg()
+        s = SVGtools.circle(self.rx, self.ry, (self.r + r_plus), stroke_color, stroke, "none").svg()
+        #s = SVGtools.circle(self.rx, self.ry, (self.r + 2), stroke_color, stroke, "none").svg()
         s += SVGtools.path(dm, style).svg() if ps != 'f' else ''
         return s
         
     def calc(self):
         from hijridate import Hijri, Gregorian
         from astral import moon
+        import math
+        pi = math.pi
+        cos = math.cos
+        sin = math.sin
         
         def phase(rad):
             if self.p.config['cloudconvert'] == True:
@@ -1246,117 +1251,120 @@ class Moonphase:
             else:
                 a = str()
             return a
-
+        
         # moon phase:  360d = 2pi(rad)
         #lat = -1  # test
-        # cairosvg bug?
-        pi = math.pi
-        if self.darkmode == True:
-            pi = pi
-            self.lat = -self.lat
+        #if self.darkmode == True:
+        #    self.lat = -self.lat
             
-        if not self.p.config['cloudconvert'] == True: 
-            pi = -pi
+        if not self.p.config['cloudconvert'] == True:  # cairo fix
+            cairo_fix = True
+            self.lat = -self.lat
+        else:
+            cairo_fix = False
 
-        #rad = weather['moon_phase'] * pi * 2  
         # One call API: 0 or 1:new moon, 0.25:first qurater moon, 0.5:full moon, 0.75:third quarter moon 
-        val = moonphase(self.day, self.mon, self.yr) # Astral v3.0 module
+        val = moonphase(self.day, self.mon, self.yr) # Astral v3.0 module: 0 <= val <= 1 
         rad = val * pi * 2 if val < 1 else pi * 2  
-        c = 0.025
-        m = rad * c * math.cos(rad)
-        rp = self.r + 2      # diameter r
-        ra1 = 1 * rp
-        ra2 = (math.cos(rad) * rp)
-        ra3 = 1 * rp
-        if self.lat >= 0:
-            if phase(rad) == 'n':  # new moon
-                px1 = math.cos(pi * 0.5 - m) * rp + self.rx
-                py1 = math.sin(pi * 0.5 - m) * rp + self.ry
-                px2 = math.cos(pi * 0.5 - m) * rp + self.rx
-                py2 = -math.sin(pi * 0.5 - m) * rp + self.ry
-                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 1 {px1} {py1}z'
-                ps = phase(rad)
-                ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
-            elif rad < pi * 0.5:  # new moon to first quarter
-                px1 = math.cos(pi * 0.5 - m) * rp + self.rx
-                py1 = math.sin(pi * 0.5 - m) * rp + self.ry
-                px2 = math.cos(pi * 0.5 - m) * rp + self.rx
-                py2 = -math.sin(pi * 0.5 - m) * rp + self.ry
-                flag = 0 if self.darkmode == True else 1
-                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 {flag} {px1} {py1}z'
+        ra1 = self.r
+        ra2 = cos(rad) * self.r
+        ra3 = self.r
+        if self.lat > 0:
+            if pi * 0.5 > rad >= 0:  # new moon to first quarter
+                m = (pi * 0.5 - rad) / (pi * 0.5)
+                flag1, flag2 = (1, 0) if self.darkmode == True else (0, 1)
+                px1 = cos(pi * 0.5 + m) * self.r + self.rx
+                py1 = sin(pi * 0.5 + m) * self.r + self.ry
+                px2 = cos(pi * 0.5 + m) * self.r + self.rx
+                py2 = -sin(pi * 0.5 + m) * self.r + self.ry
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 {flag1} {flag2} {px2} {py2} {ra2*0.98} {ra3*0.98} 0 1 1 {px1} {py1}z'
                 ps = phase(rad)
                 ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
             elif pi > rad >= pi * 0.5:  # first quarter to full moon
-                px1 = math.cos(pi * 0.5 + m) * rp + self.rx
-                py1 = math.sin(pi * 0.5 + m) * rp + self.ry
-                px2 = math.cos(pi * 0.5 + m) * rp + self.rx
-                py2 = -math.sin(pi * 0.5 + m) * rp + self.ry
-                flag = 1 if self.darkmode == True else 0
-                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 {flag} {px1} {py1}z'
+                if cairo_fix == True:
+                    m = 0
+                    flag1, flag2 = (1, 1) if self.darkmode == True else (0, 0)
+                else:
+                    m = (rad - pi * 0.5) / (pi * 0.5)
+                    flag1, flag2 = (0, 0) if self.darkmode == True else (1, 1)
+                px1 = cos(pi * 0.5 - m) * self.r + self.rx
+                py1 = sin(pi * 0.5 - m) * self.r + self.ry
+                px2 = cos(pi * 0.5 - m) * self.r + self.rx
+                py2 = -sin(pi * 0.5 - m) * self.r + self.ry
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 {flag1} {flag2} {px2} {py2} {ra2*0.98} {ra3*0.98} 0 1 0 {px1} {py1}z'
                 ps = phase(rad)
                 ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
             elif pi * 1.5 > rad >= pi:  # full moon to third quarter
-                px1 = math.cos(pi * 1.5 + m) * rp + self.rx
-                py1 = math.sin(pi * 1.5 + m) * rp + self.ry
-                px2 = math.cos(pi * 1.5 + m) * rp + self.rx
-                py2 = -math.sin(pi * 1.5 + m) * rp + self.ry
-                flag = 1 if self.darkmode == True else 0
-                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 {flag} {px1} {py1}z'
+                if cairo_fix == True:
+                    m = 0
+                    flag1, flag2 = (1, 1) if self.darkmode == True else (0, 0)
+                else:
+                    m = (pi * 1.5 - rad) / (pi * 0.5)
+                    flag1, flag2 = (0, 0) if self.darkmode == True else (1, 1)
+                px1 = cos(pi * 1.5 - m) * self.r + self.rx
+                py1 = sin(pi * 1.5 - m) * self.r + self.ry
+                px2 = cos(pi * 1.5 - m) * self.r + self.rx
+                py2 = -sin(pi * 1.5 - m) * self.r + self.ry
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 {flag1} {flag2} {px2} {py2} {ra2*0.98} {ra3*0.98} 0 1 0 {px1} {py1}z'
                 ps = phase(rad)
                 ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
             else:  # third quarter to new moon
-                px1 = math.cos(pi * 1.5 - m) * rp + self.rx
-                py1 = math.sin(pi * 1.5 - m) * rp + self.ry
-                px2 = math.cos(pi * 1.5 - m) * rp + self.rx
-                py2 = -math.sin(pi * 1.5 - m) * rp + self.ry
-                flag = 0 if self.darkmode == True else 1
-                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 {flag} {px1} {py1}z'
+                m = (rad - pi * 1.5) / (pi * 0.5)
+                flag1, flag2 = (1, 0) if self.darkmode == True else (0, 1)
+                px1 = cos(pi * 1.5 + m) * self.r + self.rx
+                py1 = sin(pi * 1.5 + m) * self.r + self.ry
+                px2 = cos(pi * 1.5 + m) * self.r + self.rx
+                py2 = -sin(pi * 1.5 + m) * self.r + self.ry
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 {flag1} {flag2} {px2} {py2} {ra2*0.98} {ra3*0.98} 0 1 1 {px1} {py1}z'
                 ps = phase(rad)
                 ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
         else:
-            if phase(rad) == 'n':
-                px1 = math.cos(pi * 0.5 + m) * rp + self.rx
-                py1 = math.sin(pi * 0.5 + m) * rp + self.ry
-                px2 = math.cos(pi * 0.5 + m) * rp + self.rx
-                py2 = -math.sin(pi * 0.5 + m) * rp + self.ry
-                flag = 0 if self.darkmode == True else 1
-                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 {flag} {px1} {py1}z'
+            if pi * 0.5 > rad >= 0:  # new moon to first quarter
+                m = (pi * 0.5 - rad) / (pi * 0.5)
+                flag1, flag2 = (1, 0) if self.darkmode == True else (0, 1)
+                px1 = cos(pi * 1.5 + m) * self.r + self.rx
+                py1 = sin(pi * 1.5 + m) * self.r + self.ry
+                px2 = cos(pi * 1.5 + m) * self.r + self.rx
+                py2 = -sin(pi * 1.5 + m) * self.r + self.ry
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 {flag1} {flag2} {px2} {py2} {ra2*0.98} {ra3*0.98} 0 1 1 {px1} {py1}z'
                 ps = phase(rad)
                 ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
-            elif rad < pi * 0.5:
-                px1 = math.cos(pi * 1.5 - m) * rp + self.rx
-                py1 = math.sin(pi * 1.5 - m) * rp + self.ry
-                px2 = math.cos(pi * 1.5 - m) * rp + self.rx
-                py2 = -math.sin(pi * 1.5 - m) * rp + self.ry
-                flag = 0 if self.darkmode == True else 1
-                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 {flag} {px1} {py1}z'
+            elif pi > rad >= pi * 0.5:  # first quarter to full moon
+                if cairo_fix == True:
+                    m = 0
+                    flag1, flag2 = (1, 1) if self.darkmode == True else (0, 0)
+                else:
+                    m = (rad - pi * 0.5) / (pi * 0.5)
+                    flag1, flag2 = (0, 0) if self.darkmode == True else (1, 1)
+                px1 = cos(pi * 1.5 - m) * self.r + self.rx
+                py1 = sin(pi * 1.5 - m) * self.r + self.ry
+                px2 = cos(pi * 1.5 - m) * self.r + self.rx
+                py2 = -sin(pi * 1.5 - m) * self.r + self.ry
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 {flag1} {flag2} {px2} {py2} {ra2*0.98} {ra3*0.98} 0 1 0 {px1} {py1}z'
                 ps = phase(rad)
                 ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
-            elif pi > rad >= pi * 0.5:
-                px1 = math.cos(pi * 1.5 + m) * rp + rx
-                py1 = math.sin(pi * 1.5 + m) * rp + ry
-                px2 = math.cos(pi * 1.5 + m) * rp + rx
-                py2 = -math.sin(pi * 1.5 + m) * rp + ry
-                flag = 1 if self.darkmode == True else 0
-                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 {flag} {px1} {py1}z'
+            elif pi * 1.5 > rad >= pi:  # full moon to third quarter
+                if cairo_fix == True:
+                    m = 0
+                    flag1, flag2 = (1, 1) if self.darkmode == True else (0, 0)
+                else:
+                    m = (pi * 1.5 - rad) / (pi * 0.5)
+                    flag1, flag2 = (0, 0) if self.darkmode == True else (1, 1)
+                px1 = cos(pi * 0.5 - m) * self.r + self.rx
+                py1 = sin(pi * 0.5 - m) * self.r + self.ry
+                px2 = cos(pi * 0.5 - m) * self.r + self.rx
+                py2 = -sin(pi * 0.5 - m) * self.r + self.ry
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 {flag1} {flag2} {px2} {py2} {ra2*0.98} {ra3*0.98} 0 1 0 {px1} {py1}z'
                 ps = phase(rad)
                 ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
-            elif pi * 1.5 > rad >= pi:
-                px1 = math.cos(pi * 0.5 + m) * rp + self.rx
-                py1 = math.sin(pi * 0.5 + m) * rp + self.ry
-                px2 = math.cos(pi * 0.5 + m) * rp + self.rx
-                py2 = -math.sin(pi * 0.5 + m) * rp + self.ry
-                flag = 1 if self.darkmode == True else 0
-                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 {flag} {px1} {py1}z'
-                ps = phase(rad)
-                ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
-            else:
-                px1 = math.cos(pi * 0.5 - m) * rp + self.rx
-                py1 = math.sin(pi * 0.5 - m) * rp + self.ry
-                px2 = math.cos(pi * 0.5 - m) * rp + self.rx
-                py2 = -math.sin(pi * 0.5 - m) * rp + self.ry
-                flag = 0 if self.darkmode == True else 1
-                dm = f'M{px1} {py1} A{ra1} {ra1} 0 1 1 {px2} {py2} {ra2} {ra3} 0 0 {flag} {px1} {py1}z'
+            else:  # third quarter to new moon
+                m = (rad - pi * 1.5) / (pi * 0.5)
+                flag1, flag2 = (1, 0) if self.darkmode == True else (0, 1)
+                px1 = cos(pi * 0.5 + m) * self.r + self.rx
+                py1 = sin(pi * 0.5 + m) * self.r + self.ry
+                px2 = cos(pi * 0.5 + m) * self.r + self.rx
+                py2 = -sin(pi * 0.5 + m) * self.r + self.ry
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 {flag1} {flag2} {px2} {py2} {ra2*0.98} {ra3*0.98} 0 1 1 {px1} {py1}z'
                 ps = phase(rad)
                 ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
         return dm, ps, ram
