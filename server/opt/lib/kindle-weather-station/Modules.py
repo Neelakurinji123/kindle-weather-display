@@ -1251,15 +1251,9 @@ class Moonphase:
             else:
                 a = str()
             return a
-        
-        # moon phase:  360d = 2pi(rad)
-        #lat = -1  # test
-        #if self.darkmode == True:
-        #    self.lat = -self.lat
             
         if not self.p.config['cloudconvert'] == True:  # cairo fix
             cairo_fix = True
-            self.lat = -self.lat
         else:
             cairo_fix = False
 
@@ -1283,29 +1277,29 @@ class Moonphase:
             elif pi > rad >= pi * 0.5:  # first quarter to full moon
                 if cairo_fix == True:
                     m = 0
-                    flag1, flag2 = (1, 1) if self.darkmode == True else (0, 0)
+                    flag1, flag2, flag3 = (0, 0, 1) if self.darkmode == True else (1, 1, 1)
                 else:
                     m = (rad - pi * 0.5) / (pi * 0.5)
-                    flag1, flag2 = (0, 0) if self.darkmode == True else (1, 1)
+                    flag1, flag2, flag3 = (0, 0, 0) if self.darkmode == True else (1, 1, 0)
                 px1 = cos(pi * 0.5 - m) * self.r + self.rx
                 py1 = sin(pi * 0.5 - m) * self.r + self.ry
                 px2 = cos(pi * 0.5 - m) * self.r + self.rx
                 py2 = -sin(pi * 0.5 - m) * self.r + self.ry
-                dm = f'M{px1} {py1} A{ra1} {ra1} 0 {flag1} {flag2} {px2} {py2} {ra2*0.98} {ra3*0.98} 0 1 0 {px1} {py1}z'
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 {flag1} {flag2} {px2} {py2} {ra2*0.98} {ra3*0.98} 0 1 {flag3} {px1} {py1}z'
                 ps = phase(rad)
                 ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
             elif pi * 1.5 > rad >= pi:  # full moon to third quarter
                 if cairo_fix == True:
                     m = 0
-                    flag1, flag2 = (1, 1) if self.darkmode == True else (0, 0)
+                    flag1, flag2, flag3 = (0, 0, 1) if self.darkmode == True else (1, 1, 1)
                 else:
                     m = (pi * 1.5 - rad) / (pi * 0.5)
-                    flag1, flag2 = (0, 0) if self.darkmode == True else (1, 1)
+                    flag1, flag2, flag3 = (0, 0, 0) if self.darkmode == True else (1, 1, 0)
                 px1 = cos(pi * 1.5 - m) * self.r + self.rx
                 py1 = sin(pi * 1.5 - m) * self.r + self.ry
                 px2 = cos(pi * 1.5 - m) * self.r + self.rx
                 py2 = -sin(pi * 1.5 - m) * self.r + self.ry
-                dm = f'M{px1} {py1} A{ra1} {ra1} 0 {flag1} {flag2} {px2} {py2} {ra2*0.98} {ra3*0.98} 0 1 0 {px1} {py1}z'
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 {flag1} {flag2} {px2} {py2} {ra2*0.98} {ra3*0.98} 0 1 {flag3} {px1} {py1}z'
                 ps = phase(rad)
                 ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
             else:  # third quarter to new moon
@@ -1332,29 +1326,29 @@ class Moonphase:
             elif pi > rad >= pi * 0.5:  # first quarter to full moon
                 if cairo_fix == True:
                     m = 0
-                    flag1, flag2 = (1, 1) if self.darkmode == True else (0, 0)
+                    flag1, flag2, flag3 = (0, 0, 1) if self.darkmode == True else (1, 1, 1)
                 else:
                     m = (rad - pi * 0.5) / (pi * 0.5)
-                    flag1, flag2 = (0, 0) if self.darkmode == True else (1, 1)
+                    flag1, flag2, flag3 = (0, 0, 0) if self.darkmode == True else (1, 1, 0)
                 px1 = cos(pi * 1.5 - m) * self.r + self.rx
                 py1 = sin(pi * 1.5 - m) * self.r + self.ry
                 px2 = cos(pi * 1.5 - m) * self.r + self.rx
                 py2 = -sin(pi * 1.5 - m) * self.r + self.ry
-                dm = f'M{px1} {py1} A{ra1} {ra1} 0 {flag1} {flag2} {px2} {py2} {ra2*0.98} {ra3*0.98} 0 1 0 {px1} {py1}z'
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 {flag1} {flag2} {px2} {py2} {ra2*0.98} {ra3*0.98} 0 1 {flag3} {px1} {py1}z'
                 ps = phase(rad)
                 ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
             elif pi * 1.5 > rad >= pi:  # full moon to third quarter
                 if cairo_fix == True:
                     m = 0
-                    flag1, flag2 = (1, 1) if self.darkmode == True else (0, 0)
+                    flag1, flag2, flag3 = (0, 0, 1) if self.darkmode == True else (1, 1, 1)
                 else:
                     m = (pi * 1.5 - rad) / (pi * 0.5)
-                    flag1, flag2 = (0, 0) if self.darkmode == True else (1, 1)
+                    flag1, flag2, flag3 = (0, 0, 0) if self.darkmode == True else (1, 1, 0)
                 px1 = cos(pi * 0.5 - m) * self.r + self.rx
                 py1 = sin(pi * 0.5 - m) * self.r + self.ry
                 px2 = cos(pi * 0.5 - m) * self.r + self.rx
                 py2 = -sin(pi * 0.5 - m) * self.r + self.ry
-                dm = f'M{px1} {py1} A{ra1} {ra1} 0 {flag1} {flag2} {px2} {py2} {ra2*0.98} {ra3*0.98} 0 1 0 {px1} {py1}z'
+                dm = f'M{px1} {py1} A{ra1} {ra1} 0 {flag1} {flag2} {px2} {py2} {ra2*0.98} {ra3*0.98} 0 1 {flag3} {px1} {py1}z'
                 ps = phase(rad)
                 ram = calc_ramadhan(self.day, self.mon, self.yr) if self.ramadhan == True else str()
             else:  # third quarter to new moon
