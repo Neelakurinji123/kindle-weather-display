@@ -1135,8 +1135,8 @@ class GraphPane:
                 jour = i18n["abbreviated_weekday"][jour] if not i18n == dict() else jour
                 yr, mon, day, _, _, _, _, _, _ = datetime.fromtimestamp(weather['dt'], tz).timetuple()  
                 lat = float(p.config['lat'])
-                moonrise = '--:--' if weather['moonrise'] == 0 else str(datetime.fromtimestamp(weather['moonrise'], tz).strftime('%H:%M'))
-                moonset = '--:--' if weather['moonset'] == 0 else str(datetime.fromtimestamp(weather['moonset'], tz).strftime('%H:%M'))                
+                moonrise = '--:--' if weather['moonrise'] == 0 else str(datetime.fromtimestamp(weather['moonrise'], tz).strftime('%-H:%M'))
+                moonset = '--:--' if weather['moonset'] == 0 else str(datetime.fromtimestamp(weather['moonset'], tz).strftime('%-H:%M'))                
                 if p.config['landscape'] == True:
                     _x = int(sp_x + (box_size_x + grid) * n) 
                     _y = y - 10
@@ -1151,14 +1151,16 @@ class GraphPane:
                     style = f'fill:{fill};stroke:{stroke_color};stroke-width:1px;'
                     i += m.svg(dm=dm, ps=ps, stroke_color=stroke_color, r_plus=2, stroke=stroke, style=style)
                     # Text: moonrise and moonset
-                    s += SVGtools.text('middle', '25', (_x + half), (_y + 80), moonrise).svg()
-                    s += SVGtools.text(anchor='middle', fontsize='25', x=(_x + half), y=(_y + 103), v=moonset, stroke='rgb(128,128,128)').svg()
+                    s += SVGtools.text('end', '20', (_x + box_size_x - 12), (_y + 100), moonrise).svg()
+                    s += SVGtools.text('start', '20', (_x + 12), (_y + 100), moonset, stroke='rgb(128,128,128)').svg()
+                    #s += SVGtools.text('middle', '25', (_x + half), (_y + 80), moonrise).svg()
+                    #s += SVGtools.text(anchor='middle', fontsize='25', x=(_x + half), y=(_y + 103), v=moonset, stroke='rgb(128,128,128)').svg()
                     # Text: moon phase and ramadhan
                     d = {'n': 'new', '1': 'first', 'f': 'full', '3': 'last'}
                     ps = d[ps] if ps in d else str()
                     ram = 'ram' if ram == 'r' else str()
                     cap = ','.join(x for x in [ps, ram] if not x == str())
-                    s += SVGtools.text2('middle', 'bold', '18', (_x + half), (_y + 55), cap).svg()
+                    s += SVGtools.text2('middle', 'bold', '18', (_x + half), (_y + 60), cap).svg()
                 else:
                     _x = int(sp_x + (box_size_x + grid) * (n - start)) 
                     _y = y + 25  
@@ -1218,12 +1220,9 @@ class Moonphase:
         sin = math.sin
         
         def phase(rad):
-            if self.p.config['cloudconvert'] == True:
-                one_day_step = 2 * pi / 56
-            else:
-                one_day_step = abs(2 * pi / 56)  # cairo fix
-                
-            if one_day_step > rad >= 0 or one_day_step > (pi * 2 - rad) >= 0:
+            #one_day_step = 2 * pi / 56
+            one_day_step = 2 * pi / 54
+            if one_day_step > rad >= 0 or one_day_step > abs(pi * 2 - rad) >= 0:
                 a = 'n'
             elif one_day_step > abs(rad - pi * 0.5) >= 0:
                 a = '1'
