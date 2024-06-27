@@ -619,17 +619,17 @@ class TwitterPane:
         client.load_cookies(path='/tmp/cookies.json')
         user = client.get_user_by_screen_name(screen_name)
         tweets = user.get_tweets('Tweets', count=1)
-        tweets_to_store = []
-        for tweet in tweets:
-            tweets_to_store.append({
-                'created_at': tweet.created_at,
-                'favorite_count': tweet.favorite_count,
-                'full_text': tweet.full_text,
-            })
+        tweet = tweets[0]
+        tweet_item = {
+            'created_at': tweet.created_at,
+            'favorite_count': tweet.favorite_count,
+            'full_text': tweet.full_text,
+        }
         # sort out: url and text
-        pattern = r'http[s]*\S+'
-        urls = re.findall(pattern, tweets_to_store[0]['full_text'])
-        full_text = re.sub(pattern, '', tweets_to_store[0]['full_text'])
+        pattern = r'http[s]*\S+[(\s+)|(\n+)]'
+        urls = re.findall(pattern, tweet_item['full_text'])
+        urls = list(map(lambda x: re.sub(r'[\n+|\s+]', '', x) , urls))
+        full_text = re.sub(pattern, '', tweet_item['full_text'])
         # translation
         if translate == 'True':
             _b = GoogleTranslator(source='auto', target='en').translate(full_text)
@@ -654,7 +654,7 @@ class TwitterPane:
                 break
         # time validation
         c = int()
-        d_object = datetime.strptime(tweets_to_store[0]['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
+        d_object = datetime.strptime(tweet_item['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
         epoch = int(d_object.timestamp()) + self.p.timezone_offset # UTC + timezone_offset
         if re.match(r'[0-9.]+m', expiration):
             c = re.sub(r'([0-9.]+)m', r'\1',expiration)

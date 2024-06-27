@@ -8,13 +8,14 @@ import json
 from deep_translator import GoogleTranslator
 #import pandas as pd
 
-settings = 'settings_twitter.json'
-with open(settings, 'r') as f:
+#setting = 'settings_twitter.json'
+setting = 'setting_landscape_twitter_tomorrowio.json'
+with open(setting, 'r') as f:
     service = json.load(f)['station']
     twitter = service['twitter']
     screen_name = twitter['screen_name']
 
-twitter_config = 'twitter_config.json'
+twitter_config = 'config/twitter_ID.json'
 with open(twitter_config, 'r') as f:
     t = json.load(f)['twitter']
     user =  t["user_screen_name"]
