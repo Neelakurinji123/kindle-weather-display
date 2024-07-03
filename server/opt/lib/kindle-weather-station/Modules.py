@@ -662,7 +662,6 @@ class TwitterPane:
         elif re.match(r'[0-9.]+h', expiration):
             c = re.sub(r'([0-9.]+)h', r'\1',expiration)
             _c = float(c) * 60 * 60
-
         if self.p.now - epoch <= _c and processing == True:
             processing = True
         elif self.p.now - epoch > _c and processing == True:
@@ -691,7 +690,12 @@ class TwitterPane:
                 url = alternate_url 
         else:
             a, url = None, None
-        return SVGtools.fontfamily(font=self.p.config['font'], _svg=a).svg(), url, processing
+     
+        if processing == True:
+            _text = SVGtools.fontfamily(font=self.p.config['font'], _svg=a).svg()
+        else:
+            _text = str()
+        return _text, url, processing
         
     def qrcode(self, url):
         import qrcode

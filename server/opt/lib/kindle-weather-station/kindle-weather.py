@@ -81,17 +81,20 @@ def svg_processing(p, text=str(), draw=str(), y=0):
                 _text, url, processing = a.text()
                 if processing == True:
                     text += _text
-                    #draw += a.draw(url)
                     qr_png_val = a.qrcode(url)
                 else:
                     # Alternate layout
                     p.config['layout'] = p.config['twitter']['alternate']
-                    text, draw = svg_processing(p=p, text=text, draw=draw, y=y)
+                    p.config['graph_objects'] = graph_objects
+                    text, draw, qr_png_val = svg_processing(p=p, text=text, draw=draw, y=y)
+                    break
             except Exception as e:
                 # Alternate layout
                 print(e)
                 p.config['layout'] = p.config['twitter']['alternate']
-                text, draw = svg_processing(p=p, text=text, draw=draw, y=y)
+                p.config['graph_objects'] = graph_objects
+                text, draw, qr_png_val = svg_processing(p=p, text=text, draw=draw, y=y)
+                break
         elif s == 'graph':
             obj = graph_objects.pop()
             if p.config['landscape'] == True:
