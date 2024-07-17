@@ -165,9 +165,11 @@ class Maintenant:
             #w[0] = d["abbreviated_weekday"][w[0][:-1]] + ',' if not d == dict() else w[0]
             #w[2] = d["abbreviated_month"][w[2]] if not d == dict() else w[2]
             if self.p.config['landscape'] == True:
-                x_sunrise = 540
+                x_date = 20
+                x_sunrise = x_date + 520
                 x_sunset = x_sunrise + 125
-                x_date = 20            
+                x_moon = 775
+                r = 12      
                 # moon icon
                 d = dark_mode(self.p, self.p.now, weather['sunrise'], weather['sunset'])
                 if d == True:
@@ -176,11 +178,10 @@ class Maintenant:
                 else:
                     fg_color = 'rgb(0,0,0)'
                     bg_color = 'rgb(255,255,255)'
-                x_moon = 775
-                r = 12
+                
                 yr, mon, day, _, _, _, _, _, _ = datetime.now().timetuple()
                 kw = {'p': self.p, 'day': day, 'mon': mon, 'yr': yr, 'lat': float(self.p.config['lat']), 'rx': x_moon, 'ry': (y - 10), 'r': r, 'ramadhan': self.p.config['ramadhan']}
-                a += SVGtools.circle(x_moon, (y - 10), r-1, fg_color, 0, fg_color).svg()
+                a += SVGtools.circle(x_moon, (y - 10), (r - 1), fg_color, 0, fg_color).svg()
                 m = Moonphase(**kw)
                 dm, ps, ram = m.calc()
                 style = f'fill:{bg_color};stroke:{bg_color};stroke-width:0px;'
@@ -1154,6 +1155,8 @@ class GraphPane:
                     dm, ps, ram = m.calc()
                     style = f'fill:{fill};stroke:{stroke_color};stroke-width:1px;'
                     i += m.svg(dm=dm, ps=ps, stroke_color=stroke_color, r_plus=2, stroke=stroke, style=style)
+                    if m.darkmode == True and ps == 'f':
+                        i += SVGtools.circle(_x + half, _y + 15, r + 1, 'rgb(0,0,0)', '2', 'rgb(0,0,0)').svg()
                     # Text: moonrise and moonset
                     s += SVGtools.text('end', '20', (_x + box_size_x - 12), (_y + 95), moonrise).svg()
                     s += SVGtools.text('start', '20', (_x + 12), (_y + 95), moonset, stroke='rgb(128,128,128)').svg()
