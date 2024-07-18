@@ -1177,6 +1177,8 @@ class GraphPane:
                     dm, ps, ram = m.calc()
                     style = f'fill:{fill};stroke:{stroke_color};stroke-width:1px;'
                     i += m.svg(dm=dm, ps=ps, stroke_color=stroke_color, r_plus=2, stroke=stroke, style=style)
+                    if m.darkmode == True and ps == 'f':
+                        i += SVGtools.circle(_x + half, _y + 7, r + 1, 'rgb(0,0,0)', '2', 'rgb(0,0,0)').svg()
                     # Text: moonrise and moonset
                     s += SVGtools.text('middle', '16', (_x + int(box_size_x * 0.5)), (_y + 50), moonrise).svg()
                     s += SVGtools.text('middle', '16', (_x + int(box_size_x * 0.5)), (_y + 68), moonset).svg()
