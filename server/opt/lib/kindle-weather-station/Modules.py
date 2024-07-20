@@ -186,6 +186,8 @@ class Maintenant:
                 dm, ps, ram = m.calc()
                 style = f'fill:{bg_color};stroke:{bg_color};stroke-width:0px;'
                 a += m.svg(dm=dm, ps=ps, stroke_color=bg_color, r_plus=0, stroke=0, style=style)
+                if m.darkmode == True and ps == 'f':
+                    a += SVGtools.circle(x_moon, (y - 10), r, 'rgb(0,0,0)', '2', 'rgb(0,0,0)').svg()
             else:
                 x_sunrise = 365
                 x_sunset = x_sunrise + 135
